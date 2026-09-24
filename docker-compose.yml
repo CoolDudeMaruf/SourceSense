@@ -1,0 +1,67 @@
+services:
+  # ── PostgreSQL ───────────────────────────────────────────────────────────────
+  db:
+    image: postgres:16-alpine
+    container_name: sourcesense_db
+    environment:
+      POSTGRES_USER: sourcesense
+      POSTGRES_PASSWORD: sourcesense
+      POSTGRES_DB: sourcesense
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sourcesense"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # ── FastAPI Backend ──────────────────────────────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: sourcesense_backend
+    environment:
+      DATABASE_URL: postgresql+asyncpg://sourcesense:sourcesense@db:5432/sourcesense
+      SYNC_DATABASE_URL: postgresql://sourcesense:sourcesense@db:5432/sourcesense
+      DEFAULT_PM10_THRESHOLD: "50.0"
+      DEFAULT_RELAY_DELAY_MINUTES: "5"
+      DEFAULT_CALIB_A: "0.33"
+      DEFAULT_CALIB_B: "0.17"
+      # Alert credentials (optional — leave blank to skip)
+      TWILIO_ACCOUNT_SID: "${TWILIO_ACCOUNT_SID:-}"
+      TWILIO_AUTH_TOKEN: "${TWILIO_AUTH_TOKEN:-}"
+      TWILIO_FROM_NUMBER: "${TWILIO_FROM_NUMBER:-}"
+      SMTP_HOST: "${SMTP_HOST:-}"
+      SMTP_USER: "${SMTP_USER:-}"
+      SMTP_PASSWORD: "${SMTP_PASSWORD:-}"
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+    working_dir: /app
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+  # ── React Frontend ───────────────────────────────────────────────────────────
+  frontend:
+    image: node:20-alpine
+    container_name: sourcesense_frontend
+    working_dir: /app
+    volumes:
+      - ./frontend:/app
+    ports:
+      - "5173:5173"
+    environment:
+      VITE_API_URL: "http://localhost:8000"
+      VITE_WS_URL: "ws://localhost:8000"
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:
