@@ -9,8 +9,8 @@ export default function NodeMap({ nodes = [], latestReadings = {}, selectedNodeI
     longitude: 90.4125,
     latitude: 23.8103,
     zoom: 12,
-    pitch: 45,
-    bearing: -17.6
+    pitch: 0,
+    bearing: 0
   });
   
   const [popupInfo, setPopupInfo] = useState(null);

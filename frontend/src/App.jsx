@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, NavLink } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, NavLink, useLocation } from 'react-router-dom';
 import { Activity, Server, List, Leaf, ShieldCheck } from 'lucide-react';
 import Dashboard from './pages/Dashboard';
 import NodeManagement from './pages/NodeManagement';
@@ -74,28 +74,43 @@ function Sidebar() {
   );
 }
 
+function Layout() {
+  const location = useLocation();
+  const isContestDashboard = location.pathname === '/';
+
+  if (isContestDashboard) {
+    return (
+      <Routes>
+        <Route path="/" element={<ContestDashboard />} />
+      </Routes>
+    );
+  }
+
+  return (
+    <div style={{ display: 'flex', minHeight: '100vh' }}>
+      <Sidebar />
+      <main
+        style={{
+          flex: 1,
+          padding: '28px 32px',
+          maxWidth: 'calc(100vw - 220px)',
+          overflowX: 'hidden',
+        }}
+      >
+        <Routes>
+          <Route path="/nodes" element={<NodeManagement />} />
+          <Route path="/events" element={<EventLog />} />
+          <Route path="/judge" element={<JudgeView />} />
+        </Routes>
+      </main>
+    </div>
+  );
+}
+
 export default function App() {
   return (
     <BrowserRouter>
-      <div style={{ display: 'flex', minHeight: '100vh' }}>
-        <Sidebar />
-        <main
-          style={{
-            flex: 1,
-            padding: '28px 32px',
-            maxWidth: 'calc(100vw - 220px)',
-            overflowX: 'hidden',
-          }}
-        >
-          <Routes>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/nodes" element={<NodeManagement />} />
-            <Route path="/events" element={<EventLog />} />
-            <Route path="/judge" element={<JudgeView />} />
-            <Route path="/contest-dashboard" element={<ContestDashboard />} />
-          </Routes>
-        </main>
-      </div>
+      <Layout />
     </BrowserRouter>
   );
 }
