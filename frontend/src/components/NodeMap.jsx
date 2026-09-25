@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import Map, { Marker, Popup } from 'react-map-gl/maplibre';
 import * as maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
@@ -14,31 +14,54 @@ export default function NodeMap({ nodes = [], latestReadings = {}, selectedNodeI
   });
   
   const [popupInfo, setPopupInfo] = useState(null);
+  const [mapType, setMapType] = useState('street');
 
   // Using a custom raster style for MapLibre so we don't need API keys
-  const mapStyle = {
-    version: 8,
-    sources: {
-      osm: {
-        type: 'raster',
-        tiles: ['https://a.tile.openstreetmap.org/{z}/{x}/{y}.png'],
-        tileSize: 256,
-        attribution: '&copy; OpenStreetMap Contributors'
-      }
-    },
-    layers: [
-      {
-        id: 'osm',
-        type: 'raster',
-        source: 'osm',
-        minzoom: 0,
-        maxzoom: 22
-      }
-    ]
-  };
+  const mapStyle = useMemo(() => {
+    const tileUrl = mapType === 'satellite'
+      ? 'https://mt1.google.com/vt/lyrs=y&hl=en&x={x}&y={y}&z={z}'
+      : 'https://mt1.google.com/vt/lyrs=m&hl=en&x={x}&y={y}&z={z}';
+      
+    return {
+      version: 8,
+      sources: {
+        osm: {
+          type: 'raster',
+          tiles: [tileUrl],
+          tileSize: 256,
+          attribution: 'Map data &copy; Google'
+        }
+      },
+      layers: [
+        {
+          id: 'osm',
+          type: 'raster',
+          source: 'osm',
+          minzoom: 0,
+          maxzoom: 22
+        }
+      ]
+    };
+  }, [mapType]);
 
   return (
     <div className="glass-card overflow-hidden relative" style={{ height: 500 }}>
+      {/* Map Type Toggle */}
+      <div style={{ position: 'absolute', top: 10, right: 10, zIndex: 10, display: 'flex', gap: '4px', background: 'rgba(10, 15, 26, 0.8)', padding: '4px', borderRadius: '8px', backdropFilter: 'blur(4px)', border: '1px solid rgba(255,255,255,0.1)' }}>
+        <button 
+          onClick={() => setMapType('street')}
+          style={{ padding: '4px 12px', fontSize: '0.75rem', borderRadius: '4px', border: 'none', background: mapType === 'street' ? 'var(--brand-500, #38bdf8)' : 'transparent', color: mapType === 'street' ? '#fff' : '#aaa', cursor: 'pointer', fontWeight: 600, transition: 'all 0.2s' }}
+        >
+          Street
+        </button>
+        <button 
+          onClick={() => setMapType('satellite')}
+          style={{ padding: '4px 12px', fontSize: '0.75rem', borderRadius: '4px', border: 'none', background: mapType === 'satellite' ? 'var(--brand-500, #38bdf8)' : 'transparent', color: mapType === 'satellite' ? '#fff' : '#aaa', cursor: 'pointer', fontWeight: 600, transition: 'all 0.2s' }}
+        >
+          Satellite
+        </button>
+      </div>
+
       <Map
         {...viewState}
         onMove={evt => setViewState(evt.viewState)}

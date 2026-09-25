@@ -47,7 +47,7 @@ export default function Dashboard() {
           });
           setLatestReadings(prev => ({ ...latestMap, ...prev }));
         })
-        .catch(() => {});
+        .catch(() => { });
     }
 
     // 2. Fetch history specifically for the selected node for the timeline chart
@@ -58,7 +58,7 @@ export default function Dashboard() {
       if (list.length > 0) {
         setLatestReadings(prev => ({ ...prev, [selectedNodeId]: list[0] }));
       }
-    }).catch(() => {});
+    }).catch(() => { });
   }, [selectedNodeId, nodes]);
 
   useEffect(() => { loadReadings(); }, [loadReadings]);
@@ -100,11 +100,11 @@ export default function Dashboard() {
   }, [readings]);
 
   const classifierColors = {
-    construction_dust:  '#fbbf24',
+    construction_dust: '#fbbf24',
     vehicle_combustion: '#f97316',
-    waste_burning:      '#ef4444',
-    humid_haze:         '#38bdf8',
-    clean:              '#4ade80',
+    waste_burning: '#ef4444',
+    humid_haze: '#38bdf8',
+    clean: '#4ade80',
   };
 
   return (
@@ -116,7 +116,7 @@ export default function Dashboard() {
             Live Dashboard
           </h1>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.78rem', margin: '2px 0 0' }}>
-            Mumbai Pilot — Sense → Understand → Act
+            Source Sense
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -151,7 +151,7 @@ export default function Dashboard() {
                 style={{
                   borderColor: selectedNodeId === n.id ? 'var(--brand-500)' : undefined,
                   color: selectedNodeId === n.id ? 'var(--brand-400)' : undefined,
-                  fontSize: '0.75rem', 
+                  fontSize: '0.75rem',
                   padding: '4px 10px',
                   borderRadius: '4px',
                   whiteSpace: 'nowrap'
@@ -164,24 +164,24 @@ export default function Dashboard() {
           </div>
           {/* AI Mode Selector */}
           <div className="flex items-center gap-2 ml-auto p-1 rounded-md" style={{ background: 'var(--bg-secondary)' }}>
-             <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginLeft: 8 }}>AI MODE:</span>
-             {['MANUAL', 'SIMULATION', 'AUTONOMOUS'].map(mode => (
-               <button
-                 key={mode}
-                 style={{
-                   padding: '4px 12px',
-                   fontSize: '0.7rem',
-                   fontWeight: 700,
-                   borderRadius: '4px',
-                   background: selectedNode?.control_mode === mode ? 'var(--brand-500)' : 'transparent',
-                   color: selectedNode?.control_mode === mode ? '#fff' : 'var(--text-muted)',
-                   border: 'none',
-                   cursor: 'pointer'
-                 }}
-               >
-                 {mode}
-               </button>
-             ))}
+            <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginLeft: 8 }}>ACTION MODE:</span>
+            {['MANUAL', 'SIMULATION', 'AUTONOMOUS'].map(mode => (
+              <button
+                key={mode}
+                style={{
+                  padding: '4px 12px',
+                  fontSize: '0.7rem',
+                  fontWeight: 700,
+                  borderRadius: '4px',
+                  background: selectedNode?.control_mode === mode ? 'var(--brand-500)' : 'transparent',
+                  color: selectedNode?.control_mode === mode ? '#fff' : 'var(--text-muted)',
+                  border: 'none',
+                  cursor: 'pointer'
+                }}
+              >
+                {mode}
+              </button>
+            ))}
           </div>
         </div>
       )}
@@ -204,13 +204,13 @@ export default function Dashboard() {
               selectedNodeId={selectedNodeId}
               onSelectNode={setSelectedNodeId}
             />
-            <ActionWindow 
-              classifierLabel={currentReading?.classifier_label} 
-              isRelayOn={currentReading?.relay_state} 
+            <ActionWindow
+              classifierLabel={currentReading?.classifier_label}
+              isRelayOn={currentReading?.relay_state}
               confidence={currentReading?.classifier_confidence}
               reason={
                 currentReading?.relay_state
-                  ? `AI triggered: ${currentReading?.classifier_label?.replace(/_/g,' ') ?? 'anomaly detected'}. PM10: ${currentReading?.pm10_corrected?.toFixed(1) ?? '—'} µg/m³, PM2.5: ${currentReading?.pm2_5_corrected?.toFixed(1) ?? '—'} µg/m³`
+                  ? `AI triggered: ${currentReading?.classifier_label?.replace(/_/g, ' ') ?? 'anomaly detected'}. PM10: ${currentReading?.pm10_corrected?.toFixed(1) ?? '—'} µg/m³, PM2.5: ${currentReading?.pm2_5_corrected?.toFixed(1) ?? '—'} µg/m³`
                   : 'Monitoring — conditions within normal range'
               }
             />
@@ -229,12 +229,12 @@ export default function Dashboard() {
                 prevAqi={prevReading?.aqi}
               />
             </div>
-            
+
             {/* Relay */}
             <div className="glass-card p-5 flex flex-col items-center justify-center">
               <RelayStatus isOn={currentReading?.relay_state} nodeId={selectedNodeId} />
             </div>
-            
+
             {/* Impact Metric */}
             <div className="glass-card p-5 flex flex-col items-center justify-center" style={{ position: 'relative', overflow: 'hidden' }}>
               <div style={{ position: 'absolute', top: -30, right: -30, width: 80, height: 80, background: 'radial-gradient(circle, rgba(56, 189, 248, 0.2) 0%, rgba(0,0,0,0) 70%)', borderRadius: '50%' }} />
@@ -292,7 +292,7 @@ export default function Dashboard() {
                   AI PM10 Forecast
                 </div>
                 <div className="flex justify-between mb-2">
-                <div className="text-center">
+                  <div className="text-center">
                     <div style={{ fontSize: '0.6rem', color: 'var(--text-muted)' }}>+10m</div>
                     <div style={{ fontSize: '0.95rem', fontWeight: 700, color: '#f87171' }}>{currentReading?.forecast_10m?.toFixed(0) || '—'} <span style={{ fontSize: '0.55rem', color: 'var(--text-muted)' }}>µg</span></div>
                   </div>

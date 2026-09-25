@@ -1,8 +1,10 @@
 import { BrowserRouter, Routes, Route, NavLink } from 'react-router-dom';
-import { Activity, Server, List, Leaf } from 'lucide-react';
+import { Activity, Server, List, Leaf, ShieldCheck } from 'lucide-react';
 import Dashboard from './pages/Dashboard';
 import NodeManagement from './pages/NodeManagement';
 import EventLog from './pages/EventLog';
+import JudgeView from './pages/JudgeView';
+import ContestDashboard from './pages/ContestDashboard';
 import './index.css';
 
 function Sidebar() {
@@ -56,6 +58,9 @@ function Sidebar() {
         <NavLink to="/events" className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}>
           <List size={15} /> Event Log
         </NavLink>
+        <NavLink to="/judge" className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}>
+          <ShieldCheck size={15} /> Judge View
+        </NavLink>
       </div>
 
       {/* Footer */}
@@ -86,6 +91,8 @@ export default function App() {
             <Route path="/" element={<Dashboard />} />
             <Route path="/nodes" element={<NodeManagement />} />
             <Route path="/events" element={<EventLog />} />
+            <Route path="/judge" element={<JudgeView />} />
+            <Route path="/contest-dashboard" element={<ContestDashboard />} />
           </Routes>
         </main>
       </div>
