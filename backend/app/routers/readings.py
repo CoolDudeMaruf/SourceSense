@@ -143,7 +143,8 @@ async def ingest_reading(payload: SensorPayload, db: AsyncSession = Depends(get_
          forecast_30m=forecast_data["forecast_30m"],
          sensor_trust=trust_score,
          classifier_label=clf_result["label"],
-         classifier_confidence=clf_result["confidence"]
+         classifier_confidence=clf_result["confidence"],
+         aqi=aqi_result["aqi"]
     )
     
     # Safety Gate
@@ -177,6 +178,9 @@ async def ingest_reading(payload: SensorPayload, db: AsyncSession = Depends(get_
         classifier_label=clf_result["label"],
         classifier_confidence=clf_result["confidence"],
         relay_state=relay_state,
+        action_reason=safe_decision.get("reason"),
+        intensity=opt_plan.get("intensity") if relay_state else None,
+        duration_min=opt_plan.get("duration_min") if relay_state else None,
         sensor_trust_score=trust_score,
         forecast_10m=forecast_data["forecast_10m"],
         forecast_20m=forecast_data["forecast_20m"],
@@ -251,6 +255,9 @@ async def ingest_reading(payload: SensorPayload, db: AsyncSession = Depends(get_
         classifier_confidence=clf_result["confidence"],
         relay_state=relay_state,
         relay_action=relay_action,
+        action_reason=safe_decision.get("reason"),
+        intensity=opt_plan.get("intensity") if relay_state else None,
+        duration_min=opt_plan.get("duration_min") if relay_state else None,
         sensor_trust_score=trust_score,
         forecast_10m=forecast_data["forecast_10m"],
         forecast_20m=forecast_data["forecast_20m"],

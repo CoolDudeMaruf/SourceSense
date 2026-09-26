@@ -1,20 +1,31 @@
 import React from 'react';
 import ActionScene3D from './ActionScene3D';
 
-export default function ActionWindow({ classifierLabel, isRelayOn, confidence, reason }) {
+export default function ActionWindow({ classifierLabel, isRelayOn, confidence, reason, isGoodAqi, aqi = 0 }) {
   let actionText = "Monitoring environment...";
   let color = "#4ade80";
+  let activeLabel = isGoodAqi ? "clean" : classifierLabel;
+  let actionPrefix = aqi > 200 ? "Heavy Action Needed" : "Light Action Needed";
 
-  if (classifierLabel === "construction_dust") {
-    actionText = "Sprinkling Water Mist";
+  if (isGoodAqi) {
+    actionText = "Monitoring. Good AQI. No action needed.";
+  } else if (!isRelayOn) {
+    actionText = "Standby (Action Paused)";
+    color = "#facc15";
+  } else if (activeLabel === "construction_dust") {
+    actionText = `${actionPrefix}: Sprinkling Water Mist`;
     color = "#38bdf8";
-  } else if (classifierLabel === "vehicle_combustion") {
-    actionText = "Issuing Traffic Advisory";
+  } else if (activeLabel === "vehicle_combustion") {
+    actionText = aqi > 200 
+      ? `${actionPrefix}: Issuing Heavy Diversion`
+      : `${actionPrefix}: Issuing Route Advisory`;
     color = "#f97316";
-  } else if (classifierLabel === "waste_burning") {
-    actionText = "Dispatching Fire Control";
+  } else if (activeLabel === "waste_burning") {
+    actionText = aqi > 200
+      ? `${actionPrefix}: Multi-Unit Dispatch`
+      : `${actionPrefix}: Local Fire Inspector`;
     color = "#ef4444";
-  } else if (classifierLabel === "humid_haze") {
+  } else if (activeLabel === "humid_haze") {
     actionText = "No Action (Weather Event)";
     color = "#94a3b8";
   }
@@ -32,26 +43,28 @@ export default function ActionWindow({ classifierLabel, isRelayOn, confidence, r
           {actionText}
         </div>
         
-        {/* AI Confidence & Reason */}
-        <div className="flex flex-col items-center mt-2 w-full px-2">
-          {confidence && (
-            <div className="flex justify-between w-full mb-1">
-               <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>AI CONFIDENCE</span>
-               <span style={{ fontSize: '0.65rem', color: 'var(--text-secondary)', fontWeight: 700 }}>{(confidence * 100).toFixed(1)}%</span>
-            </div>
-          )}
-          {reason && (
-             <div style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', textAlign: 'center', background: 'rgba(255,255,255,0.05)', padding: '4px 8px', borderRadius: 4, width: '100%' }}>
-               {reason}
-             </div>
-          )}
-        </div>
+        {/* AI Confidence & Reason (Hidden during Good AQI) */}
+        {!isGoodAqi && (
+          <div className="flex flex-col items-center mt-2 w-full px-2">
+            {confidence && (
+              <div className="flex justify-between w-full mb-1">
+                 <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>AI CONFIDENCE</span>
+                 <span style={{ fontSize: '0.65rem', color: 'var(--text-secondary)', fontWeight: 700 }}>{(confidence * 100).toFixed(1)}%</span>
+              </div>
+            )}
+            {reason && (
+               <div style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', textAlign: 'center', background: 'rgba(255,255,255,0.05)', padding: '4px 8px', borderRadius: 4, width: '100%' }}>
+                 {reason}
+               </div>
+            )}
+          </div>
+        )}
       </div>
       
       {/* 3D Canvas Container */}
       <div className="flex-1 w-full mt-2" style={{ minHeight: 180 }}>
-        {/* We pass true for isRelayOn so the 3D preview always shows the action in motion! */}
-        <ActionScene3D classifierLabel={classifierLabel} isRelayOn={true} />
+        {/* We pass the actual isRelayOn state to control the 3D animation */}
+        <ActionScene3D classifierLabel={activeLabel} isRelayOn={isRelayOn} />
       </div>
     </div>
   );

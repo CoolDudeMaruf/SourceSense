@@ -51,6 +51,9 @@ class ReadingOut(BaseModel):
     classifier_label: Optional[str]
     classifier_confidence: Optional[float]
     relay_state: bool
+    action_reason: Optional[str] = None
+    intensity: Optional[float] = None
+    duration_min: Optional[int] = None
     quality_flags: dict
     is_synthetic: bool = False
     sensor_trust_score: float = 100.0

@@ -4,7 +4,6 @@ import Dashboard from './pages/Dashboard';
 import NodeManagement from './pages/NodeManagement';
 import EventLog from './pages/EventLog';
 import JudgeView from './pages/JudgeView';
-import ContestDashboard from './pages/ContestDashboard';
 import './index.css';
 
 function Sidebar() {
@@ -76,12 +75,12 @@ function Sidebar() {
 
 function Layout() {
   const location = useLocation();
-  const isContestDashboard = location.pathname === '/';
+  const isDashboard = location.pathname === '/';
 
-  if (isContestDashboard) {
+  if (isDashboard) {
     return (
       <Routes>
-        <Route path="/" element={<ContestDashboard />} />
+        <Route path="/" element={<Dashboard />} />
       </Routes>
     );
   }

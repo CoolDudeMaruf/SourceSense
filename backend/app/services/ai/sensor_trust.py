@@ -33,8 +33,8 @@ def get_sensor_trust(node_id: int, current_pm10: Optional[float], quality_flags:
     # Value jump anomalies
     if current_pm10 is not None and ctx["last_pm10"] is not None:
         jump = abs(current_pm10 - ctx["last_pm10"])
-        # If jump is larger than 300ug in a few seconds, it's highly suspicious
-        if jump > 300:
+        # If jump is larger than 600ug in a few seconds, it's highly suspicious
+        if jump > 600:
             ctx["trust_score"] -= 20.0
             ctx["consecutive_errors"] += 1
     

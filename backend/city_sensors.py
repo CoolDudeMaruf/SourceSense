@@ -39,103 +39,41 @@ API_URL = "http://127.0.0.1:8000/api/v1"
 # 'scenario' drives the sensor data generation logic.
 
 CITY_NODES = [
-    {
-        "name": "Node-01 Gulshan Construction",
-        "location_lat": 23.7925,
-        "location_lon": 90.4078,
-        "zone": "Z1",
-        "description": "Active high-rise construction site, heavy earthmoving equipment",
-        "control_mode": "AUTONOMOUS",
-        "pm10_threshold": 60.0,
-        "scenario": "construction_dust",
-        "calib_a": 0.33,
-        "calib_b": 0.17,
-    },
-    {
-        "name": "Node-02 Farmgate Traffic",
-        "location_lat": 23.7561,
-        "location_lon": 90.3872,
-        "zone": "Z2",
-        "description": "Dense traffic corridor, peak-hour diesel combustion",
-        "control_mode": "AUTONOMOUS",
-        "pm10_threshold": 70.0,
-        "scenario": "vehicle_combustion",
-        "calib_a": 0.28,
-        "calib_b": 0.15,
-    },
-    {
-        "name": "Node-03 Amin Bazar Dumping Ground",
-        "location_lat": 23.7915,
-        "location_lon": 90.3168,
-        "zone": "Z3",
-        "description": "Municipal waste dumping ground, periodic burn events",
-        "control_mode": "AUTONOMOUS",
-        "pm10_threshold": 80.0,
-        "scenario": "waste_burning",
-        "calib_a": 0.40,
-        "calib_b": 0.20,
-    },
-    {
-        "name": "Node-04 Hatirjheel Lakefront",
-        "location_lat": 23.7667,
-        "location_lon": 90.4069,
-        "zone": "Z4",
-        "description": "Lake promenade, sea-haze and salt aerosols",
-        "control_mode": "SIMULATION",
-        "pm10_threshold": 100.0,
-        "scenario": "humid_haze",
-        "calib_a": 0.20,
-        "calib_b": 0.10,
-    },
-    {
-        "name": "Node-05 Motijheel Commercial",
-        "location_lat": 23.7250,
-        "location_lon": 90.4172,
-        "zone": "Z5",
-        "description": "Premium commercial zone, greenery and low traffic",
-        "control_mode": "AUTONOMOUS",
-        "pm10_threshold": 50.0,
-        "scenario": "clean",
-        "calib_a": 0.25,
-        "calib_b": 0.12,
-    },
-    {
-        "name": "Node-06 Tejgaon Industrial",
-        "location_lat": 23.7600,
-        "location_lon": 90.3950,
-        "zone": "Z6",
-        "description": "Mixed industrial estate: construction + vehicle depot",
-        "control_mode": "AUTONOMOUS",
-        "pm10_threshold": 65.0,
-        "scenario": "mixed_industrial",
-        "calib_a": 0.35,
-        "calib_b": 0.18,
-    },
-    {
-        "name": "Node-07 Kamalapur Station Faulty",
-        "location_lat": 23.7330,
-        "location_lon": 90.4265,
-        "zone": "Z7",
-        "description": "Railway station vicinity, sensor has intermittent PM10 faults",
-        "control_mode": "AUTONOMOUS",
-        "pm10_threshold": 60.0,
-        "scenario": "faulty_sensor",
-        "calib_a": 0.30,
-        "calib_b": 0.15,
-    },
-    {
-        "name": "Node-08 Dhanmondi Lake Upwind",
-        "location_lat": 23.7461,
-        "location_lon": 90.3742,
-        "zone": "Z8",
-        "description": "Upwind lakeside, construction debris and seasonal dust storm",
-        "control_mode": "AUTONOMOUS",
-        "pm10_threshold": 55.0,
-        "scenario": "dust_storm_rising",
-        "calib_a": 0.32,
-        "calib_b": 0.16,
-    },
+    # --- High-Density Traffic & Commercial Hubs (Hazardous) ---
+    {"name": "Azimpur", "location_lat": 23.7270, "location_lon": 90.3830, "zone": "Traffic", "description": "High-Density Traffic & Commercial Hub", "control_mode": "AUTONOMOUS", "pm10_threshold": 120.0, "scenario": "vehicle_combustion", "calib_a": 0.28, "calib_b": 0.15},
+    {"name": "Paltan", "location_lat": 23.7330, "location_lon": 90.4130, "zone": "Traffic", "description": "High-Density Traffic & Commercial Hub", "control_mode": "AUTONOMOUS", "pm10_threshold": 120.0, "scenario": "vehicle_combustion", "calib_a": 0.28, "calib_b": 0.15},
+    {"name": "Gulistan", "location_lat": 23.7240, "location_lon": 90.4120, "zone": "Traffic", "description": "High-Density Traffic & Commercial Hub", "control_mode": "AUTONOMOUS", "pm10_threshold": 125.0, "scenario": "vehicle_combustion", "calib_a": 0.28, "calib_b": 0.15},
+    {"name": "Mohakhali", "location_lat": 23.7780, "location_lon": 90.4000, "zone": "Traffic", "description": "High-Density Traffic & Commercial Hub", "control_mode": "AUTONOMOUS", "pm10_threshold": 120.0, "scenario": "vehicle_combustion", "calib_a": 0.28, "calib_b": 0.15},
+    {"name": "Farmgate", "location_lat": 23.7561, "location_lon": 90.3872, "zone": "Traffic", "description": "High-Density Traffic & Commercial Hub", "control_mode": "AUTONOMOUS", "pm10_threshold": 120.0, "scenario": "vehicle_combustion", "calib_a": 0.28, "calib_b": 0.15},
+    {"name": "Shahbagh", "location_lat": 23.7380, "location_lon": 90.3950, "zone": "Traffic", "description": "High-Density Traffic & Commercial Hub", "control_mode": "AUTONOMOUS", "pm10_threshold": 110.0, "scenario": "vehicle_combustion", "calib_a": 0.28, "calib_b": 0.15},
+    {"name": "Mogbazar", "location_lat": 23.7480, "location_lon": 90.4030, "zone": "Traffic", "description": "High-Density Traffic & Commercial Hub", "control_mode": "AUTONOMOUS", "pm10_threshold": 115.0, "scenario": "vehicle_combustion", "calib_a": 0.28, "calib_b": 0.15},
+    {"name": "Gabtoli", "location_lat": 23.7820, "location_lon": 90.3440, "zone": "Traffic", "description": "High-Density Traffic & Commercial Hub", "control_mode": "AUTONOMOUS", "pm10_threshold": 130.0, "scenario": "vehicle_combustion", "calib_a": 0.28, "calib_b": 0.15},
+    {"name": "Jatrabari", "location_lat": 23.7100, "location_lon": 90.4320, "zone": "Traffic", "description": "High-Density Traffic & Commercial Hub", "control_mode": "AUTONOMOUS", "pm10_threshold": 125.0, "scenario": "vehicle_combustion", "calib_a": 0.28, "calib_b": 0.15},
+    {"name": "Sayedabad", "location_lat": 23.7140, "location_lon": 90.4260, "zone": "Traffic", "description": "High-Density Traffic & Commercial Hub", "control_mode": "AUTONOMOUS", "pm10_threshold": 125.0, "scenario": "vehicle_combustion", "calib_a": 0.28, "calib_b": 0.15},
+    {"name": "Abdullahpur", "location_lat": 23.8760, "location_lon": 90.3950, "zone": "Traffic", "description": "High-Density Traffic & Commercial Hub", "control_mode": "AUTONOMOUS", "pm10_threshold": 120.0, "scenario": "vehicle_combustion", "calib_a": 0.28, "calib_b": 0.15},
+
+    # --- Industrial Zones & Factory Hubs (Very Hazardous) ---
+    {"name": "Tejgaon Industrial Area", "location_lat": 23.7600, "location_lon": 90.3950, "zone": "Industrial", "description": "Industrial Zones & Factory Hubs", "control_mode": "AUTONOMOUS", "pm10_threshold": 150.0, "scenario": "mixed_industrial", "calib_a": 0.35, "calib_b": 0.18},
+    {"name": "Tongi", "location_lat": 23.8900, "location_lon": 90.4000, "zone": "Industrial", "description": "Industrial Zones & Factory Hubs", "control_mode": "AUTONOMOUS", "pm10_threshold": 160.0, "scenario": "mixed_industrial", "calib_a": 0.35, "calib_b": 0.18},
+    {"name": "Hazaribagh", "location_lat": 23.7340, "location_lon": 90.3700, "zone": "Industrial", "description": "Industrial Zones & Factory Hubs (Tanneries)", "control_mode": "AUTONOMOUS", "pm10_threshold": 165.0, "scenario": "mixed_industrial", "calib_a": 0.35, "calib_b": 0.18},
+    {"name": "Keraniganj", "location_lat": 23.6820, "location_lon": 90.3340, "zone": "Industrial", "description": "Industrial Zones & Factory Hubs", "control_mode": "AUTONOMOUS", "pm10_threshold": 155.0, "scenario": "mixed_industrial", "calib_a": 0.35, "calib_b": 0.18},
+    {"name": "Savar", "location_lat": 23.8480, "location_lon": 90.2560, "zone": "Industrial", "description": "Industrial Zones & Factory Hubs", "control_mode": "AUTONOMOUS", "pm10_threshold": 160.0, "scenario": "mixed_industrial", "calib_a": 0.35, "calib_b": 0.18},
+    {"name": "Gazipur", "location_lat": 23.9990, "location_lon": 90.4200, "zone": "Industrial", "description": "Industrial Zones & Factory Hubs", "control_mode": "AUTONOMOUS", "pm10_threshold": 170.0, "scenario": "mixed_industrial", "calib_a": 0.35, "calib_b": 0.18},
+    {"name": "Narayanganj", "location_lat": 23.6230, "location_lon": 90.5000, "zone": "Industrial", "description": "Industrial Zones & Factory Hubs", "control_mode": "AUTONOMOUS", "pm10_threshold": 175.0, "scenario": "mixed_industrial", "calib_a": 0.35, "calib_b": 0.18},
+
+    # --- High-Construction & Congested Residential Areas (Unhealthy) ---
+    {"name": "Mirpur", "location_lat": 23.8220, "location_lon": 90.3650, "zone": "Construction", "description": "High-Construction (South Pallabi & Section areas)", "control_mode": "AUTONOMOUS", "pm10_threshold": 130.0, "scenario": "construction_dust", "calib_a": 0.33, "calib_b": 0.17},
+    {"name": "Uttara", "location_lat": 23.8700, "location_lon": 90.4000, "zone": "Construction", "description": "High-Construction (Sectors near highway)", "control_mode": "AUTONOMOUS", "pm10_threshold": 125.0, "scenario": "construction_dust", "calib_a": 0.33, "calib_b": 0.17},
+    {"name": "Badda", "location_lat": 23.7800, "location_lon": 90.4260, "zone": "Construction", "description": "High-Construction & Congested Residential", "control_mode": "AUTONOMOUS", "pm10_threshold": 120.0, "scenario": "construction_dust", "calib_a": 0.33, "calib_b": 0.17},
+    {"name": "Rampura", "location_lat": 23.7610, "location_lon": 90.4190, "zone": "Construction", "description": "High-Construction & Congested Residential", "control_mode": "AUTONOMOUS", "pm10_threshold": 120.0, "scenario": "construction_dust", "calib_a": 0.33, "calib_b": 0.17},
+    {"name": "Lalbagh", "location_lat": 23.7160, "location_lon": 90.3880, "zone": "Construction", "description": "Congested Residential (Old Dhaka)", "control_mode": "AUTONOMOUS", "pm10_threshold": 115.0, "scenario": "construction_dust", "calib_a": 0.33, "calib_b": 0.17},
+    {"name": "Sutrapur", "location_lat": 23.7020, "location_lon": 90.4200, "zone": "Construction", "description": "Congested Residential (Old Dhaka)", "control_mode": "AUTONOMOUS", "pm10_threshold": 115.0, "scenario": "construction_dust", "calib_a": 0.33, "calib_b": 0.17},
+    {"name": "Islampur", "location_lat": 23.7080, "location_lon": 90.4020, "zone": "Construction", "description": "Congested Residential (Old Dhaka)", "control_mode": "AUTONOMOUS", "pm10_threshold": 115.0, "scenario": "construction_dust", "calib_a": 0.33, "calib_b": 0.17},
+
+    # --- Demo Testing Node ---
+    {"name": "Demo Test Node", "location_lat": 23.8103, "location_lon": 90.4125, "zone": "Demo", "description": "Alternates through all states every 10s", "control_mode": "AUTONOMOUS", "pm10_threshold": 100.0, "scenario": "demo_alternating", "calib_a": 1.0, "calib_b": 0.0, "skip_real_aqi": True},
 ]
+
 
 
 # ─── Sensor data generators per scenario ─────────────────────────────────────
@@ -342,6 +280,73 @@ def gen_dust_storm_rising(t):
     }
 
 
+_demo_state_index = 0
+_demo_last_switch = datetime.now()
+
+def gen_demo_alternating(t):
+    global _demo_state_index, _demo_last_switch
+    if (datetime.now() - _demo_last_switch).total_seconds() >= 5:
+        _demo_state_index = (_demo_state_index + 1) % 8
+        _demo_last_switch = datetime.now()
+
+    if _demo_state_index == 0:
+        # Clean - Good AQI
+        return {
+            "Temperature_C": _jitter(28.5), "Humidity_Percent": _jitter(58.0),
+            "PM1.0": _jitter(8.0), "PM2.5": _jitter(18.0), "PM10": _jitter(32.0),
+            "MQ2": _jitter(95), "MQ4": _jitter(65), "MQ6": _jitter(55), "MQ7": _jitter(70), "MQ8": _jitter(60), "MQ131": _jitter(40), "MQ135": _jitter(75)
+        }
+    elif _demo_state_index == 1:
+        # Construction Dust - MODERATE AQI
+        return {
+            "Temperature_C": _jitter(29.5), "Humidity_Percent": _jitter(62.0),
+            "PM1.0": _jitter(14.0), "PM2.5": _jitter(24.0), "PM10": _jitter(140.0),
+            "MQ2": _jitter(220), "MQ4": _jitter(180), "MQ6": _jitter(140), "MQ7": _jitter(110), "MQ8": _jitter(140), "MQ131": _jitter(85), "MQ135": _jitter(160)
+        }
+    elif _demo_state_index == 2:
+        # Construction Dust - HIGH AQI
+        return {
+            "Temperature_C": _jitter(29.5), "Humidity_Percent": _jitter(62.0),
+            "PM1.0": _jitter(18.0), "PM2.5": _jitter(28.0), "PM10": _jitter(245.0),
+            "MQ2": _jitter(290), "MQ4": _jitter(240), "MQ6": _jitter(190), "MQ7": _jitter(140), "MQ8": _jitter(190), "MQ131": _jitter(110), "MQ135": _jitter(210)
+        }
+    elif _demo_state_index == 3:
+        # Vehicle Combustion - MODERATE AQI
+        return {
+            "Temperature_C": _jitter(31.0), "Humidity_Percent": _jitter(55.0),
+            "PM1.0": _jitter(35.0), "PM2.5": _jitter(50.0), "PM10": _jitter(160.0),
+            "MQ2": _jitter(420), "MQ4": _jitter(150), "MQ6": _jitter(120), "MQ7": _jitter(500), "MQ8": _jitter(200), "MQ131": _jitter(100), "MQ135": _jitter(250)
+        }
+    elif _demo_state_index == 4:
+        # Vehicle Combustion - SEVERE AQI
+        return {
+            "Temperature_C": _jitter(31.0), "Humidity_Percent": _jitter(55.0),
+            "PM1.0": _jitter(50.0), "PM2.5": _jitter(75.0), "PM10": _jitter(290.0),
+            "MQ2": _jitter(580), "MQ4": _jitter(190), "MQ6": _jitter(150), "MQ7": _jitter(780), "MQ8": _jitter(290), "MQ131": _jitter(140), "MQ135": _jitter(380)
+        }
+    elif _demo_state_index == 5:
+        # Waste Burning - MODERATE AQI
+        return {
+            "Temperature_C": _jitter(34.0), "Humidity_Percent": _jitter(48.0),
+            "PM1.0": _jitter(45.0), "PM2.5": _jitter(65.0), "PM10": _jitter(170.0),
+            "MQ2": _jitter(500), "MQ4": _jitter(250), "MQ6": _jitter(190), "MQ7": _jitter(300), "MQ8": _jitter(250), "MQ131": _jitter(130), "MQ135": _jitter(400)
+        }
+    elif _demo_state_index == 6:
+        # Waste Burning - SEVERE AQI
+        return {
+            "Temperature_C": _jitter(34.0), "Humidity_Percent": _jitter(48.0),
+            "PM1.0": _jitter(75.0), "PM2.5": _jitter(110.0), "PM10": _jitter(320.0),
+            "MQ2": _jitter(680), "MQ4": _jitter(380), "MQ6": _jitter(280), "MQ7": _jitter(480), "MQ8": _jitter(380), "MQ131": _jitter(190), "MQ135": _jitter(580)
+        }
+    else:
+        # Humid Haze - High AQI (No Action Weather Event)
+        return {
+            "Temperature_C": _jitter(27.0), "Humidity_Percent": _jitter(92.0),
+            "PM1.0": _jitter(70.0), "PM2.5": _jitter(95.0), "PM10": _jitter(135.0),
+            "MQ2": _jitter(100), "MQ4": _jitter(75), "MQ6": _jitter(65), "MQ7": _jitter(80), "MQ8": _jitter(70), "MQ131": _jitter(45), "MQ135": _jitter(90)
+        }
+
+
 SCENARIO_GENERATORS = {
     "construction_dust": gen_construction_dust,
     "vehicle_combustion": gen_vehicle_combustion,
@@ -351,6 +356,7 @@ SCENARIO_GENERATORS = {
     "mixed_industrial":   gen_mixed_industrial,
     "faulty_sensor":      gen_faulty_sensor,
     "dust_storm_rising":  gen_dust_storm_rising,
+    "demo_alternating":   gen_demo_alternating,
 }
 
 SCENARIO_LABELS = {
@@ -362,15 +368,16 @@ SCENARIO_LABELS = {
     "mixed_industrial":   "[INDUST]  Mixed Industrial    -> SPRAY (combined)",
     "faulty_sensor":      "[FAULT]   Faulty Sensor       -> Safety block",
     "dust_storm_rising":  "[STORM]   Dust Storm Rising   -> Forecast SPRAY",
+    "demo_alternating":   "[DEMO]    Alternating States  -> Cycling all UI states",
 }
 
 
 # ─── Node management ──────────────────────────────────────────────────────────
 
 def get_or_create_node(node_info: dict, reset: bool = False) -> int:
-    """Find existing node by name or create it; optionally reset (delete+recreate)."""
+    """Find existing node by name or create it."""
     try:
-        nodes = requests.get(f"{API_URL}/nodes", timeout=30).json()
+        nodes = requests.get(f"{API_URL}/nodes?active_only=false", timeout=30).json()
     except Exception as e:
         print(f"  ERROR Cannot reach backend at {API_URL}: {e}")
         sys.exit(1)
@@ -387,16 +394,14 @@ def get_or_create_node(node_info: dict, reset: bool = False) -> int:
         "control_mode":       node_info.get("control_mode", "AUTONOMOUS"),
         "calib_a":            node_info.get("calib_a", 0.33),
         "calib_b":            node_info.get("calib_b", 0.17),
-        "status":             "active",
+        "is_active":          True,
     }
 
     if existing:
-        if reset:
-            requests.delete(f"{API_URL}/nodes/{existing['id']}", timeout=30)
-        else:
-            # Update to make sure coords/config are fresh
-            requests.put(f"{API_URL}/nodes/{existing['id']}", json=create_payload, timeout=30)
-            return existing["id"]
+        res = requests.patch(f"{API_URL}/nodes/{existing['id']}", json=create_payload, timeout=30)
+        if res.status_code not in (200, 201):
+            print(f"  ERROR Failed to update node {existing['id']}: {res.text}")
+        return existing["id"]
 
     res = requests.post(f"{API_URL}/nodes", json=create_payload, timeout=30)
     if res.status_code not in (200, 201):
@@ -405,10 +410,44 @@ def get_or_create_node(node_info: dict, reset: bool = False) -> int:
     return res.json()["id"]
 
 
-def send_reading(node_id: int, scenario: str, t: datetime) -> dict | None:
+REAL_AQI_CACHE = {}
+
+def get_real_aqi(lat, lon):
+    key = f"{lat},{lon}"
+    cache = REAL_AQI_CACHE.get(key)
+    now = time.time()
+    # Update cache every 15 minutes
+    if cache is None or now - cache["ts"] > 900:
+        try:
+            res = requests.get(f"https://air-quality-api.open-meteo.com/v1/air-quality?latitude={lat}&longitude={lon}&current=pm10,pm2_5", timeout=5)
+            if res.status_code == 200:
+                data = res.json().get("current", {})
+                if data.get("pm10") is not None and data.get("pm2_5") is not None:
+                    REAL_AQI_CACHE[key] = {
+                        "pm10": float(data["pm10"]),
+                        "pm25": float(data["pm2_5"]),
+                        "ts": now
+                    }
+        except Exception:
+            pass
+            
+    c = REAL_AQI_CACHE.get(key)
+    if c:
+        return c["pm10"], c["pm25"]
+    return None, None
+
+def send_reading(node_id: int, node_info: dict, t: datetime) -> dict | None:
     """Generate and POST one reading for the given node."""
-    gen = SCENARIO_GENERATORS[scenario]
+    gen = SCENARIO_GENERATORS[node_info["scenario"]]
     data = gen(t)
+
+    # --- INJECT REAL-TIME AQI ---
+    if not node_info.get("skip_real_aqi", False):
+        real_pm10, real_pm25 = get_real_aqi(node_info["location_lat"], node_info["location_lon"])
+        if real_pm10 is not None and real_pm25 is not None:
+            data["PM10"] = real_pm10 * _jitter(1.0, pct=0.08)
+            data["PM2.5"] = real_pm25 * _jitter(1.0, pct=0.08)
+            data["PM1.0"] = data["PM2.5"] * _jitter(0.6, pct=0.08)
 
     # Strip internal markers before sending
     is_fault = data.pop("_is_fault", False)
@@ -443,14 +482,14 @@ def send_reading(node_id: int, scenario: str, t: datetime) -> dict | None:
 def print_banner():
     print()
     print("=" * 74)
-    print("  SourceSense -- City-Wide 8-Node Sensor Simulator")
-    print("  8 nodes | 8 scenarios | Real AI decisions in real-time")
+    print(f"  SourceSense -- City-Wide {len(CITY_NODES)}-Node Sensor Simulator")
+    print(f"  {len(CITY_NODES)} nodes | Real AI decisions in real-time")
     print("=" * 74)
     print(f"  {'Node':<4}  {'Location':<32}  {'Expected AI Action'}")
     print("-" * 74)
     for i, node in enumerate(CITY_NODES, 1):
         label = SCENARIO_LABELS[node["scenario"]]
-        name = node["name"].split(" ", 1)[1][:31].ljust(31)
+        name = node["name"][:31].ljust(31)
         print(f"  [{i:2d}]  {name}  {label}")
     print("=" * 74)
     print()
@@ -507,7 +546,7 @@ def main():
             print(f"  --- Cycle {cycle:04d} | {t.strftime('%H:%M:%S')} " + "-" * 45)
 
             for i, (node_info, node_id) in enumerate(zip(CITY_NODES, node_ids), 1):
-                result = send_reading(node_id, node_info["scenario"], t)
+                result = send_reading(node_id, node_info, t)
                 print_reading_result(i, node_info, result, t)
 
             print()

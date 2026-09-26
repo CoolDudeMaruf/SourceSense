@@ -26,11 +26,11 @@ def safety_gate(node_id: int, control_mode: str, optimizer_decision: dict) -> di
         
     # Mode Handling
     if control_mode == "MANUAL":
-        msg = f"Manual Mode Active. AI suggested SPRAY but hardware control is manual."
+        msg = f"Manual Mode Active. AI suggested {action} but hardware control is manual."
         return {"relay_action": "OFF", "reason": msg, "is_safe": True} # Action depends on manual override elsewhere
         
     elif control_mode == "SIMULATION":
-        msg = f"SIMULATION: {reason} (Would spray for {optimizer_decision.get('duration_min')} min at {optimizer_decision.get('intensity')}%)"
+        msg = f"SIMULATION: {reason} (Would trigger {action} for {optimizer_decision.get('duration_min')} min at {optimizer_decision.get('intensity')}%)"
         return {"relay_action": "ON", "reason": msg, "is_safe": True, "simulated": True}
         
     elif control_mode == "AUTONOMOUS":

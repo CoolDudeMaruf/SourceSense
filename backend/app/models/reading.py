@@ -46,6 +46,9 @@ class Reading(Base):
     relay_state: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
 
     # ── AI Layer ─────────────────────────────────────────────────────────────
+    action_reason: Mapped[str] = mapped_column(String(256), nullable=True)
+    intensity: Mapped[float] = mapped_column(Float, nullable=True)
+    duration_min: Mapped[int] = mapped_column(Integer, nullable=True)
     is_synthetic: Mapped[bool] = mapped_column(Boolean, default=False)
     sensor_trust_score: Mapped[float] = mapped_column(Float, default=100.0)
     forecast_10m: Mapped[float] = mapped_column(Float, nullable=True)

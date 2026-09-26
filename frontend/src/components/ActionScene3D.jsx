@@ -102,11 +102,11 @@ function MiniWaterSprinkler({ isRelayOn }) {
 }
 
 // --- Traffic Cone (Vehicle Combustion) ---
-function TrafficCone() {
+function TrafficCone({ isRelayOn }) {
   const coneRef = useRef();
   
   useFrame((state) => {
-    if (coneRef.current) {
+    if (coneRef.current && isRelayOn) {
       coneRef.current.rotation.y += 0.02;
     }
   });
@@ -129,27 +129,31 @@ function TrafficCone() {
         <meshStandardMaterial color="#ffffff" />
       </Cylinder>
       {/* Flashing Light */}
-      <Float speed={5} rotationIntensity={0} floatIntensity={1}>
+      <Float speed={isRelayOn ? 5 : 0} rotationIntensity={0} floatIntensity={isRelayOn ? 1 : 0}>
         <Sphere args={[0.2, 16, 16]} position={[0, 2.4, 0]}>
-          <meshBasicMaterial color="#fbbf24" />
+          <meshBasicMaterial color={isRelayOn ? "#fbbf24" : "#94a3b8"} />
         </Sphere>
-        <pointLight position={[0, 2.4, 0]} color="#fbbf24" intensity={2} distance={5} />
+        {isRelayOn && <pointLight position={[0, 2.4, 0]} color="#fbbf24" intensity={2} distance={5} />}
       </Float>
     </group>
   );
 }
 
 // --- Emergency Siren (Waste Burning) ---
-function EmergencySiren() {
+function EmergencySiren({ isRelayOn }) {
   const lightRef = useRef();
   const groupRef = useRef();
 
   useFrame((state) => {
-    if (lightRef.current) {
-      lightRef.current.intensity = 2 + Math.sin(state.clock.elapsedTime * 10) * 2;
-    }
-    if (groupRef.current) {
-      groupRef.current.rotation.y += 0.1;
+    if (isRelayOn) {
+      if (lightRef.current) {
+        lightRef.current.intensity = 2 + Math.sin(state.clock.elapsedTime * 10) * 2;
+      }
+      if (groupRef.current) {
+        groupRef.current.rotation.y += 0.1;
+      }
+    } else {
+      if (lightRef.current) lightRef.current.intensity = 0;
     }
   });
 
@@ -160,12 +164,12 @@ function EmergencySiren() {
       </Cylinder>
       <group ref={groupRef} position={[0, 0.7, 0]}>
         <Cylinder args={[0.6, 0.6, 1, 32]} transparent opacity={0.6}>
-          <meshPhysicalMaterial color="#ef4444" transmission={0.5} roughness={0.2} />
+          <meshPhysicalMaterial color={isRelayOn ? "#ef4444" : "#94a3b8"} transmission={0.5} roughness={0.2} />
         </Cylinder>
         <Box args={[0.2, 0.8, 0.2]} position={[0, 0, 0]}>
           <meshStandardMaterial color="#1e293b" />
         </Box>
-        <pointLight ref={lightRef} color="#ef4444" distance={5} />
+        <pointLight ref={lightRef} color={isRelayOn ? "#ef4444" : "#000000"} distance={5} intensity={isRelayOn ? 1 : 0} />
       </group>
       <Cylinder args={[0.8, 0.8, 0.1, 32]} position={[0, 1.25, 0]}>
         <meshStandardMaterial color="#334155" />
@@ -174,34 +178,111 @@ function EmergencySiren() {
   );
 }
 
-// --- Shield / Orb (Monitoring) ---
-function MonitoringShield() {
-  const orbRef = useRef();
+// --- Magnifying Glass (Monitoring / No Action) ---
+function MagnifyingGlass() {
+  const groupRef = useRef();
   
   useFrame((state) => {
-    if (orbRef.current) {
-      orbRef.current.rotation.y += 0.01;
-      orbRef.current.rotation.x += 0.005;
-      const scale = 1 + Math.sin(state.clock.elapsedTime * 2) * 0.05;
-      orbRef.current.scale.set(scale, scale, scale);
+    const t = state.clock.elapsedTime;
+    if (groupRef.current) {
+      // Light zoom in and zoom out (Z-axis) to represent careful monitoring
+      groupRef.current.position.z = Math.sin(t * 1.5) * 0.5;
+      // Very subtle up/down hover to keep it organic
+      groupRef.current.position.y = 0.4 + Math.sin(t * 2) * 0.05;
+      
+      // Ensure it stays perfectly facing forward for the best reflection/view
+      groupRef.current.rotation.y = 0;
+      groupRef.current.rotation.z = 0;
     }
   });
 
   return (
-    <Float speed={2} rotationIntensity={0.5} floatIntensity={1}>
-      <Sphere ref={orbRef} args={[1, 32, 32]}>
+    <group position={[0, 0.4, 0]} ref={groupRef} scale={1.1} rotation={[0, 0, 0]}>
+      
+      {/* Outer Rim Main (Polished Chrome) */}
+      <mesh>
+        <torusGeometry args={[0.9, 0.12, 64, 128]} />
+        <meshStandardMaterial color="#ffffff" metalness={1} roughness={0.05} envMapIntensity={2} />
+      </mesh>
+      
+      {/* Inner Rim Base (Matte metal holding the glass) */}
+      <mesh rotation={[Math.PI / 2, 0, 0]}>
+        <cylinderGeometry args={[0.88, 0.88, 0.15, 128]} />
+        <meshStandardMaterial color="#94a3b8" metalness={0.6} roughness={0.4} />
+      </mesh>
+
+      {/* Chrome Inner Ridge (Front) */}
+      <mesh position={[0, 0, 0.08]}>
+        <torusGeometry args={[0.85, 0.04, 32, 128]} />
+        <meshStandardMaterial color="#ffffff" metalness={1} roughness={0.05} envMapIntensity={2} />
+      </mesh>
+
+      {/* Chrome Inner Ridge (Back) */}
+      <mesh position={[0, 0, -0.08]}>
+        <torusGeometry args={[0.85, 0.04, 32, 128]} />
+        <meshStandardMaterial color="#ffffff" metalness={1} roughness={0.05} envMapIntensity={2} />
+      </mesh>
+      
+      {/* Lens (Thick Convex Physical Glass) */}
+      <mesh rotation={[Math.PI / 2, 0, 0]} scale={[1, 0.18, 1]}>
+        <sphereGeometry args={[0.84, 64, 64]} />
         <meshPhysicalMaterial 
-          color="#4ade80" 
-          transmission={0.9} 
+          color="#bae6fd" 
+          transmission={0.95} 
           opacity={1} 
           transparent 
           roughness={0} 
-          thickness={1}
-          envMapIntensity={2}
+          metalness={0.1}
+          ior={1.4} 
+          thickness={1.5}
+          clearcoat={1}
+          clearcoatRoughness={0}
+          envMapIntensity={2.5}
         />
-      </Sphere>
-      <pointLight color="#4ade80" intensity={1} distance={4} />
-    </Float>
+      </mesh>
+      
+      {/* --- Handle Group --- */}
+      <group position={[0.9 * 0.707, 0.9 * -0.707, 0]} rotation={[0, 0, Math.PI / 4]}>
+        
+        {/* Base Connector to Rim (Chrome) */}
+        <mesh position={[0, -0.15, 0]}>
+          <cylinderGeometry args={[0.1, 0.12, 0.3, 32]} />
+          <meshStandardMaterial color="#ffffff" metalness={1} roughness={0.1} envMapIntensity={1.5} />
+        </mesh>
+
+        {/* Silver Ring at top of handle */}
+        <mesh position={[0, -0.3, 0]} rotation={[Math.PI/2, 0, 0]}>
+          <torusGeometry args={[0.14, 0.03, 32, 64]} />
+          <meshStandardMaterial color="#ffffff" metalness={1} roughness={0.05} envMapIntensity={2} />
+        </mesh>
+
+        {/* Main Handle Body (Dark glossy blue) */}
+        <mesh position={[0, -0.9, 0]}>
+          <cylinderGeometry args={[0.14, 0.19, 1.2, 32]} />
+          <meshStandardMaterial 
+            color="#1e3a8a" 
+            metalness={0.3} 
+            roughness={0.2} 
+            clearcoat={1} 
+            clearcoatRoughness={0.1} 
+            envMapIntensity={1}
+          />
+        </mesh>
+        
+        {/* Silver Ring at bottom of handle */}
+        <mesh position={[0, -1.5, 0]} rotation={[Math.PI/2, 0, 0]}>
+          <torusGeometry args={[0.19, 0.03, 32, 64]} />
+          <meshStandardMaterial color="#ffffff" metalness={1} roughness={0.05} envMapIntensity={2} />
+        </mesh>
+
+        {/* End Cap (Chrome dome) */}
+        <mesh position={[0, -1.5, 0]} rotation={[0, 0, Math.PI]}>
+          <sphereGeometry args={[0.19, 32, 32, 0, Math.PI * 2, 0, Math.PI / 2]} />
+          <meshStandardMaterial color="#ffffff" metalness={1} roughness={0.1} envMapIntensity={1.5} />
+        </mesh>
+        
+      </group>
+    </group>
   );
 }
 
@@ -214,12 +295,12 @@ export default function ActionScene3D({ classifierLabel, isRelayOn }) {
         
         {/* Render appropriate scene based on classification */}
         {classifierLabel === 'construction_dust' && <MiniWaterSprinkler isRelayOn={isRelayOn} />}
-        {classifierLabel === 'vehicle_combustion' && <TrafficCone />}
-        {classifierLabel === 'waste_burning' && <EmergencySiren />}
-        {(classifierLabel === 'humid_haze' || classifierLabel === 'clean' || !classifierLabel) && <MonitoringShield />}
+        {classifierLabel === 'vehicle_combustion' && <TrafficCone isRelayOn={isRelayOn} />}
+        {classifierLabel === 'waste_burning' && <EmergencySiren isRelayOn={isRelayOn} />}
+        {(classifierLabel === 'humid_haze' || classifierLabel === 'clean' || !classifierLabel) && <MagnifyingGlass />}
         
         <Environment preset="city" />
-        <OrbitControls enableZoom={true} minDistance={3} maxDistance={10} autoRotate={classifierLabel !== 'vehicle_combustion'} autoRotateSpeed={2} />
+        <OrbitControls enableZoom={true} minDistance={3} maxDistance={10} autoRotate={classifierLabel === 'construction_dust' || classifierLabel === 'waste_burning'} autoRotateSpeed={2} />
       </Canvas>
     </div>
   );
