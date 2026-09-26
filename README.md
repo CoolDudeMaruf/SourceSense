@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🌿 SourceSense
+# 🌿 SourceSense 
 
 ### Enterprise-Grade IoT Air Quality Monitoring & Autonomous Pollution Remediation Platform
 
