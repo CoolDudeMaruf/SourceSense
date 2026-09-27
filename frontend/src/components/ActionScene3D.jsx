@@ -101,40 +101,186 @@ function MiniWaterSprinkler({ isRelayOn }) {
   );
 }
 
-// --- Traffic Cone (Vehicle Combustion) ---
-function TrafficCone({ isRelayOn }) {
-  const coneRef = useRef();
-  
+// --- Traffic Advisory Scene (City + Traffic Light) ---
+function TrafficAdvisoryScene({ isRelayOn }) {
+  const groupRef = useRef();
+
   useFrame((state) => {
-    if (coneRef.current && isRelayOn) {
-      coneRef.current.rotation.y += 0.02;
+    if (groupRef.current) {
+      // Gentle floating effect to mimic the isometric illustration feel
+      groupRef.current.position.y = -0.6 + Math.sin(state.clock.elapsedTime * 1.5) * 0.03;
     }
   });
 
   return (
-    <group ref={coneRef} position={[0, -0.5, 0]}>
-      {/* Base */}
-      <Box args={[1.5, 0.1, 1.5]} position={[0, 0.05, 0]}>
-        <meshStandardMaterial color="#f97316" />
+    <group ref={groupRef} position={[0, -0.6, 0]} rotation={[0, -Math.PI / 4, 0]}>
+      {/* Ground/Road Base */}
+      <Box args={[6, 0.1, 2.5]} position={[0, 0, 0]} receiveShadow>
+        <meshStandardMaterial color="#312e81" roughness={0.8} />
       </Box>
-      {/* Cone Body */}
-      <Cone args={[0.5, 2, 16]} position={[0, 1.1, 0]}>
-        <meshStandardMaterial color="#f97316" />
-      </Cone>
-      {/* White Stripes */}
-      <Cylinder args={[0.35, 0.43, 0.4, 16]} position={[0, 1.2, 0]}>
-        <meshStandardMaterial color="#ffffff" />
-      </Cylinder>
-      <Cylinder args={[0.2, 0.28, 0.3, 16]} position={[0, 1.8, 0]}>
-        <meshStandardMaterial color="#ffffff" />
-      </Cylinder>
-      {/* Flashing Light */}
-      <Float speed={isRelayOn ? 5 : 0} rotationIntensity={0} floatIntensity={isRelayOn ? 1 : 0}>
-        <Sphere args={[0.2, 16, 16]} position={[0, 2.4, 0]}>
-          <meshBasicMaterial color={isRelayOn ? "#fbbf24" : "#94a3b8"} />
+      {/* Dashed Line */}
+      <Box args={[5.8, 0.12, 0.05]} position={[0, 0, 0]}>
+        <meshStandardMaterial color="#ffffff" emissive="#ffffff" emissiveIntensity={0.5} />
+      </Box>
+
+      {/* --- Building 1: Tall Purple Skyscraper --- */}
+      <group position={[-1.5, 1.5, -1.8]}>
+        <Box args={[0.9, 3, 0.9]}>
+          <meshStandardMaterial color="#1e1b4b" roughness={0.3} metalness={0.2} />
+        </Box>
+        {/* Windows */}
+        {Array.from({ length: 5 }).map((_, i) => (
+          <Box key={`w1-${i}`} args={[0.1, 0.2, 0.95]} position={[0.4, -1 + i * 0.5, 0]}>
+            <meshStandardMaterial color="#818cf8" emissive="#818cf8" emissiveIntensity={0.8} />
+          </Box>
+        ))}
+      </group>
+
+      {/* --- Building 2: White Modern Tower --- */}
+      <group position={[-0.2, 1.8, -1.5]}>
+        <Box args={[0.8, 3.6, 0.8]}>
+          <meshStandardMaterial color="#f8fafc" roughness={0.1} metalness={0.1} />
+        </Box>
+        <Box args={[0.9, 0.2, 0.9]} position={[0, 1.7, 0]}>
+          <meshStandardMaterial color="#e2e8f0" />
+        </Box>
+        {/* Windows */}
+        {Array.from({ length: 8 }).map((_, i) => (
+          <Box key={`w2-${i}`} args={[0.85, 0.1, 0.1]} position={[0, -1.2 + i * 0.4, 0.4]}>
+            <meshStandardMaterial color="#94a3b8" />
+          </Box>
+        ))}
+      </group>
+
+      {/* --- Building 3: Tech Hub (Cylindrical) --- */}
+      <group position={[1.2, 1, -1.2]}>
+        <Cylinder args={[0.7, 0.7, 2, 32]}>
+          <meshStandardMaterial color="#e2e8f0" roughness={0.2} metalness={0.3} />
+        </Cylinder>
+        {/* Glowing Rings */}
+        <Cylinder args={[0.72, 0.72, 0.05, 32]} position={[0, 0.5, 0]}>
+          <meshStandardMaterial color="#38bdf8" emissive="#38bdf8" emissiveIntensity={1} />
+        </Cylinder>
+        <Cylinder args={[0.72, 0.72, 0.05, 32]} position={[0, -0.5, 0]}>
+          <meshStandardMaterial color="#38bdf8" emissive="#38bdf8" emissiveIntensity={1} />
+        </Cylinder>
+        {/* Orange Roof */}
+        <Cylinder args={[0.5, 0.5, 0.1, 32]} position={[0, 1.05, 0]}>
+          <meshStandardMaterial color="#ea580c" />
+        </Cylinder>
+      </group>
+
+      {/* --- Vehicles --- */}
+      {/* Yellow Car */}
+      <group position={[-1.2, 0.2, 0.6]}>
+        <Box args={[0.7, 0.2, 0.35]} position={[0, 0, 0]}>
+          <meshStandardMaterial color="#eab308" />
+        </Box>
+        <Box args={[0.4, 0.15, 0.3]} position={[-0.05, 0.15, 0]}>
+          <meshStandardMaterial color="#1e293b" />
+        </Box>
+        {/* Wheels */}
+        <Cylinder args={[0.08, 0.08, 0.4]} rotation={[Math.PI/2, 0, 0]} position={[-0.2, -0.1, 0]}>
+           <meshStandardMaterial color="#0f172a" />
+        </Cylinder>
+        <Cylinder args={[0.08, 0.08, 0.4]} rotation={[Math.PI/2, 0, 0]} position={[0.2, -0.1, 0]}>
+           <meshStandardMaterial color="#0f172a" />
+        </Cylinder>
+        {/* Headlights */}
+        <Box args={[0.05, 0.05, 0.25]} position={[0.35, 0, 0]}>
+          <meshStandardMaterial color="#ffffff" emissive="#ffffff" emissiveIntensity={1} />
+        </Box>
+      </group>
+
+      {/* Truck (Causing pollution) */}
+      <group position={[1.2, 0.35, -0.5]}>
+        {/* Cabin */}
+        <Box args={[0.5, 0.4, 0.4]} position={[0.6, -0.05, 0]}>
+          <meshStandardMaterial color="#f97316" />
+        </Box>
+        <Box args={[0.2, 0.2, 0.38]} position={[0.6, 0.1, 0]}>
+          <meshStandardMaterial color="#1e293b" />
+        </Box>
+        {/* Cargo */}
+        <Box args={[1.2, 0.6, 0.45]} position={[-0.25, 0.05, 0]}>
+          <meshStandardMaterial color="#1e1b4b" />
+        </Box>
+        {/* Wheels */}
+        <Cylinder args={[0.1, 0.1, 0.5]} rotation={[Math.PI/2, 0, 0]} position={[0.6, -0.2, 0]}>
+           <meshStandardMaterial color="#0f172a" />
+        </Cylinder>
+        <Cylinder args={[0.1, 0.1, 0.5]} rotation={[Math.PI/2, 0, 0]} position={[-0.4, -0.2, 0]}>
+           <meshStandardMaterial color="#0f172a" />
+        </Cylinder>
+        <Cylinder args={[0.1, 0.1, 0.5]} rotation={[Math.PI/2, 0, 0]} position={[-0.7, -0.2, 0]}>
+           <meshStandardMaterial color="#0f172a" />
+        </Cylinder>
+
+        {/* Smoke Clouds from Truck */}
+        <group position={[-1.2, 0.6, 0]}>
+          <Sphere args={[0.25, 16, 16]} position={[0, 0, 0]}>
+             <meshStandardMaterial color="#0f172a" roughness={1} />
+          </Sphere>
+          <Sphere args={[0.35, 16, 16]} position={[-0.3, 0.2, 0.1]}>
+             <meshStandardMaterial color="#0f172a" roughness={1} />
+          </Sphere>
+          <Sphere args={[0.2, 16, 16]} position={[-0.5, 0.1, -0.1]}>
+             <meshStandardMaterial color="#0f172a" roughness={1} />
+          </Sphere>
+          <Sphere args={[0.4, 16, 16]} position={[-0.6, 0.4, 0.2]}>
+             <meshStandardMaterial color="#0f172a" roughness={1} />
+          </Sphere>
+        </group>
+      </group>
+
+      {/* --- Detailed Traffic Light --- */}
+      <group position={[2.5, 0, 1.2]} rotation={[0, Math.PI / 4, 0]}>
+        {/* Base */}
+        <Cylinder args={[0.2, 0.2, 0.1, 16]} position={[0, 0.05, 0]}>
+          <meshStandardMaterial color="#334155" />
+        </Cylinder>
+        {/* Pole */}
+        <Cylinder args={[0.04, 0.05, 2.5, 16]} position={[0, 1.25, 0]}>
+          <meshStandardMaterial color="#475569" metalness={0.5} roughness={0.2} />
+        </Cylinder>
+        {/* Arm */}
+        <Cylinder args={[0.03, 0.03, 0.8, 16]} rotation={[0, 0, Math.PI/2]} position={[-0.4, 2.4, 0]}>
+          <meshStandardMaterial color="#475569" metalness={0.5} roughness={0.2} />
+        </Cylinder>
+        
+        {/* Light Housing */}
+        <Box args={[0.3, 0.9, 0.3]} position={[-0.7, 2.1, 0]}>
+          <meshStandardMaterial color="#0f172a" roughness={0.8} />
+        </Box>
+        {/* Hoods */}
+        <Cylinder args={[0.12, 0.12, 0.1, 16]} rotation={[Math.PI/2, 0, 0]} position={[-0.7, 2.4, 0.16]}>
+          <meshStandardMaterial color="#0f172a" />
+        </Cylinder>
+        <Cylinder args={[0.12, 0.12, 0.1, 16]} rotation={[Math.PI/2, 0, 0]} position={[-0.7, 2.1, 0.16]}>
+          <meshStandardMaterial color="#0f172a" />
+        </Cylinder>
+        <Cylinder args={[0.12, 0.12, 0.1, 16]} rotation={[Math.PI/2, 0, 0]} position={[-0.7, 1.8, 0.16]}>
+          <meshStandardMaterial color="#0f172a" />
+        </Cylinder>
+
+        {/* Lights */}
+        {/* Red Light (Active when Relay ON) */}
+        <Sphere args={[0.09, 16, 16]} position={[-0.7, 2.4, 0.18]}>
+          <meshBasicMaterial color={isRelayOn ? "#ef4444" : "#450a0a"} />
         </Sphere>
-        {isRelayOn && <pointLight position={[0, 2.4, 0]} color="#fbbf24" intensity={2} distance={5} />}
-      </Float>
+        {isRelayOn && <pointLight position={[-0.7, 2.4, 0.3]} color="#ef4444" intensity={3} distance={5} />}
+        
+        {/* Yellow Light */}
+        <Sphere args={[0.09, 16, 16]} position={[-0.7, 2.1, 0.18]}>
+          <meshBasicMaterial color={!isRelayOn ? "#eab308" : "#422006"} />
+        </Sphere>
+        {!isRelayOn && <pointLight position={[-0.7, 2.1, 0.3]} color="#eab308" intensity={1.5} distance={3} />}
+
+        {/* Green Light */}
+        <Sphere args={[0.09, 16, 16]} position={[-0.7, 1.8, 0.18]}>
+          <meshBasicMaterial color="#064e3b" />
+        </Sphere>
+      </group>
     </group>
   );
 }
@@ -295,7 +441,7 @@ export default function ActionScene3D({ classifierLabel, isRelayOn }) {
         
         {/* Render appropriate scene based on classification */}
         {classifierLabel === 'construction_dust' && <MiniWaterSprinkler isRelayOn={isRelayOn} />}
-        {classifierLabel === 'vehicle_combustion' && <TrafficCone isRelayOn={isRelayOn} />}
+        {classifierLabel === 'vehicle_combustion' && <TrafficAdvisoryScene isRelayOn={isRelayOn} />}
         {classifierLabel === 'waste_burning' && <EmergencySiren isRelayOn={isRelayOn} />}
         {(classifierLabel === 'humid_haze' || classifierLabel === 'clean' || !classifierLabel) && <MagnifyingGlass />}
         

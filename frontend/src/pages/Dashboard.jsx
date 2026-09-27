@@ -1159,7 +1159,7 @@ export default function Dashboard() {
                             Action Window
                           </span>
                           {currentReading?.relay_state
-                            ? <span className="osen-badge osen-badge-danger">Relay ON</span>
+                            ? <span className="osen-badge osen-badge-danger">Action ON</span>
                             : <span className="osen-badge osen-badge-muted"><strong style={{ fontWeight: 800 }}>time: {uptimeStr}</strong></span>}
                         </div>
                         <div style={{ padding: '0 1.25rem 1.25rem' }}>
@@ -1168,7 +1168,7 @@ export default function Dashboard() {
                             isRelayOn={currentReading?.relay_state}
                             isGoodAqi={currentReading?.aqi <= 100}
                             aqi={currentReading?.aqi}
-                            reason={currentReading?.action_reason || "Standby (Action Paused)"}
+                            reason={currentReading?.action_reason || (currentReading?.relay_state ? "Action running" : "Standby (Action Paused)")}
                           />
                         </div>
                       </div>
@@ -1238,7 +1238,7 @@ export default function Dashboard() {
                               props = [
                                 { label: "Signal Mode", value: isSevere ? "Red-Wave (HGV)" : "Yellow-Wave" },
                                 { label: "Detour", value: isSevere ? `Active (${currentReading.intensity || 85}%)` : "Advisory Only" },
-                                { label: "Clearance ETA", value: `~${currentReading.duration_min || 2} hrs` }
+                                { label: "Clearance ETA", value: `~${currentReading.duration_min || 2} mins` }
                               ];
                             } else if (currentReading.classifier_label === 'waste_burning') {
                               const isSevere = currentReading.aqi > 200;
