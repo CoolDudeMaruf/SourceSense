@@ -6,13 +6,11 @@ import sys
 
 API_URL = "http://localhost:8000/api/v1"
 
-# Define our virtual nodes
+# Define our virtual nodes tailored to Gazipur DUET and surroundings
 VIRTUAL_NODES = [
-    {"name": "Z4_Sensor_01 (Reliable)", "location_lat": 19.0760, "location_lon": 72.8777, "zone": "Z4", "type": "construction"},
-    {"name": "Z4_Sensor_02 (Reliable)", "location_lat": 19.0762, "location_lon": 72.8779, "zone": "Z4", "type": "construction"},
-    {"name": "Z4_Sensor_03 (Faulty)", "location_lat": 19.0758, "location_lon": 72.8775, "zone": "Z4", "type": "construction"},
-    {"name": "Z1_Sensor_01 (Distant)", "location_lat": 18.9220, "location_lon": 72.8347, "zone": "Z1", "type": "vehicle"},
+    {"name": "Gazipur City", "location_lat": 23.9999, "location_lon": 90.4203, "zone": "Gazipur", "type": "industrial_emissions"},
 ]
+
 
 def get_or_create_node(node_info):
     try:
@@ -57,24 +55,36 @@ def main():
     
     def send_scenario_reading(node_idx, current_time, pm10_val, is_faulty=False):
         nid = node_ids[node_idx]
-        pm25 = pm10_val * 0.4
-        pm1_0 = pm25 * 0.6
+        info = VIRTUAL_NODES[node_idx]
+        
+        if info["type"] == "industrial_emissions":
+            pm25 = pm10_val * 0.7  # Industrial has more PM2.5 compared to dust
+            pm1_0 = pm25 * 0.8
+            mq131 = 300 + pm10_val/2 # High NOx / Ozone
+            mq135 = 450 + pm10_val   # High NH3 / VOCs
+            mq7 = 150 + pm10_val/3
+        else:
+            pm25 = pm10_val * 0.4
+            pm1_0 = pm25 * 0.6
+            mq131 = 80 + pm10_val/4
+            mq135 = 100 + pm10_val/3
+            mq7 = 350 + pm10_val # High CO for vehicles
         
         payload = {
             "node_id": nid,
             "Timestamp": current_time.strftime("%Y-%m-%dT%H:%M:%S"),
-            "Temperature_C": 24.5,
-            "Humidity_Percent": 75.0,
+            "Temperature_C": 28.5, # Gazipur climate
+            "Humidity_Percent": 65.0,
             "PM1.0": pm1_0,
             "PM2.5": pm25,
             "PM10": pm10_val,
             "MQ2": 150 + pm10_val/2,
             "MQ4": 100 + pm10_val/3,
             "MQ6": 80 + pm10_val/4,
-            "MQ7": 120 + pm10_val/2,
+            "MQ7": mq7,
             "MQ8": 100,
-            "MQ131": 50,
-            "MQ135": 80
+            "MQ131": mq131,
+            "MQ135": mq135
         }
         
         if is_faulty:
@@ -115,7 +125,7 @@ def main():
         if m == 5:
             print("[EVENT] Sensor 03 reports impossible data jump! Trust system should catch this.")
         if m == 10:
-            print("[EVENT] AI Forecast predicting high risk in Z4. Safety gate validating intervention.")
+            print("[EVENT] AI Forecast predicting high risk in Gazipur. Safety gate validating intervention.")
             
         time.sleep(1)
         

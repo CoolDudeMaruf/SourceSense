@@ -26,13 +26,12 @@ from app.services.validator import (
 from app.services.humidity_correction import correct_reading
 from app.services.aqi_calculator import calculate_aqi
 from app.services.classifier import classify
-from app.services.relay_logic import relay_manager
+from app.services.relay_logic import relay_manager, trigger_infrastructure_webhook
 from app.services import alert_dispatcher
 
-from app.services.ai import (
-    get_sensor_trust, analyze_history, generate_forecast, 
-    optimize_intervention, safety_gate
-)
+from app.services.trust import calculate_sensor_trust
+from app.services.event_manager import event_manager
+from app.services.ai import generate_forecast, optimize_intervention, safety_gate
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/v1/readings", tags=["readings"])
@@ -120,12 +119,16 @@ async def ingest_reading(payload: SensorPayload, db: AsyncSession = Depends(get_
         quality_flags=quality_flags,
     )
 
-    # ── AI Intelligence Layer ─────────────────────────────────────────────────
-    trust_score = get_sensor_trust(node.id, payload.PM10, quality_flags)
+    # ── Real Intelligence Layer ─────────────────────────────────────────────────
+    trust_score = calculate_sensor_trust(node.id, payload.PM10, quality_flags, payload.Timestamp)
     
-    history_analysis = analyze_history(
-        zone=node.zone, 
+    # Check persistence and set event state
+    event_state = event_manager.process_reading(
+        node_id=node.id, 
         pm10=correction["pm10_corrected"], 
+        threshold=node.pm10_threshold, 
+        classifier_label=clf_result["label"], 
+        trust_score=trust_score, 
         timestamp=payload.Timestamp
     )
     
@@ -133,7 +136,7 @@ async def ingest_reading(payload: SensorPayload, db: AsyncSession = Depends(get_
     if ctx.get("prev_row") and ctx["prev_row"].get("PM10"):
          pm10_trend = payload.PM10 - ctx["prev_row"]["PM10"]
          
-    time_factor = 1.2 if history_analysis.get("is_recurring") else 1.0
+    time_factor = 1.0 # Removed synthetic history loop
     forecast_data = generate_forecast(correction["pm10_corrected"], pm10_trend, time_factor)
 
     # Optimizer
@@ -147,8 +150,13 @@ async def ingest_reading(payload: SensorPayload, db: AsyncSession = Depends(get_
          aqi=aqi_result["aqi"]
     )
     
-    # Safety Gate
-    safe_decision = safety_gate(node.id, node.control_mode, opt_plan)
+    # Safety Gate (Evidence Based)
+    if clf_result["label"] == "unknown":
+        safe_decision = {"relay_action": "OFF", "reason": "Classification confidence too low. Unknown source."}
+    elif event_state not in ["CONFIRMED", "AUTHORIZED", "ACTIVE_MITIGATION"]:
+        safe_decision = {"relay_action": "OFF", "reason": f"Event state is {event_state}. Waiting for persistence."}
+    else:
+        safe_decision = safety_gate(node.id, node.control_mode, opt_plan)
     
     # We override the old relay logic with the AI decision
     relay_state = safe_decision["relay_action"] == "ON"
@@ -212,6 +220,16 @@ async def ingest_reading(payload: SensorPayload, db: AsyncSession = Depends(get_
         )
         db.add(event)
         await db.flush()
+
+        # Trigger municipal infrastructure webhooks
+        trigger_infrastructure_webhook(
+            node_id=node.id,
+            action=relay_action,
+            source=clf_result["label"],
+            aqi=aqi_result["aqi"],
+            zone=node.zone,
+            reason=safe_decision.get("reason", "")
+        )
 
         # Dispatch alerts
         dispatch_results = alert_dispatcher.dispatch(

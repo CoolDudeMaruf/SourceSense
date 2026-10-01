@@ -30,6 +30,13 @@ class Node(Base):
     zone: Mapped[str] = mapped_column(String(32), default="Z1")
 
     is_active: Mapped[bool] = mapped_column(default=True)
+    
+    # Telemetry and Maintenance
+    battery_level: Mapped[float] = mapped_column(Float, default=100.0) # percentage
+    power_consumption_w: Mapped[float] = mapped_column(Float, default=2.5) # watts
+    last_cleaning_date: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=True)
+    last_battery_replacement: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=True)
+
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now()

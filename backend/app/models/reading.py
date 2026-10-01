@@ -54,6 +54,10 @@ class Reading(Base):
     forecast_10m: Mapped[float] = mapped_column(Float, nullable=True)
     forecast_20m: Mapped[float] = mapped_column(Float, nullable=True)
     forecast_30m: Mapped[float] = mapped_column(Float, nullable=True)
+    
+    # ── Telemetry ─────────────────────────────────────────────────────────────
+    battery_level: Mapped[float] = mapped_column(Float, nullable=True)
+    power_consumption_w: Mapped[float] = mapped_column(Float, nullable=True)
 
     # ── Quality flags (JSONB) ─────────────────────────────────────────────────
     # Example: {"pm10": "failed_read", "humidity": "sensor_glitch", "mq131": "failed_read",

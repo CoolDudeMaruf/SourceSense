@@ -17,6 +17,6 @@ echo All services have been launched in separate command windows!
 echo - Backend: http://localhost:8000
 echo - Frontend: http://localhost:5173
 echo.
-echo TIP: For the 8-node city-wide simulation, run start_city_sim.bat instead!
+echo TIP: For the 25-node city-wide simulation, run start_city_sim.bat instead!
 echo.
 pause

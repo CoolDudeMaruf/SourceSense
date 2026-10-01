@@ -60,6 +60,8 @@ class ReadingOut(BaseModel):
     forecast_10m: Optional[float] = None
     forecast_20m: Optional[float] = None
     forecast_30m: Optional[float] = None
+    battery_level: Optional[float] = None
+    power_consumption_w: Optional[float] = None
     created_at: datetime
 
     model_config = {"from_attributes": True}

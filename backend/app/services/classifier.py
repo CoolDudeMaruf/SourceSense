@@ -30,6 +30,7 @@ LABELS = [
     "construction_dust",
     "vehicle_combustion",
     "waste_burning",
+    "industrial_emissions",
     "humid_haze",
     "clean",
 ]
@@ -137,8 +138,13 @@ def classify(
     model = get_model()
     proba = model.predict_proba([features])[0]
     label_idx = int(np.argmax(proba))
-    label = model.classes_[label_idx]
     confidence = round(float(proba[label_idx]), 4)
+    
+    # ML Abstention / Unknown Logic
+    if confidence < 0.65:
+        label = "unknown"
+    else:
+        label = model.classes_[label_idx]
 
     return {
         "label": label,

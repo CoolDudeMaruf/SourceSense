@@ -30,6 +30,7 @@ LABELS = [
     "construction_dust",
     "vehicle_combustion",
     "waste_burning",
+    "industrial_emissions",
     "humid_haze",
     "clean",
 ]
@@ -98,6 +99,22 @@ def _generate_synthetic_data(n_per_class: int = 400) -> tuple[np.ndarray, np.nda
         RNG.uniform(350, 600, n),   # MQ135 — high VOC
         RNG.uniform(30,  65, n),    # humidity
     ]), "waste_burning")
+
+    # ── industrial_emissions ──────────────────────────────────────────────────
+    pm2_5 = RNG.uniform(60, 200, n)
+    pm10 = pm2_5 * RNG.uniform(1.2, 2.5, n)
+    ratio = pm10 / pm2_5
+    add(np.column_stack([
+        ratio, pm2_5, pm10,
+        RNG.uniform(200, 450, n),   # MQ2
+        RNG.uniform(150, 350, n),   # MQ4
+        RNG.uniform(100, 300, n),   # MQ6
+        RNG.uniform(200, 500, n),   # MQ7
+        RNG.uniform(100, 250, n),   # MQ8
+        RNG.uniform(300, 800, n),   # MQ131 — Very high NOx/Ozone
+        RNG.uniform(400, 900, n),   # MQ135 — Very high NH3/VOCs
+        RNG.uniform(30,  65, n),    # humidity
+    ]), "industrial_emissions")
 
     # ── humid_haze ────────────────────────────────────────────────────────────
     pm2_5 = RNG.uniform(10, 40, n)

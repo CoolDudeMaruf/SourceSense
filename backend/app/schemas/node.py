@@ -18,6 +18,10 @@ class NodeCreate(BaseModel):
     calib_b: float = 0.17
     control_mode: str = "AUTONOMOUS"
     zone: str = "Z1"
+    battery_level: float = 100.0
+    power_consumption_w: float = 2.5
+    last_cleaning_date: Optional[datetime] = None
+    last_battery_replacement: Optional[datetime] = None
 
 
 class NodeUpdate(BaseModel):
@@ -35,6 +39,10 @@ class NodeUpdate(BaseModel):
     is_active: Optional[bool] = None
     control_mode: Optional[str] = None
     zone: Optional[str] = None
+    battery_level: Optional[float] = None
+    power_consumption_w: Optional[float] = None
+    last_cleaning_date: Optional[datetime] = None
+    last_battery_replacement: Optional[datetime] = None
 
 
 class NodeOut(BaseModel):
@@ -53,6 +61,10 @@ class NodeOut(BaseModel):
     is_active: bool
     control_mode: str
     zone: str
+    battery_level: float
+    power_consumption_w: float
+    last_cleaning_date: Optional[datetime]
+    last_battery_replacement: Optional[datetime]
     created_at: datetime
 
     model_config = {"from_attributes": True}

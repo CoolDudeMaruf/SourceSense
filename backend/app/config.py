@@ -35,6 +35,7 @@ class Settings(BaseSettings):
     smtp_user: Optional[str] = Field(default=None, alias="SMTP_USER")
     smtp_password: Optional[str] = Field(default=None, alias="SMTP_PASSWORD")
     smtp_from: Optional[str] = Field(default="alerts@sourcesense.io", alias="SMTP_FROM")
+    city_infrastructure_webhook_url: Optional[str] = Field(default="https://mock-city-api.sourcesense.io/v1/mitigate", alias="CITY_INFRASTRUCTURE_WEBHOOK_URL")
 
     # ── CORS ──────────────────────────────────────────────────────────────────
     cors_origins: list[str] = Field(

@@ -51,7 +51,7 @@ def main():
     print("================================================================")
     print(f" {CYAN}SourceSense — Complete City Simulator Launcher{RESET}")
     print("================================================================")
-    print(f" This script runs the Backend, Frontend, and 8-Node Dhaka City")
+    print(f" This script runs the Backend, Frontend, and 25-Node Dhaka City")
     print(f" Simulator simultaneously in this console.\n")
     
     try:
@@ -77,7 +77,7 @@ def main():
         print(f"\n{YELLOW}Waiting 7 seconds for the backend to start up...{RESET}\n")
         time.sleep(7)
         
-        # 3. Start the Python City Sensor Simulator (8 nodes)
+        # 3. Start the Python City Sensor Simulator (25 nodes)
         start_process(
             "City Simulator (city_sensors.py)",
             [sys.executable, "city_sensors.py", "--loop", "--interval", "5"],

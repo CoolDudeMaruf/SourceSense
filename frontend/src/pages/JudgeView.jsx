@@ -19,12 +19,32 @@ const STATE_COLORS = {
   [NODE_STATES.FAULT]: '#EF4444' // Crimson
 };
 
-// Mock initial nodes
 const initialNodes = [
-  { id: 'N-01', location: 'Main Gate', state: NODE_STATES.NORMAL, pm25: 12, pm10: 25, flow: 0, dustRemoved: 1.2 },
-  { id: 'N-02', location: 'Assembly Area', state: NODE_STATES.ACTIVE, pm25: 45, pm10: 80, flow: 120, dustRemoved: 4.5 },
-  { id: 'N-03', location: 'Exhaust Vent B', state: NODE_STATES.PENDING_ACTION, pm25: 65, pm10: 110, flow: 0, dustRemoved: 2.1 },
-  { id: 'N-04', location: 'Chemical Storage', state: NODE_STATES.FAULT, pm25: 999, pm10: 999, flow: 0, dustRemoved: 0.8 },
+  { id: 'N-01', location: 'Gazipur City', state: NODE_STATES.NORMAL, pm25: 12, pm10: 25, flow: 0, dustRemoved: 1.2 },
+  { id: 'N-02', location: 'Tongi', state: NODE_STATES.ACTIVE, pm25: 45, pm10: 80, flow: 120, dustRemoved: 4.5 },
+  { id: 'N-03', location: 'Narayanganj City', state: NODE_STATES.PENDING_ACTION, pm25: 65, pm10: 110, flow: 0, dustRemoved: 2.1 },
+  { id: 'N-04', location: 'Savar', state: NODE_STATES.FAULT, pm25: 999, pm10: 999, flow: 0, dustRemoved: 0.8 },
+  { id: 'N-05', location: 'Sreepur', state: NODE_STATES.NORMAL, pm25: 15, pm10: 30, flow: 0, dustRemoved: 1.5 },
+  { id: 'N-06', location: 'Narsingdi', state: NODE_STATES.NORMAL, pm25: 18, pm10: 35, flow: 0, dustRemoved: 1.8 },
+  { id: 'N-07', location: 'Manikganj', state: NODE_STATES.NORMAL, pm25: 10, pm10: 20, flow: 0, dustRemoved: 1.0 },
+  { id: 'N-08', location: 'Tangail', state: NODE_STATES.NORMAL, pm25: 22, pm10: 45, flow: 0, dustRemoved: 2.2 },
+  { id: 'N-09', location: 'Mirpur (Eastern Housing & Pallabi)', state: NODE_STATES.NORMAL, pm25: 25, pm10: 50, flow: 0, dustRemoved: 2.5 },
+  { id: 'N-10', location: 'Azimpur', state: NODE_STATES.NORMAL, pm25: 20, pm10: 40, flow: 0, dustRemoved: 2.0 },
+  { id: 'N-11', location: 'Tejgaon Industrial Area', state: NODE_STATES.NORMAL, pm25: 30, pm10: 60, flow: 0, dustRemoved: 3.0 },
+  { id: 'N-12', location: 'Kalyanpur', state: NODE_STATES.NORMAL, pm25: 14, pm10: 28, flow: 0, dustRemoved: 1.4 },
+  { id: 'N-13', location: 'Motijheel', state: NODE_STATES.NORMAL, pm25: 16, pm10: 32, flow: 0, dustRemoved: 1.6 },
+  { id: 'N-14', location: 'Hazaribagh', state: NODE_STATES.NORMAL, pm25: 35, pm10: 70, flow: 0, dustRemoved: 3.5 },
+  { id: 'N-15', location: 'Mohakhali', state: NODE_STATES.NORMAL, pm25: 19, pm10: 38, flow: 0, dustRemoved: 1.9 },
+  { id: 'N-16', location: 'Uttara (Sectors 10-14)', state: NODE_STATES.NORMAL, pm25: 21, pm10: 42, flow: 0, dustRemoved: 2.1 },
+  { id: 'N-17', location: 'Goran & Khilgaon', state: NODE_STATES.NORMAL, pm25: 17, pm10: 34, flow: 0, dustRemoved: 1.7 },
+  { id: 'N-18', location: 'Becharam Deuri (Old Dhaka)', state: NODE_STATES.NORMAL, pm25: 28, pm10: 56, flow: 0, dustRemoved: 2.8 },
+  { id: 'N-19', location: 'Badda', state: NODE_STATES.NORMAL, pm25: 24, pm10: 48, flow: 0, dustRemoved: 2.4 },
+  { id: 'N-20', location: 'Malibagh', state: NODE_STATES.NORMAL, pm25: 23, pm10: 46, flow: 0, dustRemoved: 2.3 },
+  { id: 'N-21', location: 'Gabtoli', state: NODE_STATES.NORMAL, pm25: 26, pm10: 52, flow: 0, dustRemoved: 2.6 },
+  { id: 'N-22', location: 'Jatrabari', state: NODE_STATES.NORMAL, pm25: 29, pm10: 58, flow: 0, dustRemoved: 2.9 },
+  { id: 'N-23', location: 'Paltan', state: NODE_STATES.NORMAL, pm25: 13, pm10: 26, flow: 0, dustRemoved: 1.3 },
+  { id: 'N-24', location: 'Bashundhara R/A', state: NODE_STATES.NORMAL, pm25: 11, pm10: 22, flow: 0, dustRemoved: 1.1 },
+  { id: 'N-25', location: 'Gulshan & Banani', state: NODE_STATES.NORMAL, pm25: 27, pm10: 54, flow: 0, dustRemoved: 2.7 },
 ];
 
 // --- Part 3: 3D Digital Twin Component ---
@@ -152,7 +172,12 @@ export default function JudgeView() {
               
               {/* Nodes */}
               {nodes.map((node, i) => {
-                const positions = [ {top: '20%', left: '20%'}, {top: '50%', left: '40%'}, {top: '30%', left: '70%'}, {top: '70%', left: '80%'} ];
+                // Generate positions dynamically based on index to fit 25 nodes in a 5x5 grid roughly
+                const row = Math.floor(i / 5);
+                const col = i % 5;
+                const top = 15 + (row * 15) + '%';
+                const left = 15 + (col * 15) + '%';
+                const pos = { top, left };
                 const isSelected = selectedNode.id === node.id;
                 return (
                   <div 
@@ -160,7 +185,7 @@ export default function JudgeView() {
                     onClick={() => handleNodeClick(node)}
                     style={{
                       position: 'absolute',
-                      ...positions[i],
+                      ...pos,
                       cursor: 'pointer',
                       transform: 'translate(-50%, -50%)',
                       zIndex: isSelected ? 10 : 1

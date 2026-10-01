@@ -90,6 +90,8 @@ def calculate_aqi(
 
     overall_aqi = max(sub_indices)
     category, color = _get_category(overall_aqi)
+    
+    primary_pollutant = "PM2.5" if pm25_si == overall_aqi else "PM10"
 
     return {
         "aqi": overall_aqi,
@@ -97,6 +99,7 @@ def calculate_aqi(
         "aqi_color": color,
         "pm25_subindex": pm25_si,
         "pm10_subindex": pm10_si,
+        "primary_pollutant": primary_pollutant,
     }
 
 

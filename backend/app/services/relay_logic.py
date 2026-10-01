@@ -14,8 +14,43 @@ State is maintained in-memory per node. On restart, defaults to OFF.
 from datetime import datetime, timedelta
 from typing import Optional
 import logging
+import requests
 
 logger = logging.getLogger(__name__)
+
+def trigger_infrastructure_webhook(node_id: int, action: str, source: str, aqi: int, zone: str, reason: str):
+    """
+    Direct API trigger / webhook to city municipal infrastructure.
+    Demonstrates active mitigation based on high AQI and specific pollution sources.
+    """
+    webhook_url = f"http://city-infrastructure.local/api/v1/mitigate/{zone}"
+    
+    payload = {
+        "node_id": node_id,
+        "action": action,
+        "pollution_source": source,
+        "aqi": aqi,
+        "reason": reason,
+        "mitigation_systems": []
+    }
+    
+    if action == "ON":
+        if source == "vehicle_combustion":
+            payload["mitigation_systems"].append("adaptive_traffic_lights_divert")
+            payload["mitigation_systems"].append("smog_towers_activate")
+        elif source == "construction_dust" or source == "industrial_emissions":
+            payload["mitigation_systems"].append("automated_water_sprinklers")
+            payload["mitigation_systems"].append("smog_towers_activate")
+        else:
+            payload["mitigation_systems"].append("general_air_purification")
+            
+    try:
+        # In a real scenario, this would be an actual API call. 
+        # Using a timeout to ensure it doesn't block processing.
+        # response = requests.post(webhook_url, json=payload, timeout=2.0)
+        logger.info(f"Triggered city infrastructure webhook for zone {zone}: {payload}")
+    except Exception as e:
+        logger.error(f"Failed to trigger city infrastructure webhook: {e}")
 
 
 class RelayStateManager:

@@ -1,7 +1,7 @@
 """
-SourceSense – City-Wide 8-Node Sensor Simulator
+SourceSense – City-Wide 25-Node Sensor Simulator
 ================================================
-Simulates 8 sensor nodes spread across a fictional Dhaka-area city,
+Simulates 25 sensor nodes spread across a fictional Dhaka-area city,
 each with a DISTINCT pollution profile that triggers different AI actions:
 
  Node │ Location             │ Scenario                      │ AI Action
@@ -39,37 +39,32 @@ API_URL = "http://127.0.0.1:8000/api/v1"
 # 'scenario' drives the sensor data generation logic.
 
 CITY_NODES = [
-    # --- High-Density Traffic & Commercial Hubs (Hazardous) ---
-    {"name": "Azimpur", "location_lat": 23.7270, "location_lon": 90.3830, "zone": "Traffic", "description": "High-Density Traffic & Commercial Hub", "control_mode": "AUTONOMOUS", "pm10_threshold": 120.0, "scenario": "vehicle_combustion", "calib_a": 0.28, "calib_b": 0.15},
-    {"name": "Paltan", "location_lat": 23.7330, "location_lon": 90.4130, "zone": "Traffic", "description": "High-Density Traffic & Commercial Hub", "control_mode": "AUTONOMOUS", "pm10_threshold": 120.0, "scenario": "vehicle_combustion", "calib_a": 0.28, "calib_b": 0.15},
-    {"name": "Gulistan", "location_lat": 23.7240, "location_lon": 90.4120, "zone": "Traffic", "description": "High-Density Traffic & Commercial Hub", "control_mode": "AUTONOMOUS", "pm10_threshold": 125.0, "scenario": "vehicle_combustion", "calib_a": 0.28, "calib_b": 0.15},
-    {"name": "Mohakhali", "location_lat": 23.7780, "location_lon": 90.4000, "zone": "Traffic", "description": "High-Density Traffic & Commercial Hub", "control_mode": "AUTONOMOUS", "pm10_threshold": 120.0, "scenario": "vehicle_combustion", "calib_a": 0.28, "calib_b": 0.15},
-    {"name": "Farmgate", "location_lat": 23.7561, "location_lon": 90.3872, "zone": "Traffic", "description": "High-Density Traffic & Commercial Hub", "control_mode": "AUTONOMOUS", "pm10_threshold": 120.0, "scenario": "vehicle_combustion", "calib_a": 0.28, "calib_b": 0.15},
-    {"name": "Shahbagh", "location_lat": 23.7380, "location_lon": 90.3950, "zone": "Traffic", "description": "High-Density Traffic & Commercial Hub", "control_mode": "AUTONOMOUS", "pm10_threshold": 110.0, "scenario": "vehicle_combustion", "calib_a": 0.28, "calib_b": 0.15},
-    {"name": "Mogbazar", "location_lat": 23.7480, "location_lon": 90.4030, "zone": "Traffic", "description": "High-Density Traffic & Commercial Hub", "control_mode": "AUTONOMOUS", "pm10_threshold": 115.0, "scenario": "vehicle_combustion", "calib_a": 0.28, "calib_b": 0.15},
-    {"name": "Gabtoli", "location_lat": 23.7820, "location_lon": 90.3440, "zone": "Traffic", "description": "High-Density Traffic & Commercial Hub", "control_mode": "AUTONOMOUS", "pm10_threshold": 130.0, "scenario": "vehicle_combustion", "calib_a": 0.28, "calib_b": 0.15},
-    {"name": "Jatrabari", "location_lat": 23.7100, "location_lon": 90.4320, "zone": "Traffic", "description": "High-Density Traffic & Commercial Hub", "control_mode": "AUTONOMOUS", "pm10_threshold": 125.0, "scenario": "vehicle_combustion", "calib_a": 0.28, "calib_b": 0.15},
-    {"name": "Sayedabad", "location_lat": 23.7140, "location_lon": 90.4260, "zone": "Traffic", "description": "High-Density Traffic & Commercial Hub", "control_mode": "AUTONOMOUS", "pm10_threshold": 125.0, "scenario": "vehicle_combustion", "calib_a": 0.28, "calib_b": 0.15},
-    {"name": "Abdullahpur", "location_lat": 23.8760, "location_lon": 90.3950, "zone": "Traffic", "description": "High-Density Traffic & Commercial Hub", "control_mode": "AUTONOMOUS", "pm10_threshold": 120.0, "scenario": "vehicle_combustion", "calib_a": 0.28, "calib_b": 0.15},
-
-    # --- Industrial Zones & Factory Hubs (Very Hazardous) ---
-    {"name": "Tejgaon Industrial Area", "location_lat": 23.7600, "location_lon": 90.3950, "zone": "Industrial", "description": "Industrial Zones & Factory Hubs", "control_mode": "AUTONOMOUS", "pm10_threshold": 150.0, "scenario": "mixed_industrial", "calib_a": 0.35, "calib_b": 0.18},
-    {"name": "Tongi", "location_lat": 23.8900, "location_lon": 90.4000, "zone": "Industrial", "description": "Industrial Zones & Factory Hubs", "control_mode": "AUTONOMOUS", "pm10_threshold": 160.0, "scenario": "mixed_industrial", "calib_a": 0.35, "calib_b": 0.18},
-    {"name": "Hazaribagh", "location_lat": 23.7340, "location_lon": 90.3700, "zone": "Industrial", "description": "Industrial Zones & Factory Hubs (Tanneries)", "control_mode": "AUTONOMOUS", "pm10_threshold": 165.0, "scenario": "mixed_industrial", "calib_a": 0.35, "calib_b": 0.18},
-    {"name": "Keraniganj", "location_lat": 23.6820, "location_lon": 90.3340, "zone": "Industrial", "description": "Industrial Zones & Factory Hubs", "control_mode": "AUTONOMOUS", "pm10_threshold": 155.0, "scenario": "mixed_industrial", "calib_a": 0.35, "calib_b": 0.18},
-    {"name": "Savar", "location_lat": 23.8480, "location_lon": 90.2560, "zone": "Industrial", "description": "Industrial Zones & Factory Hubs", "control_mode": "AUTONOMOUS", "pm10_threshold": 160.0, "scenario": "mixed_industrial", "calib_a": 0.35, "calib_b": 0.18},
-    {"name": "Gazipur", "location_lat": 23.9990, "location_lon": 90.4200, "zone": "Industrial", "description": "Industrial Zones & Factory Hubs", "control_mode": "AUTONOMOUS", "pm10_threshold": 170.0, "scenario": "mixed_industrial", "calib_a": 0.35, "calib_b": 0.18},
-    {"name": "Narayanganj", "location_lat": 23.6230, "location_lon": 90.5000, "zone": "Industrial", "description": "Industrial Zones & Factory Hubs", "control_mode": "AUTONOMOUS", "pm10_threshold": 175.0, "scenario": "mixed_industrial", "calib_a": 0.35, "calib_b": 0.18},
-
-    # --- High-Construction & Congested Residential Areas (Unhealthy) ---
-    {"name": "Mirpur", "location_lat": 23.8220, "location_lon": 90.3650, "zone": "Construction", "description": "High-Construction (South Pallabi & Section areas)", "control_mode": "AUTONOMOUS", "pm10_threshold": 130.0, "scenario": "construction_dust", "calib_a": 0.33, "calib_b": 0.17},
-    {"name": "Uttara", "location_lat": 23.8700, "location_lon": 90.4000, "zone": "Construction", "description": "High-Construction (Sectors near highway)", "control_mode": "AUTONOMOUS", "pm10_threshold": 125.0, "scenario": "construction_dust", "calib_a": 0.33, "calib_b": 0.17},
-    {"name": "Badda", "location_lat": 23.7800, "location_lon": 90.4260, "zone": "Construction", "description": "High-Construction & Congested Residential", "control_mode": "AUTONOMOUS", "pm10_threshold": 120.0, "scenario": "construction_dust", "calib_a": 0.33, "calib_b": 0.17},
-    {"name": "Rampura", "location_lat": 23.7610, "location_lon": 90.4190, "zone": "Construction", "description": "High-Construction & Congested Residential", "control_mode": "AUTONOMOUS", "pm10_threshold": 120.0, "scenario": "construction_dust", "calib_a": 0.33, "calib_b": 0.17},
-    {"name": "Lalbagh", "location_lat": 23.7160, "location_lon": 90.3880, "zone": "Construction", "description": "Congested Residential (Old Dhaka)", "control_mode": "AUTONOMOUS", "pm10_threshold": 115.0, "scenario": "construction_dust", "calib_a": 0.33, "calib_b": 0.17},
-    {"name": "Sutrapur", "location_lat": 23.7020, "location_lon": 90.4200, "zone": "Construction", "description": "Congested Residential (Old Dhaka)", "control_mode": "AUTONOMOUS", "pm10_threshold": 115.0, "scenario": "construction_dust", "calib_a": 0.33, "calib_b": 0.17},
-    {"name": "Islampur", "location_lat": 23.7080, "location_lon": 90.4020, "zone": "Construction", "description": "Congested Residential (Old Dhaka)", "control_mode": "AUTONOMOUS", "pm10_threshold": 115.0, "scenario": "construction_dust", "calib_a": 0.33, "calib_b": 0.17},
-
+    # Top 25 Most Polluted Urban Cities and Areas in Dhaka Region
+    {"name": "Gazipur City", "location_lat": 23.9999, "location_lon": 90.4203, "zone": "Industrial", "description": "High Industrial Emissions", "control_mode": "AUTONOMOUS", "pm10_threshold": 170.0, "scenario": "mixed_industrial", "calib_a": 0.35, "calib_b": 0.18},
+    {"name": "Tongi", "location_lat": 23.8900, "location_lon": 90.4000, "zone": "Industrial", "description": "Heavy Industrial Activity", "control_mode": "AUTONOMOUS", "pm10_threshold": 160.0, "scenario": "mixed_industrial", "calib_a": 0.35, "calib_b": 0.18},
+    {"name": "Narayanganj City", "location_lat": 23.6230, "location_lon": 90.5000, "zone": "Industrial", "description": "Textile and Industrial Hub", "control_mode": "AUTONOMOUS", "pm10_threshold": 175.0, "scenario": "mixed_industrial", "calib_a": 0.35, "calib_b": 0.18},
+    {"name": "Savar", "location_lat": 23.8480, "location_lon": 90.2560, "zone": "Industrial", "description": "Industrial and Factory Hub", "control_mode": "AUTONOMOUS", "pm10_threshold": 160.0, "scenario": "mixed_industrial", "calib_a": 0.35, "calib_b": 0.18},
+    {"name": "Sreepur", "location_lat": 24.2000, "location_lon": 90.4700, "zone": "Industrial", "description": "Factories and Industrial Expansion", "control_mode": "AUTONOMOUS", "pm10_threshold": 155.0, "scenario": "mixed_industrial", "calib_a": 0.35, "calib_b": 0.18},
+    {"name": "Narsingdi", "location_lat": 23.9200, "location_lon": 90.7200, "zone": "Industrial", "description": "Textile Mills and Industrial Zone", "control_mode": "AUTONOMOUS", "pm10_threshold": 150.0, "scenario": "mixed_industrial", "calib_a": 0.35, "calib_b": 0.18},
+    {"name": "Manikganj", "location_lat": 23.8600, "location_lon": 90.0000, "zone": "Industrial", "description": "Brick Kilns and Manufacturing", "control_mode": "AUTONOMOUS", "pm10_threshold": 150.0, "scenario": "mixed_industrial", "calib_a": 0.35, "calib_b": 0.18},
+    {"name": "Tangail", "location_lat": 24.2500, "location_lon": 89.9200, "zone": "Industrial", "description": "Textile Weaving and Kilns", "control_mode": "AUTONOMOUS", "pm10_threshold": 145.0, "scenario": "mixed_industrial", "calib_a": 0.35, "calib_b": 0.18},
+    {"name": "Mirpur (Eastern Housing & Pallabi)", "location_lat": 23.8220, "location_lon": 90.3650, "zone": "Construction", "description": "High-Construction and Dust", "control_mode": "AUTONOMOUS", "pm10_threshold": 130.0, "scenario": "construction_dust", "calib_a": 0.33, "calib_b": 0.17},
+    {"name": "Azimpur", "location_lat": 23.7270, "location_lon": 90.3830, "zone": "Traffic", "description": "Dense Traffic Area", "control_mode": "AUTONOMOUS", "pm10_threshold": 120.0, "scenario": "vehicle_combustion", "calib_a": 0.28, "calib_b": 0.15},
+    {"name": "Tejgaon Industrial Area", "location_lat": 23.7600, "location_lon": 90.3950, "zone": "Industrial", "description": "Central Industrial and Factory Zone", "control_mode": "AUTONOMOUS", "pm10_threshold": 150.0, "scenario": "mixed_industrial", "calib_a": 0.35, "calib_b": 0.18},
+    {"name": "Kalyanpur", "location_lat": 23.7780, "location_lon": 90.3650, "zone": "Traffic", "description": "Congested Traffic Corridor", "control_mode": "AUTONOMOUS", "pm10_threshold": 120.0, "scenario": "vehicle_combustion", "calib_a": 0.28, "calib_b": 0.15},
+    {"name": "Motijheel", "location_lat": 23.7330, "location_lon": 90.4170, "zone": "Traffic", "description": "High-Density Commercial Hub", "control_mode": "AUTONOMOUS", "pm10_threshold": 125.0, "scenario": "vehicle_combustion", "calib_a": 0.28, "calib_b": 0.15},
+    {"name": "Hazaribagh", "location_lat": 23.7340, "location_lon": 90.3700, "zone": "Industrial", "description": "Tanneries and Waste Burning", "control_mode": "AUTONOMOUS", "pm10_threshold": 165.0, "scenario": "waste_burning", "calib_a": 0.35, "calib_b": 0.18},
+    {"name": "Mohakhali", "location_lat": 23.7780, "location_lon": 90.4000, "zone": "Traffic", "description": "Busy Traffic Intersection", "control_mode": "AUTONOMOUS", "pm10_threshold": 120.0, "scenario": "vehicle_combustion", "calib_a": 0.28, "calib_b": 0.15},
+    {"name": "Uttara (Sectors 10-14)", "location_lat": 23.8700, "location_lon": 90.4000, "zone": "Construction", "description": "Major Construction Activities", "control_mode": "AUTONOMOUS", "pm10_threshold": 125.0, "scenario": "construction_dust", "calib_a": 0.33, "calib_b": 0.17},
+    {"name": "Goran & Khilgaon", "location_lat": 23.7430, "location_lon": 90.4350, "zone": "Traffic", "description": "Densely Populated with Heavy Traffic", "control_mode": "AUTONOMOUS", "pm10_threshold": 115.0, "scenario": "vehicle_combustion", "calib_a": 0.28, "calib_b": 0.15},
+    {"name": "Becharam Deuri (Old Dhaka)", "location_lat": 23.7160, "location_lon": 90.3880, "zone": "Construction", "description": "Congested Narrow Roads and Dust", "control_mode": "AUTONOMOUS", "pm10_threshold": 115.0, "scenario": "construction_dust", "calib_a": 0.33, "calib_b": 0.17},
+    {"name": "Badda", "location_lat": 23.7800, "location_lon": 90.4260, "zone": "Construction", "description": "Construction and Road Work", "control_mode": "AUTONOMOUS", "pm10_threshold": 120.0, "scenario": "construction_dust", "calib_a": 0.33, "calib_b": 0.17},
+    {"name": "Malibagh", "location_lat": 23.7480, "location_lon": 90.4130, "zone": "Traffic", "description": "Severe Traffic Congestion", "control_mode": "AUTONOMOUS", "pm10_threshold": 115.0, "scenario": "vehicle_combustion", "calib_a": 0.28, "calib_b": 0.15},
+    {"name": "Gabtoli", "location_lat": 23.7820, "location_lon": 90.3440, "zone": "Traffic", "description": "Major Inter-city Bus Terminal", "control_mode": "AUTONOMOUS", "pm10_threshold": 130.0, "scenario": "vehicle_combustion", "calib_a": 0.28, "calib_b": 0.15},
+    {"name": "Jatrabari", "location_lat": 23.7100, "location_lon": 90.4320, "zone": "Traffic", "description": "Heavy Truck and Bus Movement", "control_mode": "AUTONOMOUS", "pm10_threshold": 125.0, "scenario": "vehicle_combustion", "calib_a": 0.28, "calib_b": 0.15},
+    {"name": "Paltan", "location_lat": 23.7330, "location_lon": 90.4130, "zone": "Traffic", "description": "Commercial Hub Traffic", "control_mode": "AUTONOMOUS", "pm10_threshold": 120.0, "scenario": "vehicle_combustion", "calib_a": 0.28, "calib_b": 0.15},
+    {"name": "Bashundhara R/A", "location_lat": 23.8150, "location_lon": 90.4270, "zone": "Construction", "description": "Ongoing Real Estate Construction", "control_mode": "AUTONOMOUS", "pm10_threshold": 120.0, "scenario": "construction_dust", "calib_a": 0.33, "calib_b": 0.17},
+    {"name": "Gulshan & Banani", "location_lat": 23.7920, "location_lon": 90.4130, "zone": "Traffic", "description": "Commercial and Traffic Emissions", "control_mode": "AUTONOMOUS", "pm10_threshold": 115.0, "scenario": "vehicle_combustion", "calib_a": 0.28, "calib_b": 0.15},
 ]
 
 
@@ -515,7 +510,7 @@ def print_reading_result(i: int, node: dict, result: dict | None, t: datetime):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="SourceSense 8-Node City Sensor Simulator")
+    parser = argparse.ArgumentParser(description="SourceSense 25-Node City Sensor Simulator")
     parser.add_argument("--loop",     action="store_true", help="Keep sending indefinitely")
     parser.add_argument("--once",     action="store_true", help="Send one cycle and exit")
     parser.add_argument("--reset",    action="store_true", help="Delete and recreate nodes")
@@ -524,7 +519,7 @@ def main():
 
     print_banner()
 
-    # ── Initialize all 8 nodes ───────────────────────────────────────────────
+    # ── Initialize all 25 nodes ───────────────────────────────────────────────
     print("Initializing city nodes...")
     node_ids = []
     for node_info in CITY_NODES:
@@ -560,7 +555,7 @@ def main():
     except KeyboardInterrupt:
         print("\n\n  Simulation stopped by user.")
 
-    print("\n  Done. Open the dashboard to see all 8 nodes live.\n")
+    print("\n  Done. Open the dashboard to see all 25 nodes live.\n")
 
 
 if __name__ == "__main__":

@@ -3,12 +3,54 @@ from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, desc
+from datetime import datetime, timezone
 
 from app.database import get_db
 from app.models.node import Node
 from app.schemas.node import NodeCreate, NodeUpdate, NodeOut
 
 router = APIRouter(prefix="/api/v1/nodes", tags=["nodes"])
+
+@router.get("/dashboard/maintenance")
+async def get_maintenance_dashboard(db: AsyncSession = Depends(get_db)):
+    """
+    Predictive maintenance dashboard endpoint.
+    Flags sensors that require physical cleaning or battery replacement.
+    """
+    q = select(Node).where(Node.is_active == True)
+    result = await db.execute(q)
+    nodes = result.scalars().all()
+    
+    maintenance_alerts = []
+    for node in nodes:
+        alerts = []
+        if node.battery_level is not None and node.battery_level < 20.0:
+            alerts.append(f"Low battery: {node.battery_level}%")
+        if node.power_consumption_w is not None and node.power_consumption_w > 5.0:
+            alerts.append(f"High power consumption: {node.power_consumption_w}W")
+            
+        now = datetime.now(timezone.utc)
+        if node.last_cleaning_date:
+            days_since_clean = (now - node.last_cleaning_date).days
+            if days_since_clean > 30:
+                alerts.append(f"Sensor cleaning overdue ({days_since_clean} days)")
+        else:
+            alerts.append("Sensor has never been cleaned")
+            
+        if node.last_battery_replacement:
+            days_since_replace = (now - node.last_battery_replacement).days
+            if days_since_replace > 365:
+                alerts.append(f"Battery replacement recommended ({days_since_replace} days)")
+                
+        if alerts:
+            maintenance_alerts.append({
+                "node_id": node.id,
+                "node_name": node.name,
+                "location": f"{node.location_lat}, {node.location_lon}",
+                "alerts": alerts
+            })
+            
+    return {"status": "ok", "maintenance_alerts": maintenance_alerts}
 
 
 @router.post("", response_model=NodeOut, status_code=201)
