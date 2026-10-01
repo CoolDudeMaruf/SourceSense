@@ -36,7 +36,7 @@ const initialNodes = [
   { id: 'N-14', location: 'Hazaribagh', state: NODE_STATES.NORMAL, pm25: 35, pm10: 70, flow: 0, dustRemoved: 3.5 },
   { id: 'N-15', location: 'Mohakhali', state: NODE_STATES.NORMAL, pm25: 19, pm10: 38, flow: 0, dustRemoved: 1.9 },
   { id: 'N-16', location: 'Uttara (Sectors 10-14)', state: NODE_STATES.NORMAL, pm25: 21, pm10: 42, flow: 0, dustRemoved: 2.1 },
-  { id: 'N-17', location: 'Goran & Khilgaon', state: NODE_STATES.NORMAL, pm25: 17, pm10: 34, flow: 0, dustRemoved: 1.7 },
+  { id: 'N-17', location: 'Khilgaon', state: NODE_STATES.NORMAL, pm25: 17, pm10: 34, flow: 0, dustRemoved: 1.7 },
   { id: 'N-18', location: 'Becharam Deuri (Old Dhaka)', state: NODE_STATES.NORMAL, pm25: 28, pm10: 56, flow: 0, dustRemoved: 2.8 },
   { id: 'N-19', location: 'Badda', state: NODE_STATES.NORMAL, pm25: 24, pm10: 48, flow: 0, dustRemoved: 2.4 },
   { id: 'N-20', location: 'Malibagh', state: NODE_STATES.NORMAL, pm25: 23, pm10: 46, flow: 0, dustRemoved: 2.3 },
@@ -44,7 +44,7 @@ const initialNodes = [
   { id: 'N-22', location: 'Jatrabari', state: NODE_STATES.NORMAL, pm25: 29, pm10: 58, flow: 0, dustRemoved: 2.9 },
   { id: 'N-23', location: 'Paltan', state: NODE_STATES.NORMAL, pm25: 13, pm10: 26, flow: 0, dustRemoved: 1.3 },
   { id: 'N-24', location: 'Bashundhara R/A', state: NODE_STATES.NORMAL, pm25: 11, pm10: 22, flow: 0, dustRemoved: 1.1 },
-  { id: 'N-25', location: 'Gulshan & Banani', state: NODE_STATES.NORMAL, pm25: 27, pm10: 54, flow: 0, dustRemoved: 2.7 },
+  { id: 'N-25', location: 'Banani', state: NODE_STATES.NORMAL, pm25: 27, pm10: 54, flow: 0, dustRemoved: 2.7 },
 ];
 
 // --- Part 3: 3D Digital Twin Component ---

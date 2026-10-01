@@ -51,6 +51,7 @@ def _get_node_context(node_id: int) -> dict:
 
 
 @router.post("", response_model=IngestionResponse, status_code=201)
+@router.post("/", response_model=IngestionResponse, status_code=201, include_in_schema=False)
 async def ingest_reading(payload: SensorPayload, db: AsyncSession = Depends(get_db)):
     """Ingest a new sensor reading, run validation, compute AQI + classification."""
     # ── Fetch node ────────────────────────────────────────────────────────────
