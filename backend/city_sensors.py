@@ -70,8 +70,6 @@ CITY_NODES = [
     {"name": "Sutrapur", "location_lat": 23.7020, "location_lon": 90.4200, "zone": "Construction", "description": "Congested Residential (Old Dhaka)", "control_mode": "AUTONOMOUS", "pm10_threshold": 115.0, "scenario": "construction_dust", "calib_a": 0.33, "calib_b": 0.17},
     {"name": "Islampur", "location_lat": 23.7080, "location_lon": 90.4020, "zone": "Construction", "description": "Congested Residential (Old Dhaka)", "control_mode": "AUTONOMOUS", "pm10_threshold": 115.0, "scenario": "construction_dust", "calib_a": 0.33, "calib_b": 0.17},
 
-    # --- Demo Testing Node ---
-    {"name": "Demo Test Node", "location_lat": 23.8103, "location_lon": 90.4125, "zone": "Demo", "description": "Alternates through all states every 10s", "control_mode": "AUTONOMOUS", "pm10_threshold": 100.0, "scenario": "demo_alternating", "calib_a": 1.0, "calib_b": 0.0, "skip_real_aqi": True},
 ]
 
 
