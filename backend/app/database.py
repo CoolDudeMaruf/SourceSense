@@ -78,6 +78,46 @@ async def seed_essential_nodes():
                 )
                 session.add(judge_node)
                 await session.commit()
+                await session.refresh(judge_node)
+
+            from app.models.reading import Reading
+            from datetime import datetime, timezone, timedelta
+            existing_readings = (await session.execute(select(Reading).where(Reading.node_id == judge_node.id))).scalars().all()
+            if not existing_readings:
+                now = datetime.now(timezone.utc)
+                initial_scenarios = [
+                    ("construction_dust", 260.0, 38.0, 280),
+                    ("vehicle_combustion", 310.0, 85.0, 310),
+                    ("waste_burning", 340.0, 120.0, 340),
+                    ("humid_haze", 180.0, 95.0, 180),
+                    ("clean", 28.0, 15.0, 30),
+                ]
+                for idx, (label, pm10, pm25, aqi) in enumerate(initial_scenarios):
+                    r = Reading(
+                        node_id=judge_node.id,
+                        timestamp=now - timedelta(seconds=(5 - idx) * 10),
+                        temperature_c=29.5,
+                        humidity_percent=60.0,
+                        pm1_0_raw=pm25 * 0.6,
+                        pm2_5_raw=pm25,
+                        pm10_raw=pm10,
+                        pm2_5_corrected=pm25,
+                        pm10_corrected=pm10,
+                        humidity_used=60.0,
+                        mq2=280, mq4=210, mq6=170, mq7=300, mq8=180, mq131=95, mq135=190,
+                        quality_flags={"pm10": "normal", "humidity": "normal"},
+                        aqi=aqi,
+                        aqi_category="Severe" if aqi > 200 else "Moderate" if aqi > 100 else "Good",
+                        classifier_label=label,
+                        classifier_confidence=0.92,
+                        relay_state=(aqi > 100 and label != "humid_haze"),
+                        action_reason=f"Demonstration reading for {label}",
+                        sensor_trust_score=100.0,
+                        battery_level=99.0,
+                        is_solar_charging=True
+                    )
+                    session.add(r)
+                await session.commit()
         except Exception:
             pass
 

@@ -667,13 +667,6 @@ def main():
             print(f"  --- Cycle {cycle:04d} | {t.strftime('%H:%M:%S')} " + "-" * 45)
 
             for i, (node_info, node_id) in enumerate(zip(CITY_NODES, node_ids), 1):
-                # Throttle Judge View Node to send at exact 10 second intervals
-                if node_info["scenario"] == "judge_view_cycling":
-                    now_sec = time.time()
-                    if now_sec - last_judge_sent < 9.5 and cycle > 1 and not args.once:
-                        continue
-                    last_judge_sent = now_sec
-
                 result = send_reading(node_id, node_info, t)
                 print_reading_result(i, node_info, result, t)
 
