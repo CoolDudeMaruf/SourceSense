@@ -34,15 +34,18 @@ async def create_all_tables():
     async with engine.begin() as conn:
         from app.models import node, reading, event, alert  # noqa: F401 – register models
         await conn.run_sync(Base.metadata.create_all)
-        
-        # Auto-migration for new columns (ignores error if column exists)
+
+    # Auto-migration: add new columns outside the main transaction so a
+    # duplicate-column error on re-deploy does NOT poison the whole connection.
+    # PostgreSQL supports "ADD COLUMN IF NOT EXISTS" (pg 9.6+).
+    from sqlalchemy import text
+    migrations = [
+        "ALTER TABLE readings ADD COLUMN IF NOT EXISTS battery_level FLOAT;",
+        "ALTER TABLE readings ADD COLUMN IF NOT EXISTS is_solar_charging BOOLEAN;",
+    ]
+    for stmt in migrations:
         try:
-            from sqlalchemy import text
-            await conn.execute(text("ALTER TABLE readings ADD COLUMN is_solar_charging BOOLEAN;"))
+            async with engine.begin() as conn:
+                await conn.execute(text(stmt))
         except Exception:
-            pass
-        try:
-            from sqlalchemy import text
-            await conn.execute(text("ALTER TABLE readings ADD COLUMN battery_level FLOAT;"))
-        except Exception:
-            pass
+            pass  # Column already exists on this DB instance (SQLite fallback)
