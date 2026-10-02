@@ -229,6 +229,8 @@ async def ingest_reading(payload: SensorPayload, db: AsyncSession = Depends(get_
         forecast_10m=forecast_data["forecast_10m"],
         forecast_20m=forecast_data["forecast_20m"],
         forecast_30m=forecast_data["forecast_30m"],
+        battery_level=payload.battery_level,
+        is_solar_charging=payload.is_solar_charging,
     )
     db.add(reading)
     await db.flush()

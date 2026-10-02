@@ -448,6 +448,7 @@ SCENARIO_LABELS = {
     "dust_storm_rising":  "[STORM]   Dust Storm Rising   -> Forecast SPRAY",
     "demo_alternating":   "[DEMO]    Alternating States  -> Cycling all UI states",
     "judge_view_cycling": "[JUDGE]   Judge View Node     -> Barrier-free 10s Actions",
+    "faulty_device_degraded": "[FAULT]   Degraded Hardware   -> Low Health Score",
 }
 
 
