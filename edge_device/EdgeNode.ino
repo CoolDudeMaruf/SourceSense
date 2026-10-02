@@ -199,7 +199,9 @@ void loop() {
   int localAqi = calculateAQI(pm25, pm10);
   int combinedAqi = localAqi;
   if (cachedPublicAqi >= 0) {
-    combinedAqi = (localAqi + cachedPublicAqi) / 2; // Average local and public AQI
+    // Air quality is defined by the worst pollutant. Average artificially lowers it.
+    // Instead, we take the MAXIMUM of local and public AQI.
+    combinedAqi = (localAqi > cachedPublicAqi) ? localAqi : cachedPublicAqi;
   }
 
   Serial.print("Local Computed AQI: ");
