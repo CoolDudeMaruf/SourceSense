@@ -1188,7 +1188,7 @@ export default function Dashboard() {
                           <ActionWindow
                             classifierLabel={currentReading?.classifier_label}
                             isRelayOn={currentReading?.relay_state}
-                            isGoodAqi={currentReading?.aqi <= 100}
+                            isGoodAqi={currentReading?.aqi <= 50}
                             aqi={currentReading?.aqi}
                             reason={currentReading?.action_reason || (currentReading?.relay_state ? "Action running" : "Standby (Action Paused)")}
                           />
@@ -1229,7 +1229,7 @@ export default function Dashboard() {
                             if (!currentReading) return <div className="osen-state-center">No Data</div>;
 
                             if (!currentReading.relay_state) {
-                              const isGood = currentReading?.aqi <= 100;
+                              const isGood = currentReading?.aqi <= 50;
                               const pauseReason = currentReading?.action_reason || (isGood ? 'Good AQI — No action needed' : 'Action paused by AI intelligence');
                               return (
                                 <div style={{ textAlign: 'center', padding: '0 0.5rem' }}>

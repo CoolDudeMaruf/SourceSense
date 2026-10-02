@@ -390,55 +390,36 @@ def gen_faulty_device_degraded(t):
     }
 
 
-_judge_state_index = 0
-
 def gen_judge_view_cycling(t):
-    """Judge View Node scenario — 100% barrier-free, high-potency action generator.
-    Cycles through clear, unblocked AI action scenarios every call:
-      0: Construction Dust (Sprinkling Water Mist)
-      1: Vehicle Combustion (Traffic Diversion Advisory)
-      2: Waste Burning (Fire Control Dispatch)
-      3: Humid Haze (Weather Event - No Action)
-      4: Clean Air (Good AQI - Standby)
+    """Judge View Node scenario — 100% barrier-free action generator.
+    Transitions active AI action states every 10 seconds based on clock time:
+      Slot 0 (00-10s): Construction Dust -> Sprinkling Water Mist Cannon [ON]
+      Slot 1 (10-20s): Vehicle Combustion -> Traffic Re-routing Advisory [ON]
+      Slot 2 (20-30s): Waste Burning -> Multi-Unit Fire Dispatch [ON]
     """
-    global _judge_state_index
-    idx = _judge_state_index % 5
-    _judge_state_index += 1
+    import time
+    slot = int(time.time() / 10) % 3
 
-    if idx == 0:
-        # Construction Dust -> High PM10, low CO/gases -> SPRAY Mist Cannon
+    if slot == 0:
+        # Construction Dust - High PM10 -> SPRAY Mist Cannon
         return {
-            "Temperature_C": _jitter(29.5), "Humidity_Percent": _jitter(60.0),
-            "PM1.0": _jitter(22.0), "PM2.5": _jitter(38.0), "PM10": _jitter(260.0),
+            "Temperature_C": _jitter(29.5), "Humidity_Percent": _jitter(58.0),
+            "PM1.0": _jitter(25.0), "PM2.5": _jitter(42.0), "PM10": _jitter(270.0),
             "MQ2": _jitter(280), "MQ4": _jitter(210), "MQ6": _jitter(170), "MQ7": _jitter(130), "MQ8": _jitter(180), "MQ131": _jitter(95), "MQ135": _jitter(190)
         }
-    elif idx == 1:
-        # Vehicle Combustion -> High MQ7 (CO), Moderate PM10 -> Traffic Diversion
+    elif slot == 1:
+        # Vehicle Combustion - High MQ7 (CO), Moderate PM10 -> Traffic Advisory
         return {
             "Temperature_C": _jitter(31.5), "Humidity_Percent": _jitter(52.0),
-            "PM1.0": _jitter(55.0), "PM2.5": _jitter(85.0), "PM10": _jitter(310.0),
-            "MQ2": _jitter(610), "MQ4": _jitter(200), "MQ6": _jitter(160), "MQ7": _jitter(820), "MQ8": _jitter(310), "MQ131": _jitter(150), "MQ135": _jitter(410)
-        }
-    elif idx == 2:
-        # Waste Burning -> High MQ2, MQ135, PM2.5, PM10 -> Fire Dispatch
-        return {
-            "Temperature_C": _jitter(34.5), "Humidity_Percent": _jitter(45.0),
-            "PM1.0": _jitter(80.0), "PM2.5": _jitter(120.0), "PM10": _jitter(340.0),
-            "MQ2": _jitter(720), "MQ4": _jitter(410), "MQ6": _jitter(310), "MQ7": _jitter(510), "MQ8": _jitter(410), "MQ131": _jitter(210), "MQ135": _jitter(620)
-        }
-    elif idx == 3:
-        # Humid Haze -> High Humidity (92%), PM10 180 -> Weather Event (No Action)
-        return {
-            "Temperature_C": _jitter(27.0), "Humidity_Percent": _jitter(92.0),
-            "PM1.0": _jitter(70.0), "PM2.5": _jitter(95.0), "PM10": _jitter(180.0),
-            "MQ2": _jitter(100), "MQ4": _jitter(75), "MQ6": _jitter(65), "MQ7": _jitter(80), "MQ8": _jitter(70), "MQ131": _jitter(45), "MQ135": _jitter(90)
+            "PM1.0": _jitter(55.0), "PM2.5": _jitter(88.0), "PM10": _jitter(315.0),
+            "MQ2": _jitter(610), "MQ4": _jitter(200), "MQ6": _jitter(160), "MQ7": _jitter(850), "MQ8": _jitter(310), "MQ131": _jitter(150), "MQ135": _jitter(410)
         }
     else:
-        # Clean Air -> Good AQI
+        # Waste Burning - High MQ2, MQ135, PM2.5, PM10 -> Fire Control Dispatch
         return {
-            "Temperature_C": _jitter(28.0), "Humidity_Percent": _jitter(55.0),
-            "PM1.0": _jitter(8.0), "PM2.5": _jitter(15.0), "PM10": _jitter(28.0),
-            "MQ2": _jitter(90), "MQ4": _jitter(60), "MQ6": _jitter(50), "MQ7": _jitter(65), "MQ8": _jitter(55), "MQ131": _jitter(35), "MQ135": _jitter(70)
+            "Temperature_C": _jitter(34.5), "Humidity_Percent": _jitter(45.0),
+            "PM1.0": _jitter(82.0), "PM2.5": _jitter(125.0), "PM10": _jitter(345.0),
+            "MQ2": _jitter(730), "MQ4": _jitter(415), "MQ6": _jitter(315), "MQ7": _jitter(515), "MQ8": _jitter(415), "MQ131": _jitter(215), "MQ135": _jitter(625)
         }
 
 
