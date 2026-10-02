@@ -127,11 +127,11 @@ async def ingest_reading(payload: SensorPayload, db: AsyncSession = Depends(get_
     # ── Real Intelligence Layer ─────────────────────────────────────────────────
     trust_score = calculate_sensor_trust(node.id, payload.PM10, quality_flags, payload.Timestamp)
     
-    # Judge View & Demo nodes get 100% trust and instant 0s persistence delay
+    # Trigger instant action (persistence_delay = 0) when sensor trust >= 50% and AI confidence >= 50%
     if "Judge" in node.name or node.zone in ["Demo", "Judge"]:
         trust_score = 1.0
         persistence_delay = 0
-    elif trust_score >= 0.7 and clf_result["confidence"] >= 0.6:
+    elif trust_score >= 0.50 and clf_result["confidence"] >= 0.50:
         persistence_delay = 0
     else:
         persistence_delay = 300

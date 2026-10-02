@@ -37,8 +37,8 @@ class EventManager:
             ctx["first_exceedance"] = timestamp
             ctx["state"] = "UNCONFIRMED"
             
-        # If persistence time has passed or persistence is 0
-        elif (timestamp - ctx["first_exceedance"]).total_seconds() >= persistence_sec:
+        # If persistence time has passed or persistence is 0, set state to CONFIRMED immediately
+        if persistence_sec == 0 or (timestamp - ctx["first_exceedance"]).total_seconds() >= persistence_sec:
             ctx["state"] = "CONFIRMED"
             
         return ctx["state"]

@@ -18,9 +18,9 @@ def safety_gate(node_id: int, control_mode: str, optimizer_decision: dict) -> di
     confidence = optimizer_decision.get("confidence", 0)
     reason = optimizer_decision.get("reason", "")
     
-    # Safety Constraint 1: Minimum Confidence
-    if confidence < 60.0:
-        msg = f"Safety Block: Confidence too low ({confidence}%). {reason}"
+    # Safety Constraint 1: Minimum Combined Confidence (50% trust * 50% classifier = 25.0% combined)
+    if confidence < 25.0:
+        msg = f"Safety Block: Combined confidence too low ({confidence:.1f}%). {reason}"
         logger.warning(msg)
         return {"relay_action": "OFF", "reason": msg, "is_safe": False}
         
@@ -34,14 +34,14 @@ def safety_gate(node_id: int, control_mode: str, optimizer_decision: dict) -> di
         return {"relay_action": "ON", "reason": msg, "is_safe": True, "simulated": True}
         
     elif control_mode == "AUTONOMOUS":
-        if confidence >= 90.0:
+        if confidence >= 70.0:
             msg = f"Autonomous intervention allowed. {reason}"
             return {"relay_action": "ON", "reason": msg, "is_safe": True, "simulated": False}
-        elif confidence >= 60.0:
+        elif confidence >= 25.0:
             msg = f"Conservative intervention allowed. {reason}"
             return {"relay_action": "ON", "reason": msg, "is_safe": True, "simulated": False}
         else:
-            msg = f"Safety Block: Confidence marginal ({confidence}%). Need gather evidence."
+            msg = f"Safety Block: Confidence marginal ({confidence:.1f}%). Need gather evidence."
             return {"relay_action": "OFF", "reason": msg, "is_safe": False}
             
     return {"relay_action": "OFF", "reason": "Unknown control mode", "is_safe": False}

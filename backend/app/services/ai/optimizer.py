@@ -16,8 +16,8 @@ def optimize_intervention(zone: str, pm10: float, forecast_30m: float,
          
     decision_confidence = sensor_trust * classifier_confidence * 100.0
     
-    if aqi <= 100 and pm10 <= 100:
-        return {"action": "NONE", "reason": f"AQI Low ({int(aqi)}), below concern threshold.", "confidence": decision_confidence}
+    if aqi <= 50 and pm10 <= 50:
+        return {"action": "NONE", "reason": f"AQI Good ({int(aqi)}), below concern threshold.", "confidence": decision_confidence}
 
     # Dynamic calculation based on continuous sensor data (PM10 & Forecast)
     base_pm = max(pm10, forecast_30m)
