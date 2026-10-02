@@ -34,3 +34,10 @@ async def create_all_tables():
     async with engine.begin() as conn:
         from app.models import node, reading, event, alert  # noqa: F401 – register models
         await conn.run_sync(Base.metadata.create_all)
+        
+        # Auto-migration for new columns (ignores error if column exists)
+        try:
+            from sqlalchemy import text
+            await conn.execute(text("ALTER TABLE readings ADD COLUMN is_solar_charging BOOLEAN;"))
+        except Exception:
+            pass
