@@ -46,15 +46,26 @@ export default function ActionWindow({ classifierLabel, isRelayOn, confidence, r
         {/* AI Confidence & Reason (Hidden during Good AQI) */}
         {!isGoodAqi && (
           <div className="flex flex-col items-center mt-2 w-full px-2">
-            {confidence && (
+            {confidence != null && (
               <div className="flex justify-between w-full mb-1">
                  <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>AI CONFIDENCE</span>
                  <span style={{ fontSize: '0.65rem', color: 'var(--text-secondary)', fontWeight: 700 }}>{(confidence * 100).toFixed(1)}%</span>
               </div>
             )}
             {reason && (
-               <div style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', textAlign: 'center', background: 'rgba(255,255,255,0.05)', padding: '4px 8px', borderRadius: 4, width: '100%' }}>
-                 {reason}
+               <div style={{
+                 fontSize: '0.75rem',
+                 color: !isRelayOn ? '#854d0e' : 'var(--text-secondary)',
+                 textAlign: 'center',
+                 background: !isRelayOn ? 'rgba(250, 204, 21, 0.15)' : 'rgba(255,255,255,0.05)',
+                 border: !isRelayOn ? '1px solid rgba(250, 204, 21, 0.3)' : '1px solid rgba(255,255,255,0.1)',
+                 padding: '5px 10px',
+                 borderRadius: 6,
+                 width: '100%',
+                 marginTop: 4,
+                 fontWeight: 600
+               }}>
+                 {!isRelayOn ? <span><strong>Reason:</strong> {reason}</span> : reason}
                </div>
             )}
           </div>

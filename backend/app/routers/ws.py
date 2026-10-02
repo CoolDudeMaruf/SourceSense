@@ -86,6 +86,15 @@ async def ws_live_feed(ws: WebSocket, node_id: int):
                     "classifier_label": reading.classifier_label,
                     "classifier_confidence": reading.classifier_confidence,
                     "relay_state": reading.relay_state,
+                    "action_reason": reading.action_reason,
+                    "intensity": reading.intensity,
+                    "duration_min": reading.duration_min,
+                    "sensor_trust_score": reading.sensor_trust_score,
+                    "forecast_10m": reading.forecast_10m,
+                    "forecast_20m": reading.forecast_20m,
+                    "forecast_30m": reading.forecast_30m,
+                    "battery_level": reading.battery_level,
+                    "is_solar_charging": reading.is_solar_charging,
                     "quality_flags": reading.quality_flags,
                 }
                 await ws.send_json(payload)

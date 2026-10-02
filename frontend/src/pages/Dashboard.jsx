@@ -1229,13 +1229,14 @@ export default function Dashboard() {
 
                             if (!currentReading.relay_state) {
                               const isGood = currentReading?.aqi <= 100;
+                              const pauseReason = currentReading?.action_reason || (isGood ? 'Good AQI — No action needed' : 'Action paused by AI intelligence');
                               return (
-                                <div style={{ textAlign: 'center' }}>
+                                <div style={{ textAlign: 'center', padding: '0 0.5rem' }}>
                                   <div style={{ fontSize: '1.2rem', fontWeight: 700, color: isGood ? 'var(--ogs)' : 'var(--ow)' }}>
                                     {isGood ? 'Monitoring' : 'Standby'}
                                   </div>
-                                  <div style={{ fontSize: '0.85rem', color: 'var(--ts)', marginTop: 4 }}>
-                                    {isGood ? 'Good AQI — No action needed' : 'Action paused for AI intelligence'}
+                                  <div style={{ fontSize: '0.8rem', color: 'var(--ts)', marginTop: 6, lineHeight: 1.35, maxWidth: 220 }}>
+                                    {pauseReason}
                                   </div>
                                 </div>
                               );
