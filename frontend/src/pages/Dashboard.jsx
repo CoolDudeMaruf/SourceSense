@@ -6,7 +6,7 @@ import LiveReadingsCard from '../components/LiveReadingsCard';
 import AQIBadge from '../components/AQIBadge';
 import RelayStatus from '../components/RelayStatus';
 import ActionWindow from '../components/ActionWindow';
-import ExternalSystems from './ExternalSystems';
+
 import TimelineChart from '../components/TimelineChart';
 import DataQualityPanel from '../components/DataQualityPanel';
 import { useWebSocket } from '../hooks/useWebSocket';
@@ -1440,7 +1440,7 @@ export default function Dashboard() {
                       {tab === 'quality' ? (
                         <DataQualityPanel readings={readings} />
                       ) : tab === 'external' ? (
-                        <ExternalSystems />
+                        <div>External systems feature temporarily disabled</div>
                       ) : (
                         <div className="osen-table-wrap">
                           <table className="osen-table">
