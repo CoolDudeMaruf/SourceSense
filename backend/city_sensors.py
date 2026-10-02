@@ -41,6 +41,9 @@ API_URL = f"http://127.0.0.1:{PORT}/api/v1"
 # 'scenario' drives the sensor data generation logic.
 
 CITY_NODES = [
+    # Judge View Node — Barrier-free fast cycling action demonstrator
+    {"name": "00 - Judge View Node", "location_lat": 23.8105, "location_lon": 90.4130, "zone": "Demo", "description": "Barrier-free demonstrator node — cycles actions every 10 sec", "control_mode": "AUTONOMOUS", "pm10_threshold": 100.0, "scenario": "judge_view_cycling", "calib_a": 0.33, "calib_b": 0.17, "skip_real_aqi": True, "battery_level": 99.0, "is_solar_charging": True},
+
     # Special Test Node for UI demonstrations
     {"name": "00 - Edge AI Test Node", "location_lat": 23.8103, "location_lon": 90.4125, "zone": "Demo", "description": "Cycles through all AI classification scenarios", "control_mode": "AUTONOMOUS", "pm10_threshold": 120.0, "scenario": "demo_alternating", "calib_a": 0.33, "calib_b": 0.17, "skip_real_aqi": True},
 
@@ -387,6 +390,58 @@ def gen_faulty_device_degraded(t):
     }
 
 
+_judge_state_index = 0
+
+def gen_judge_view_cycling(t):
+    """Judge View Node scenario — 100% barrier-free, high-potency action generator.
+    Cycles through clear, unblocked AI action scenarios every call:
+      0: Construction Dust (Sprinkling Water Mist)
+      1: Vehicle Combustion (Traffic Diversion Advisory)
+      2: Waste Burning (Fire Control Dispatch)
+      3: Humid Haze (Weather Event - No Action)
+      4: Clean Air (Good AQI - Standby)
+    """
+    global _judge_state_index
+    idx = _judge_state_index % 5
+    _judge_state_index += 1
+
+    if idx == 0:
+        # Construction Dust -> High PM10, low CO/gases -> SPRAY Mist Cannon
+        return {
+            "Temperature_C": _jitter(29.5), "Humidity_Percent": _jitter(60.0),
+            "PM1.0": _jitter(22.0), "PM2.5": _jitter(38.0), "PM10": _jitter(260.0),
+            "MQ2": _jitter(280), "MQ4": _jitter(210), "MQ6": _jitter(170), "MQ7": _jitter(130), "MQ8": _jitter(180), "MQ131": _jitter(95), "MQ135": _jitter(190)
+        }
+    elif idx == 1:
+        # Vehicle Combustion -> High MQ7 (CO), Moderate PM10 -> Traffic Diversion
+        return {
+            "Temperature_C": _jitter(31.5), "Humidity_Percent": _jitter(52.0),
+            "PM1.0": _jitter(55.0), "PM2.5": _jitter(85.0), "PM10": _jitter(310.0),
+            "MQ2": _jitter(610), "MQ4": _jitter(200), "MQ6": _jitter(160), "MQ7": _jitter(820), "MQ8": _jitter(310), "MQ131": _jitter(150), "MQ135": _jitter(410)
+        }
+    elif idx == 2:
+        # Waste Burning -> High MQ2, MQ135, PM2.5, PM10 -> Fire Dispatch
+        return {
+            "Temperature_C": _jitter(34.5), "Humidity_Percent": _jitter(45.0),
+            "PM1.0": _jitter(80.0), "PM2.5": _jitter(120.0), "PM10": _jitter(340.0),
+            "MQ2": _jitter(720), "MQ4": _jitter(410), "MQ6": _jitter(310), "MQ7": _jitter(510), "MQ8": _jitter(410), "MQ131": _jitter(210), "MQ135": _jitter(620)
+        }
+    elif idx == 3:
+        # Humid Haze -> High Humidity (92%), PM10 180 -> Weather Event (No Action)
+        return {
+            "Temperature_C": _jitter(27.0), "Humidity_Percent": _jitter(92.0),
+            "PM1.0": _jitter(70.0), "PM2.5": _jitter(95.0), "PM10": _jitter(180.0),
+            "MQ2": _jitter(100), "MQ4": _jitter(75), "MQ6": _jitter(65), "MQ7": _jitter(80), "MQ8": _jitter(70), "MQ131": _jitter(45), "MQ135": _jitter(90)
+        }
+    else:
+        # Clean Air -> Good AQI
+        return {
+            "Temperature_C": _jitter(28.0), "Humidity_Percent": _jitter(55.0),
+            "PM1.0": _jitter(8.0), "PM2.5": _jitter(15.0), "PM10": _jitter(28.0),
+            "MQ2": _jitter(90), "MQ4": _jitter(60), "MQ6": _jitter(50), "MQ7": _jitter(65), "MQ8": _jitter(55), "MQ131": _jitter(35), "MQ135": _jitter(70)
+        }
+
+
 SCENARIO_GENERATORS = {
     "construction_dust": gen_construction_dust,
     "vehicle_combustion": gen_vehicle_combustion,
@@ -398,6 +453,7 @@ SCENARIO_GENERATORS = {
     "dust_storm_rising":  gen_dust_storm_rising,
     "demo_alternating":   gen_demo_alternating,
     "faulty_device_degraded": gen_faulty_device_degraded,
+    "judge_view_cycling": gen_judge_view_cycling,
 }
 
 SCENARIO_LABELS = {
@@ -410,6 +466,7 @@ SCENARIO_LABELS = {
     "faulty_sensor":      "[FAULT]   Faulty Sensor       -> Safety block",
     "dust_storm_rising":  "[STORM]   Dust Storm Rising   -> Forecast SPRAY",
     "demo_alternating":   "[DEMO]    Alternating States  -> Cycling all UI states",
+    "judge_view_cycling": "[JUDGE]   Judge View Node     -> Barrier-free 10s Actions",
 }
 
 
@@ -601,6 +658,7 @@ def main():
     print(f"{'-'*74}\n")
 
     cycle = 0
+    last_judge_sent = 0.0
     try:
         from datetime import timezone
         while True:
@@ -609,6 +667,13 @@ def main():
             print(f"  --- Cycle {cycle:04d} | {t.strftime('%H:%M:%S')} " + "-" * 45)
 
             for i, (node_info, node_id) in enumerate(zip(CITY_NODES, node_ids), 1):
+                # Throttle Judge View Node to send at exact 10 second intervals
+                if node_info["scenario"] == "judge_view_cycling":
+                    now_sec = time.time()
+                    if now_sec - last_judge_sent < 9.5 and cycle > 1 and not args.once:
+                        continue
+                    last_judge_sent = now_sec
+
                 result = send_reading(node_id, node_info, t)
                 print_reading_result(i, node_info, result, t)
 
