@@ -1,0 +1,57 @@
+services:
+  # ── Backend Service (FastAPI) ───────────────────────────────────────────────
+  - type: web
+    name: sourcesense-backend
+    env: docker
+    region: oregon
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    healthCheckPath: /health
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: sourcesense-db
+          property: connectionString
+      - key: SYNC_DATABASE_URL
+        fromDatabase:
+          name: sourcesense-db
+          property: connectionString
+      - key: CORS_ORIGINS
+        # Allow frontend URLs; adjust if you have a custom domain
+        value: '["*"]'
+
+  # ── Frontend Service (React / Vite) ─────────────────────────────────────────
+  - type: web
+    name: sourcesense-frontend
+    # Deploying as a Static Site directly via Render's built-in static builder is highly recommended for React,
+    # but we can also use docker. Here we use the static environment for best performance & free tier eligibility.
+    env: static
+    region: oregon
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./dist
+    envVars:
+      - key: NODE_VERSION
+        value: 20
+      - key: VITE_API_URL
+        fromService:
+          type: web
+          name: sourcesense-backend
+          property: host
+          # Note: this will inject something like `sourcesense-backend-xxxx.onrender.com`.
+          # However, VITE requires the full URL scheme (https://).
+          # On Render, it's often easier to set this manually in the dashboard after initial creation,
+          # or define a wrapper URL. Render doesn't natively prepend `https://` with `fromService`.
+          # If it fails, you can manually override VITE_API_URL in the Render Dashboard to `https://<backend-url>`.
+      - key: VITE_WS_URL
+        fromService:
+          type: web
+          name: sourcesense-backend
+          property: host
+
+databases:
+  # ── PostgreSQL Database ─────────────────────────────────────────────────────
+  - name: sourcesense-db
+    databaseName: sourcesense
+    user: sourcesense
+    region: oregon
+    plan: free # Change to starter or standard for production

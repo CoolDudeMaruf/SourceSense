@@ -12,10 +12,26 @@ class Settings(BaseSettings):
         default="sqlite+aiosqlite:///./sourcesense.db",
         alias="DATABASE_URL",
     )
+    
+    def get_async_db_url(self) -> str:
+        url = self.database_url
+        if url.startswith("postgres://"):
+            url = url.replace("postgres://", "postgresql+asyncpg://", 1)
+        elif url.startswith("postgresql://"):
+            url = url.replace("postgresql://", "postgresql+asyncpg://", 1)
+        return url
+
     sync_database_url: str = Field(
         default="sqlite:///./sourcesense.db",
         alias="SYNC_DATABASE_URL",
     )
+    
+    def get_sync_db_url(self) -> str:
+        url = self.sync_database_url
+        if url.startswith("postgres://"):
+            url = url.replace("postgres://", "postgresql://", 1)
+        return url
+
 
     # ── Relay / trigger defaults (overridden per-node in DB) ──────────────────
     default_pm10_threshold: float = Field(default=50.0, alias="DEFAULT_PM10_THRESHOLD")

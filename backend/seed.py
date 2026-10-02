@@ -40,7 +40,7 @@ REPORT_PATH = Path(__file__).parent / "data_quality_report.md"
 
 def main():
     # Use sync engine for seeding
-    sync_url = settings.sync_database_url
+    sync_url = settings.get_sync_db_url()
     engine = create_engine(sync_url, echo=False)
     Base.metadata.create_all(engine)
 
