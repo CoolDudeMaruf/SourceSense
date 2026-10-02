@@ -21,9 +21,23 @@ async def lifespan(app: FastAPI):
     # Pre-warm the classifier (trains if no model.pkl exists)
     from app.services.classifier import get_model
     get_model()
+    
+    # Start the simulator in the background so the dashboard is alive on Render
+    import subprocess
+    import sys
+    import os
+    logger.info("Starting background city simulator...")
+    sim_process = subprocess.Popen(
+        [sys.executable, "city_sensors.py", "--loop", "--interval", "3"], 
+        cwd=os.path.join(os.path.dirname(__file__), ".."),
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL
+    )
+
     logger.info("Startup complete.")
     yield
     logger.info("SourceSense shutting down.")
+    sim_process.terminate()
 
 
 app = FastAPI(
