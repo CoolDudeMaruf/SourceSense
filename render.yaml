@@ -25,7 +25,6 @@ services:
     # Deploying as a Static Site directly via Render's built-in static builder is highly recommended for React,
     # but we can also use docker. Here we use the static environment for best performance & free tier eligibility.
     env: static
-    region: oregon
     rootDir: frontend
     buildCommand: npm install && npm run build
     staticPublishPath: ./dist
