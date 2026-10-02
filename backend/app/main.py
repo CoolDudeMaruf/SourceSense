@@ -64,6 +64,26 @@ async def root():
     return {"service": "SourceSense", "version": "1.0.0", "status": "operational"}
 
 
+import os
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
+
 @app.get("/health", tags=["health"])
 async def health():
     return {"status": "ok"}
+
+# Mount the React frontend (only if the static directory exists, which it will in Docker)
+static_dir = os.path.join(os.path.dirname(__file__), "..", "static")
+if os.path.isdir(static_dir):
+    # Mount everything else as static files, except it won't handle SPA routing cleanly if we just mount "/"
+    # So we mount assets and handle the root explicitly
+    app.mount("/assets", StaticFiles(directory=os.path.join(static_dir, "assets")), name="assets")
+    app.mount("/vite.svg", StaticFiles(directory=static_dir), name="vite.svg")
+    
+    @app.get("/{catchall:path}")
+    async def serve_spa(catchall: str):
+        # Serve index.html for any unhandled routes to support React Router
+        index_path = os.path.join(static_dir, "index.html")
+        if os.path.isfile(index_path):
+            return FileResponse(index_path)
+        return {"error": "Frontend not built properly"}

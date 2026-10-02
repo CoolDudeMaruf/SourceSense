@@ -1,4 +1,4 @@
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const API_BASE = import.meta.env.VITE_API_URL !== undefined ? import.meta.env.VITE_API_URL : (import.meta.env.MODE === 'development' ? 'http://localhost:8000' : '');
 
 export const api = {
   // Nodes
@@ -36,4 +36,8 @@ export const api = {
   getForecast: (nodeId) => fetch(`${API_BASE}/api/v1/forecast/${nodeId}`).then(r => r.json()),
 };
 
-export const WS_BASE = (import.meta.env.VITE_WS_URL || 'ws://localhost:8000');
+export const WS_BASE = import.meta.env.VITE_WS_URL !== undefined 
+  ? import.meta.env.VITE_WS_URL 
+  : (import.meta.env.MODE === 'development' 
+      ? 'ws://localhost:8000' 
+      : (window.location.protocol === 'https:' ? 'wss://' : 'ws://') + window.location.host);
