@@ -26,6 +26,27 @@ bool isCloudConnected = false;
 // Instantiate the Classifier
 Eloquent::ML::Port::RandomForest classifier;
 
+// Helper function to calculate AQI from PM2.5 and PM10 using EPA standards
+int calculateAQI(float pm25, float pm10) {
+  // Simplified EPA AQI calculation for PM2.5
+  int aqi25 = 0;
+  if (pm25 <= 12.0) aqi25 = (50.0 / 12.0) * pm25;
+  else if (pm25 <= 35.4) aqi25 = ((49.0) / (23.3)) * (pm25 - 12.1) + 51;
+  else if (pm25 <= 55.4) aqi25 = ((49.0) / (19.9)) * (pm25 - 35.5) + 101;
+  else if (pm25 <= 150.4) aqi25 = ((49.0) / (94.9)) * (pm25 - 55.5) + 151;
+  else aqi25 = 201; // Very Unhealthy / Hazardous
+
+  // Simplified EPA AQI calculation for PM10
+  int aqi10 = 0;
+  if (pm10 <= 54) aqi10 = (50.0 / 54.0) * pm10;
+  else if (pm10 <= 154) aqi10 = ((49.0) / (99.0)) * (pm10 - 55.0) + 51;
+  else if (pm10 <= 254) aqi10 = ((49.0) / (99.0)) * (pm10 - 155.0) + 101;
+  else aqi10 = 151;
+
+  // Return the higher of the two (driving pollutant)
+  return (aqi25 > aqi10) ? aqi25 : aqi10;
+}
+
 void sendToCloud(float temp, float hum, float pm1_0, float pm25, float pm10,
                  float *features, String classification);
 
@@ -124,9 +145,23 @@ void loop() {
     digitalWrite(RELAY_PIN, LOW);
   }
 
-  // 5. Cloud Telemetry (Fire-and-Forget, only every 2 minutes)
-  if (millis() - lastCloudSend >= CLOUD_INTERVAL) {
+  // 5. Dynamic Cloud Telemetry (Event-Triggered)
+  int localAqi = calculateAQI(pm25, pm10);
+  Serial.print("Local Computed AQI: ");
+  Serial.println(localAqi);
+
+  unsigned long currentInterval;
+  if (localAqi > 50) {
+    // AQI is Moderate/Bad. Send data immediately (bypass 5-min timer)
+    currentInterval = 0; 
+  } else {
+    // Air is Good. Save bandwidth, only send every 5 minutes (300,000 ms)
+    currentInterval = 300000; 
+  }
+
+  if (millis() - lastCloudSend >= currentInterval) {
     if (isCloudConnected && WiFi.status() == WL_CONNECTED) {
+      Serial.println("Threshold met. Sending payload to Cloud...");
       sendToCloud(temp, hum, pm1_0, pm25, pm10, features, classification);
     } else {
       Serial.println("Warning: Cloud offline. Relying on Edge-Native Fail-Safe.");
