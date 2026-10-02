@@ -29,9 +29,7 @@ async def lifespan(app: FastAPI):
     logger.info("Starting background city simulator...")
     sim_process = subprocess.Popen(
         [sys.executable, "city_sensors.py", "--loop", "--interval", "3"], 
-        cwd=os.path.join(os.path.dirname(__file__), ".."),
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL
+        cwd=os.path.join(os.path.dirname(__file__), "..")
     )
 
     logger.info("Startup complete.")

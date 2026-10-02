@@ -430,7 +430,7 @@ def get_real_aqi(lat, lon):
     # Update cache every 15 minutes
     if cache is None or now - cache["ts"] > 900:
         try:
-            res = requests.get(f"https://air-quality-api.open-meteo.com/v1/air-quality?latitude={lat}&longitude={lon}&current=pm10,pm2_5", timeout=5)
+            res = requests.get(f"https://air-quality-api.open-meteo.com/v1/air-quality?latitude={lat}&longitude={lon}&current=pm10,pm2_5", timeout=2)
             if res.status_code == 200:
                 data = res.json().get("current", {})
                 if data.get("pm10") is not None and data.get("pm2_5") is not None:
@@ -439,11 +439,16 @@ def get_real_aqi(lat, lon):
                         "pm25": float(data["pm2_5"]),
                         "ts": now
                     }
+                else:
+                    REAL_AQI_CACHE[key] = {"pm10": None, "pm25": None, "ts": now}
+            else:
+                REAL_AQI_CACHE[key] = {"pm10": None, "pm25": None, "ts": now}
         except Exception:
-            pass
+            # Cache the failure so we don't hang every cycle
+            REAL_AQI_CACHE[key] = {"pm10": None, "pm25": None, "ts": now}
             
     c = REAL_AQI_CACHE.get(key)
-    if c:
+    if c and c["pm10"] is not None:
         return c["pm10"], c["pm25"]
     return None, None
 
