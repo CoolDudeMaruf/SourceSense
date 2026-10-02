@@ -12,6 +12,7 @@ import DataQualityPanel from '../components/DataQualityPanel';
 import { useWebSocket } from '../hooks/useWebSocket';
 import { api } from '../utils/api';
 import { exportReadingsToCSV } from '../utils/csvExport';
+import './Dashboard.css';
 
 /* ─── Osen theme tokens injected as a <style> block ─── */
 const OSEN_STYLES = `
