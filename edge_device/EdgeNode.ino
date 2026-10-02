@@ -23,6 +23,10 @@ const int SENSOR_PIN = A0;
 // Network Status
 bool isCloudConnected = false;
 
+// Edge Preprocessing (Exponential Moving Average Filter)
+float filteredAnalog = -1; 
+const float EMA_ALPHA = 0.2; // Smoothing factor (lower = smoother, less noise)
+
 // Instantiate the Classifier
 Eloquent::ML::Port::RandomForest classifier;
 
@@ -89,18 +93,25 @@ void setup() {
 }
 
 void loop() {
-  // 1. Read Sensor Data (Simulated analog reads mapped to physical values)
+  // 1. Read Sensor Data & Apply Edge Preprocessing Filter
   // ESP8266 ADC is 10-bit (0-1023), unlike ESP32 which is 12-bit (0-4095).
   int rawAnalog = analogRead(SENSOR_PIN);
 
-  // To make the simulation interesting, we'll add some random variance since
-  // they all share A0
-  float pm25 = (rawAnalog + random(-50, 50)) * (150.0 / 1023.0); // Scale 0-150 ug/m3
-  float pm10 = (rawAnalog + random(-50, 50)) * (200.0 / 1023.0);
-  float co = (rawAnalog + random(-20, 20)) * (5.0 / 1023.0);
-  float no2 = (rawAnalog + random(-20, 20)) * (100.0 / 1023.0);
-  float temp = (rawAnalog + random(-10, 10)) * (45.0 / 1023.0);
-  float hum = (rawAnalog + random(-10, 10)) * (100.0 / 1023.0);
+  // Apply Exponential Moving Average (EMA) Low-Pass Filter to remove hardware noise
+  if (filteredAnalog < 0) {
+    filteredAnalog = rawAnalog; // Initialize on first read
+  } else {
+    filteredAnalog = (EMA_ALPHA * rawAnalog) + ((1.0 - EMA_ALPHA) * filteredAnalog);
+  }
+
+  // To make the simulation interesting, we use the smoothed analog value
+  // but still add a tiny bit of random variance for realism
+  float pm25 = (filteredAnalog + random(-20, 20)) * (150.0 / 1023.0); // Scale 0-150 ug/m3
+  float pm10 = (filteredAnalog + random(-20, 20)) * (200.0 / 1023.0);
+  float co = (filteredAnalog + random(-10, 10)) * (5.0 / 1023.0);
+  float no2 = (filteredAnalog + random(-10, 10)) * (100.0 / 1023.0);
+  float temp = (filteredAnalog + random(-5, 5)) * (45.0 / 1023.0);
+  float hum = (filteredAnalog + random(-5, 5)) * (100.0 / 1023.0);
 
   // Prevent negative values from random variance
   if (pm25 < 0.0) pm25 = 0.0;
