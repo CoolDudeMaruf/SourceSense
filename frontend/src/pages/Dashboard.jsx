@@ -821,22 +821,25 @@ export default function Dashboard() {
   }, []);
 
   const loadReadings = useCallback(() => {
-    if (nodes.length > 0) {
-      Promise.all(nodes.map(n => api.getReadings(n.id, 1).then(res => res[0])))
-        .then(results => {
-          const latestMap = {};
-          results.forEach(r => { if (r && r.node_id) latestMap[r.node_id] = r; });
-          setLatestReadings(prev => ({ ...prev, ...latestMap }));
-        })
-        .catch(() => { });
-    }
+    // 1. Fetch latest reading for ALL nodes via global endpoint
+    api.getReadings(null, 100).then(results => {
+      const list = Array.isArray(results) ? results : [];
+      const latestMap = {};
+      list.forEach(r => {
+        if (r && r.node_id && !latestMap[r.node_id]) {
+          latestMap[r.node_id] = r;
+        }
+      });
+      setLatestReadings(prev => ({ ...prev, ...latestMap }));
+    }).catch(() => {});
+
+    // 2. Fetch history for the SELECTED node
     if (!selectedNodeId) return;
     api.getReadings(selectedNodeId, 100).then(data => {
       const list = Array.isArray(data) ? data : [];
       setReadings(list);
-      if (list.length > 0) setLatestReadings(prev => ({ ...prev, [selectedNodeId]: list[0] }));
     }).catch(() => { });
-  }, [selectedNodeId, nodes]);
+  }, [selectedNodeId]);
 
   useEffect(() => {
     loadReadings();
