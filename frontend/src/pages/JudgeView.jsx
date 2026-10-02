@@ -23,7 +23,7 @@ const initialNodes = [
   { id: 'N-01', location: 'Gazipur City', state: NODE_STATES.NORMAL, pm25: 12, pm10: 25, flow: 0, dustRemoved: 1.2 },
   { id: 'N-02', location: 'Tongi', state: NODE_STATES.ACTIVE, pm25: 45, pm10: 80, flow: 120, dustRemoved: 4.5 },
   { id: 'N-03', location: 'Narayanganj City', state: NODE_STATES.PENDING_ACTION, pm25: 65, pm10: 110, flow: 0, dustRemoved: 2.1 },
-  { id: 'N-04', location: 'Savar', state: NODE_STATES.FAULT, pm25: 999, pm10: 999, flow: 0, dustRemoved: 0.8 },
+  { id: 'N-04', location: 'Savar', state: NODE_STATES.NORMAL, pm25: 14, pm10: 28, flow: 0, dustRemoved: 1.4 },
   { id: 'N-05', location: 'Sreepur', state: NODE_STATES.NORMAL, pm25: 15, pm10: 30, flow: 0, dustRemoved: 1.5 },
   { id: 'N-06', location: 'Narsingdi', state: NODE_STATES.NORMAL, pm25: 18, pm10: 35, flow: 0, dustRemoved: 1.8 },
   { id: 'N-07', location: 'Manikganj', state: NODE_STATES.NORMAL, pm25: 10, pm10: 20, flow: 0, dustRemoved: 1.0 },

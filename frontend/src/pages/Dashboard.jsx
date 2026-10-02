@@ -781,6 +781,7 @@ export default function Dashboard() {
   const [tab, setTab] = useState('live');
   const [sessionStartTime] = useState(Date.now());
   const [uptimeStr, setUptimeStr] = useState('00:00');
+  const [physicalOnly, setPhysicalOnly] = useState(false);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -811,9 +812,8 @@ export default function Dashboard() {
         const nodeList = Array.isArray(data) ? data : [];
         setNodes(nodeList);
         if (nodeList.length > 0) {
-          const defaultNode = nodeList.find(n => n.name.includes("Judge"))
-            || nodeList.find(n => n.name.includes("Gulshan") && n.name.startsWith("Node-01"))
-            || nodeList.find(n => n.name.startsWith("Node-01"))
+          const defaultNode = nodeList.find(n => n.id === 30 || n.name.toLowerCase().includes("physical") || n.name.toLowerCase().includes("edge"))
+            || nodeList.find(n => n.name.includes("Judge"))
             || nodeList[0];
           setSelectedNodeId(defaultNode.id);
         }
@@ -868,6 +868,11 @@ export default function Dashboard() {
       return [lastReading, ...prev].slice(0, 200);
     });
   }, [lastReading]);
+
+  const displayedNodes = useMemo(() => {
+    if (!physicalOnly) return nodes;
+    return nodes.filter(n => n.id === 30 || n.name.toLowerCase().includes("physical") || n.name.toLowerCase().includes("edge") || n.name.includes("Judge"));
+  }, [nodes, physicalOnly]);
 
   const selectedNode = nodes.find(n => n.id === selectedNodeId);
   const currentReading = latestReadings[selectedNodeId];
@@ -933,8 +938,26 @@ export default function Dashboard() {
                 <Activity size={15} /> Dashboard
               </button>
 
-              <div className="osen-nav-section" style={{ marginTop: '1.25rem' }}>AQI Hotspots</div>
-              {[...nodes].sort((a, b) => (latestReadings[b.id]?.aqi || 0) - (latestReadings[a.id]?.aqi || 0)).map((n, idx) => {
+              <div className="osen-nav-section" style={{ marginTop: '1.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingRight: '1rem' }}>
+                <span>AQI Hotspots</span>
+                <button
+                  onClick={() => setPhysicalOnly(!physicalOnly)}
+                  style={{
+                    fontSize: '0.62rem',
+                    fontWeight: 700,
+                    padding: '2px 6px',
+                    borderRadius: '4px',
+                    background: physicalOnly ? '#0d6efd' : '#e9ecef',
+                    color: physicalOnly ? '#fff' : '#6c757d',
+                    border: 'none',
+                    cursor: 'pointer'
+                  }}
+                  title="Toggle Physical Hardware vs All Nodes"
+                >
+                  {physicalOnly ? '⚡ Physical' : '🌐 All'}
+                </button>
+              </div>
+              {[...displayedNodes].sort((a, b) => (latestReadings[b.id]?.aqi || 0) - (latestReadings[a.id]?.aqi || 0)).map((n, idx) => {
                 const r = latestReadings[n.id];
                 const isOn = r?.relay_state;
 
@@ -1111,19 +1134,24 @@ export default function Dashboard() {
               </div>
 
               {/* ── Node selector bar ── */}
-              {nodes.length > 0 && (
+              {displayedNodes.length > 0 && (
                 <div className="osen-node-bar osen-section">
                   <span style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--ts)', textTransform: 'uppercase', letterSpacing: '0.05em', whiteSpace: 'nowrap' }}>Select Node:</span>
-                  {nodes.map(n => (
-                    <button
-                      key={n.id}
-                      className={`osen-node-pill ${selectedNodeId === n.id ? 'active' : ''}`}
-                      onClick={() => setSelectedNodeId(n.id)}
-                    >
-                      <Activity size={11} />
-                      {n.name}
-                    </button>
-                  ))}
+                  {displayedNodes.map(n => {
+                    const isPhysical = n.id === 30 || n.name.toLowerCase().includes("physical") || n.name.toLowerCase().includes("edge");
+                    return (
+                      <button
+                        key={n.id}
+                        className={`osen-node-pill ${selectedNodeId === n.id ? 'active' : ''}`}
+                        onClick={() => setSelectedNodeId(n.id)}
+                        style={isPhysical ? { borderColor: '#0d6efd', fontWeight: 700 } : {}}
+                      >
+                        <Activity size={11} />
+                        {n.name}
+                        {isPhysical && <span style={{ marginLeft: 4, fontSize: '0.62rem', background: '#0d6efd', color: '#fff', borderRadius: 3, padding: '1px 4px' }}>⚡ Physical Hardware</span>}
+                      </button>
+                    );
+                  })}
                   {selectedNode && (
                     <div style={{ marginLeft: 'auto', display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
                       <div className="osen-mode-badge" style={{ margin: 0, color: 'var(--ogs)', borderColor: 'rgba(25,135,84,0.15)', background: 'rgba(25,135,84,0.08)' }}>
