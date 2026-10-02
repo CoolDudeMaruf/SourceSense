@@ -57,9 +57,7 @@ app.include_router(classifier.router)
 app.include_router(ws.router)
 
 
-@app.get("/", tags=["health"])
-async def root():
-    return {"service": "SourceSense", "version": "1.0.0", "status": "operational"}
+
 
 
 import os
