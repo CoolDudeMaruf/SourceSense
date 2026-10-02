@@ -4,8 +4,7 @@ services:
     name: sourcesense-backend
     env: docker
     region: oregon
-    dockerfilePath: ./backend/Dockerfile
-    dockerContext: ./backend
+    rootDir: backend
     healthCheckPath: /health
     envVars:
       - key: DATABASE_URL
@@ -27,6 +26,7 @@ services:
     # but we can also use docker. Here we use the static environment for best performance & free tier eligibility.
     env: static
     region: oregon
+    rootDir: frontend
     buildCommand: npm install && npm run build
     staticPublishPath: ./dist
     envVars:
