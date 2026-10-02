@@ -73,7 +73,7 @@ async def ws_live_feed(ws: WebSocket, node_id: int):
                 payload = {
                     "id": reading.id,
                     "node_id": reading.node_id,
-                    "timestamp": reading.timestamp.isoformat(),
+                    "timestamp": reading.timestamp.isoformat() + "Z",
                     "pm1_0_raw": reading.pm1_0_raw,
                     "pm2_5_raw": reading.pm2_5_raw,
                     "pm10_raw": reading.pm10_raw,

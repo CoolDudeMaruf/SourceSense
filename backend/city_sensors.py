@@ -556,9 +556,10 @@ def main():
 
     cycle = 0
     try:
+        from datetime import timezone
         while True:
             cycle += 1
-            t = datetime.now()
+            t = datetime.now(timezone.utc)
             print(f"  --- Cycle {cycle:04d} | {t.strftime('%H:%M:%S')} " + "-" * 45)
 
             for i, (node_info, node_id) in enumerate(zip(CITY_NODES, node_ids), 1):

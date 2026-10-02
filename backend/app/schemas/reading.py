@@ -1,7 +1,7 @@
 """SourceSense – Pydantic schemas for sensor readings."""
 from datetime import datetime
 from typing import Optional
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, field_serializer
 
 
 class SensorPayload(BaseModel):
@@ -65,6 +65,12 @@ class ReadingOut(BaseModel):
     created_at: datetime
 
     model_config = {"from_attributes": True}
+
+    @field_serializer('timestamp', 'created_at')
+    def serialize_dt(self, dt: datetime, _info):
+        if dt.tzinfo is None:
+            return dt.isoformat() + "Z"
+        return dt.isoformat()
 
 
 class IngestionResponse(BaseModel):
