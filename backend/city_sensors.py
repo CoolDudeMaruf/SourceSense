@@ -70,6 +70,14 @@ CITY_NODES = [
     {"name": "Paltan", "location_lat": 23.7330, "location_lon": 90.4130, "zone": "Traffic", "description": "Commercial Hub Traffic", "control_mode": "AUTONOMOUS", "pm10_threshold": 120.0, "scenario": "vehicle_combustion", "calib_a": 0.28, "calib_b": 0.15},
     {"name": "Bashundhara R/A", "location_lat": 23.8150, "location_lon": 90.4270, "zone": "Construction", "description": "Ongoing Real Estate Construction", "control_mode": "AUTONOMOUS", "pm10_threshold": 120.0, "scenario": "construction_dust", "calib_a": 0.33, "calib_b": 0.17},
     {"name": "Banani", "location_lat": 23.7920, "location_lon": 90.4130, "zone": "Traffic", "description": "Commercial and Traffic Emissions", "control_mode": "AUTONOMOUS", "pm10_threshold": 115.0, "scenario": "vehicle_combustion", "calib_a": 0.28, "calib_b": 0.15},
+
+    # ── Faulty device for Device Health Monitor demonstration ──────────────────
+    {"name": "ZZ - Faulty Node (Maintenance)", "location_lat": 23.8250, "location_lon": 90.3500, "zone": "Demo",
+     "description": "Degraded sensor node - battery dying, solar panel offline, erratic PM readings",
+     "control_mode": "MANUAL", "pm10_threshold": 120.0, "scenario": "faulty_device_degraded",
+     "calib_a": 0.33, "calib_b": 0.17, "skip_real_aqi": True,
+     "battery_level": 8.0,    # critically low
+     "is_solar_charging": False},  # solar offline
 ]
 
 
@@ -345,6 +353,40 @@ def gen_demo_alternating(t):
         }
 
 
+_faulty_device_call = 0
+
+def gen_faulty_device_degraded(t):
+    """Degraded hardware node — simulates critical battery, offline solar,
+    erratic PM spikes and occasional NULL-like zeros to trigger health alerts."""
+    global _faulty_device_call
+    _faulty_device_call += 1
+    # Every 5th reading send a crazy PM spike (simulating sensor brownout)
+    if _faulty_device_call % 5 == 0:
+        pm10 = random.uniform(400, 600)
+        pm25 = random.uniform(300, 500)
+    else:
+        # Otherwise mostly fine-ish air but with heavy jitter noise
+        pm10 = _jitter(45.0, pct=0.6)
+        pm25 = _jitter(30.0, pct=0.6)
+    pm10 = max(0, pm10)
+    pm25 = max(0, pm25)
+    return {
+        "Temperature_C": _jitter(31.0, pct=0.3),
+        "Humidity_Percent": _jitter(62.0, pct=0.3),
+        "PM1.0": pm25 * _jitter(0.6, pct=0.4),
+        "PM2.5": pm25,
+        "PM10": pm10,
+        "MQ2":  _jitter(180, pct=0.8),
+        "MQ4":  _jitter(110, pct=0.8),
+        "MQ6":  _jitter(90,  pct=0.8),
+        "MQ7":  _jitter(130, pct=0.8),
+        "MQ8":  _jitter(95,  pct=0.8),
+        "MQ131": _jitter(60, pct=0.8),
+        "MQ135": _jitter(140, pct=0.8),
+        "_is_fault": True,
+    }
+
+
 SCENARIO_GENERATORS = {
     "construction_dust": gen_construction_dust,
     "vehicle_combustion": gen_vehicle_combustion,
@@ -355,6 +397,7 @@ SCENARIO_GENERATORS = {
     "faulty_sensor":      gen_faulty_sensor,
     "dust_storm_rising":  gen_dust_storm_rising,
     "demo_alternating":   gen_demo_alternating,
+    "faulty_device_degraded": gen_faulty_device_degraded,
 }
 
 SCENARIO_LABELS = {
@@ -471,8 +514,9 @@ def send_reading(node_id: int, node_info: dict, t: datetime) -> dict | None:
     payload = {
         "node_id": node_id,
         "Timestamp": t.isoformat(),
-        "battery_level": _jitter(85.0, pct=0.05),
-        "is_solar_charging": True,
+        # Per-node battery/solar; fallback to healthy defaults for normal nodes
+        "battery_level": _jitter(node_info.get("battery_level", 85.0), pct=0.03),
+        "is_solar_charging": node_info.get("is_solar_charging", True),
         **data,
     }
 

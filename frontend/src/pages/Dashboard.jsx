@@ -9,6 +9,7 @@ import ActionWindow from '../components/ActionWindow';
 
 import TimelineChart from '../components/TimelineChart';
 import DataQualityPanel from '../components/DataQualityPanel';
+import DeviceHealthMonitor from '../components/DeviceHealthMonitor';
 import { useWebSocket } from '../hooks/useWebSocket';
 import { api } from '../utils/api';
 import { exportReadingsToCSV } from '../utils/csvExport';
@@ -1443,11 +1444,19 @@ export default function Dashboard() {
                     <div className="osen-tab-bar" style={{ padding: '0 1.25rem' }}>
                       <button className={`osen-tab ${tab === 'live' ? 'active' : ''}`} onClick={() => setTab('live')}>Recent Readings</button>
                       <button className={`osen-tab ${tab === 'quality' ? 'active' : ''}`} onClick={() => setTab('quality')}>Data Quality Panel</button>
+                      <button className={`osen-tab ${tab === 'health' ? 'active' : ''}`} onClick={() => setTab('health')} style={{ position: 'relative' }}>
+                        Device Health
+                        {Object.values(latestReadings).some(r => (r?.battery_level ?? 100) < 20 || r?.is_solar_charging === false) && (
+                          <span style={{ position: 'absolute', top: 6, right: 6, width: 7, height: 7, borderRadius: '50%', background: '#dc3545' }} />
+                        )}
+                      </button>
                       <button className={`osen-tab ${tab === 'external' ? 'active' : ''}`} onClick={() => setTab('external')}>External Services</button>
                     </div>
                     <div style={{ padding: (tab === 'external') ? 0 : '1.25rem' }}>
                       {tab === 'quality' ? (
                         <DataQualityPanel readings={readings} />
+                      ) : tab === 'health' ? (
+                        <DeviceHealthMonitor nodes={nodes} latestReadings={latestReadings} />
                       ) : tab === 'external' ? (
                         <div>External systems feature temporarily disabled</div>
                       ) : (
