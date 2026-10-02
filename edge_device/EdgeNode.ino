@@ -47,42 +47,6 @@ int calculateAQI(float pm25, float pm10) {
   return (aqi25 > aqi10) ? aqi25 : aqi10;
 }
 
-// Variables for Public API
-unsigned long lastPublicApiFetch = 0;
-int cachedPublicAqi = -1;
-const unsigned long PUBLIC_API_INTERVAL = 600000; // 10 minutes
-
-// Helper function to fetch public AQI using Open-Meteo
-int fetchPublicAQI() {
-  if (WiFi.status() != WL_CONNECTED) return -1;
-  
-  WiFiClientSecure client;
-  client.setInsecure();
-  HTTPClient http;
-  
-  // Open-Meteo Air Quality API for Dhaka (Free, no API key needed)
-  http.begin(client, "https://air-quality-api.open-meteo.com/v1/air-quality?latitude=23.8103&longitude=90.4125&current=us_aqi");
-  int httpCode = http.GET();
-  
-  int publicAqi = -1;
-  if (httpCode > 0) {
-    String payload = http.getString();
-    
-    // Parse JSON manually: "us_aqi": 147
-    int aqiIndex = payload.indexOf("\"us_aqi\":");
-    if (aqiIndex > 0) {
-      int startIndex = aqiIndex + 9;
-      int endIndex = payload.indexOf("}", startIndex);
-      if (endIndex > startIndex) {
-        String aqiStr = payload.substring(startIndex, endIndex);
-        publicAqi = aqiStr.toInt();
-      }
-    }
-  }
-  http.end();
-  return publicAqi;
-}
-
 void sendToCloud(float temp, float hum, float pm1_0, float pm25, float pm10,
                  float *features, String classification);
 
@@ -181,37 +145,15 @@ void loop() {
     digitalWrite(RELAY_PIN, LOW);
   }
 
-  // 5. Fetch Public API Data (every 10 minutes to avoid rate limits)
-  if (millis() - lastPublicApiFetch >= PUBLIC_API_INTERVAL || cachedPublicAqi == -1) {
-    Serial.println("Fetching public AQI from Open-Meteo API...");
-    int fetchedAqi = fetchPublicAQI();
-    if (fetchedAqi >= 0) {
-      cachedPublicAqi = fetchedAqi;
-      Serial.print("Public API AQI: ");
-      Serial.println(cachedPublicAqi);
-    } else {
-      Serial.println("Failed to fetch Public AQI.");
-    }
-    lastPublicApiFetch = millis();
-  }
-
-  // 6. Dynamic Cloud Telemetry (Event-Triggered by Combined AQI)
+  // 5. Dynamic Cloud Telemetry (Event-Triggered by Local AQI)
   int localAqi = calculateAQI(pm25, pm10);
-  int combinedAqi = localAqi;
-  if (cachedPublicAqi >= 0) {
-    // Air quality is defined by the worst pollutant. Average artificially lowers it.
-    // Instead, we take the MAXIMUM of local and public AQI.
-    combinedAqi = (localAqi > cachedPublicAqi) ? localAqi : cachedPublicAqi;
-  }
 
   Serial.print("Local Computed AQI: ");
-  Serial.print(localAqi);
-  Serial.print(" | Combined AQI: ");
-  Serial.println(combinedAqi);
+  Serial.println(localAqi);
 
   unsigned long currentInterval;
-  if (combinedAqi > 50) {
-    // Combined AQI is Moderate/Bad. Send data immediately (bypass 5-min timer)
+  if (localAqi > 50) {
+    // Local AQI is Moderate/Bad. Send data immediately (bypass 5-min timer)
     currentInterval = 0; 
   } else {
     // Air is Good. Save bandwidth, only send every 5 minutes (300,000 ms)
