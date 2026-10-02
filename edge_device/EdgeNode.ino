@@ -180,6 +180,7 @@ void sendToCloud(float temp, float hum, float pm1_0, float pm25, float pm10,
   client.setInsecure(); // Allow connecting to HTTPS without verifying the certificate chain
   
   HTTPClient http;
+  http.setTimeout(20000); // 20-second timeout to handle Render cold starts
   http.begin(client, serverUrl);
   http.addHeader("Content-Type", "application/json");
 
