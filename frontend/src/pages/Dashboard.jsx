@@ -1372,9 +1372,38 @@ export default function Dashboard() {
                     <div className="osen-card-inner">
                       <div className="osen-card-header">
                         <span className="osen-card-title"><span className="osen-card-title-dot" />PM Readings</span>
-                        <span className="osen-badge osen-badge-muted" style={{ fontFamily: 'monospace' }}>
-                          {currentReading ? new Date(currentReading.timestamp).toLocaleTimeString() : '—'}
-                        </span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                          {/* ── Battery Health inline ── */}
+                          {currentReading?.battery_level != null && (() => {
+                            const batt = currentReading.battery_level;
+                            const battColor = batt >= 50 ? '#198754' : batt >= 20 ? '#ffc107' : batt >= 10 ? '#fd7e14' : '#dc3545';
+                            const battLabel = batt >= 50 ? 'Healthy' : batt >= 20 ? 'Low' : batt >= 10 ? 'Critical' : 'Dead';
+                            return (
+                              <div style={{ display: 'flex', alignItems: 'center', gap: 6, background: `${battColor}10`, border: `1px solid ${battColor}30`, borderRadius: 8, padding: '3px 10px' }}>
+                                {/* Solar indicator */}
+                                {currentReading.is_solar_charging
+                                  ? <span title="Solar Charging Active" style={{ fontSize: '0.7rem' }}>☀️</span>
+                                  : <span title="Solar Offline" style={{ fontSize: '0.7rem' }}>🔌</span>}
+                                {/* Battery bar */}
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                                    <span style={{ fontSize: '0.72rem', fontWeight: 800, color: battColor }}>{batt.toFixed(0)}%</span>
+                                    <span style={{ fontSize: '0.62rem', color: battColor, fontWeight: 600 }}>{battLabel}</span>
+                                    {!currentReading.is_solar_charging && (
+                                      <span style={{ fontSize: '0.6rem', color: '#dc3545', fontWeight: 700 }}>⚠ No Solar</span>
+                                    )}
+                                  </div>
+                                  <div style={{ width: 72, height: 5, borderRadius: 3, background: '#e9ecef', overflow: 'hidden' }}>
+                                    <div style={{ width: `${Math.min(batt, 100)}%`, height: '100%', background: battColor, borderRadius: 3, transition: 'width 0.5s ease' }} />
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          })()}
+                          <span className="osen-badge osen-badge-muted" style={{ fontFamily: 'monospace' }}>
+                            {currentReading ? new Date(currentReading.timestamp).toLocaleTimeString() : '—'}
+                          </span>
+                        </div>
                       </div>
                       <LiveReadingsCard reading={currentReading} />
                     </div>
