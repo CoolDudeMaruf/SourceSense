@@ -14,7 +14,8 @@ const int SENSOR_HUM_PIN = 26;  // Analog pin for Humidity
 // Network & Cloud Configuration
 const char* ssid = "YOUR_WIFI_SSID";
 const char* password = "YOUR_WIFI_PASSWORD";
-const char* cloudApiUrl = "https://sourcesense4.onrender.com/api/v1/readings"; // Cloud endpoint (no private IPs)
+const char* cloudApiUrl = "https://sourcesense-4.onrender.com/api/v1/readings"; // Cloud endpoint
+const int node_id = 30; // Node ID
 
 unsigned long lastCloudSend = 0;
 const unsigned long CLOUD_INTERVAL = 120000; // 2 minutes (120,000 ms)

@@ -88,7 +88,9 @@ void setup() {
     Serial.println("\nFailed to connect to WiFi. Running in offline mode.");
   }
 
-  Serial.println("SourceSense Edge-Native Node initialized (ESP8266).");
+  Serial.print("SourceSense Edge-Native Node ID ");
+  Serial.print(node_id);
+  Serial.println(" initialized (ESP8266).");
   Serial.println("TinyML Model Loaded: RandomForest Classifier");
 }
 
@@ -134,7 +136,9 @@ void loop() {
   float pm1_0 = pm25 * 0.8; // Simulated PM1.0
 
   // 3. Autonomous Edge Inference
-  Serial.print("Running local inference... ");
+  Serial.print("[Node ID: ");
+  Serial.print(node_id);
+  Serial.print("] Running local inference... ");
   int classIdx = classifier.predict(features);
   String classification = classifier.predictLabel(features);
   Serial.println(classification);
@@ -145,10 +149,14 @@ void loop() {
       classification == "construction_dust") {
 
     if (pm25 > 50.0 || pm10 > 80.0) {
-      Serial.println("CRITICAL EVENT: Triggering Misting Relays Locally!");
+      Serial.print("[Node ID: ");
+      Serial.print(node_id);
+      Serial.println("] CRITICAL EVENT: Triggering Misting Relays Locally!");
       digitalWrite(RELAY_PIN, HIGH);
     } else {
-      Serial.println("Event detected, but below local actuation threshold.");
+      Serial.print("[Node ID: ");
+      Serial.print(node_id);
+      Serial.println("] Event detected, but below local actuation threshold.");
       digitalWrite(RELAY_PIN, LOW);
     }
 
@@ -159,7 +167,9 @@ void loop() {
   // 5. Dynamic Cloud Telemetry (Event-Triggered by Local AQI)
   int localAqi = calculateAQI(pm25, pm10);
 
-  Serial.print("Local Computed AQI: ");
+  Serial.print("[Node ID: ");
+  Serial.print(node_id);
+  Serial.print("] Local Computed AQI: ");
   Serial.println(localAqi);
 
   unsigned long currentInterval;
@@ -173,10 +183,14 @@ void loop() {
 
   if (millis() - lastCloudSend >= currentInterval) {
     if (isCloudConnected && WiFi.status() == WL_CONNECTED) {
-      Serial.println("Threshold met. Sending payload to Cloud...");
+      Serial.print("[Node ID: ");
+      Serial.print(node_id);
+      Serial.println("] Threshold met. Sending payload to Cloud...");
       sendToCloud(temp, hum, pm1_0, pm25, pm10, features, classification);
     } else {
-      Serial.println("Warning: Cloud offline. Relying on Edge-Native Fail-Safe.");
+      Serial.print("[Node ID: ");
+      Serial.print(node_id);
+      Serial.println("] Warning: Cloud offline. Relying on Edge-Native Fail-Safe.");
     }
     lastCloudSend = millis();
   }
@@ -229,14 +243,21 @@ void sendToCloud(float temp, float hum, float pm1_0, float pm25, float pm10,
   payload += "}";
 
   int httpResponseCode = http.POST(payload);
-  Serial.print("HTTP POST Response code: ");
+  Serial.print("[Node ID: ");
+  Serial.print(node_id);
+  Serial.print("] HTTP POST Response code: ");
   Serial.println(httpResponseCode);
 
   if (httpResponseCode > 0) {
     String response = http.getString();
+    Serial.print("[Node ID: ");
+    Serial.print(node_id);
+    Serial.print("] Cloud Response: ");
     Serial.println(response);
   } else {
-    Serial.print("Error code: ");
+    Serial.print("[Node ID: ");
+    Serial.print(node_id);
+    Serial.print("] Error code: ");
     Serial.println(httpResponseCode);
   }
 
