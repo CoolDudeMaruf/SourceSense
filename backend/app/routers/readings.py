@@ -58,7 +58,28 @@ async def ingest_reading(payload: SensorPayload, db: AsyncSession = Depends(get_
     result = await db.execute(select(Node).where(Node.id == payload.node_id))
     node: Optional[Node] = result.scalar_one_or_none()
     if not node:
-        raise HTTPException(status_code=404, detail=f"Node {payload.node_id} not found")
+        # Auto-create node for physical hardware devices (e.g. Node 30) to prevent 404
+        node = Node(
+            id=payload.node_id,
+            name=f"Physical Edge Node {payload.node_id}",
+            location_lat=23.8103,
+            location_lon=90.4125,
+            zone="Demo",
+            description=f"Hardware ESP8266 Edge Device (ID: {payload.node_id})",
+            pm10_threshold=100.0,
+            control_mode="AUTONOMOUS",
+            calib_a=0.33,
+            calib_b=0.17,
+            is_active=True,
+            battery_level=payload.battery_level or 100.0,
+            is_charging=payload.is_solar_charging or False,
+            health_score=100.0,
+            power_consumption_w=0.15
+        )
+        db.add(node)
+        await db.commit()
+        await db.refresh(node)
+        logger.info(f"Auto-created Node {payload.node_id} for physical device")
 
     ctx = _get_node_context(payload.node_id)
     if ctx["first_seen"] is None:

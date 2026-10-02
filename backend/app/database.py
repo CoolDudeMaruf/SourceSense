@@ -118,6 +118,30 @@ async def seed_essential_nodes():
                     )
                     session.add(r)
                 await session.commit()
+
+            # Seed Physical Edge Node 30 if it doesn't exist
+            res30 = await session.execute(select(Node).where(Node.id == 30))
+            node30 = res30.scalar_one_or_none()
+            if not node30:
+                node30 = Node(
+                    id=30,
+                    name="Physical Edge Node 30",
+                    location_lat=23.8103,
+                    location_lon=90.4125,
+                    zone="Demo",
+                    description="Hardware ESP8266 Edge Device (Node 30)",
+                    control_mode="AUTONOMOUS",
+                    pm10_threshold=100.0,
+                    calib_a=0.33,
+                    calib_b=0.17,
+                    is_active=True,
+                    battery_level=100.0,
+                    is_charging=True,
+                    health_score=100.0,
+                    power_consumption_w=0.15
+                )
+                session.add(node30)
+                await session.commit()
         except Exception:
             pass
 
