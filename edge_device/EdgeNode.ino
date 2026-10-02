@@ -1,4 +1,6 @@
 #include "model.h"
+#include <WiFi.h>
+#include <HTTPClient.h>
 
 // Define GPIO Pins
 const int RELAY_PIN = 12;
@@ -9,8 +11,13 @@ const int SENSOR_NO2_PIN = 33;  // Analog pin for NO2
 const int SENSOR_TEMP_PIN = 25; // Analog pin for Temperature
 const int SENSOR_HUM_PIN = 26;  // Analog pin for Humidity
 
-// Network Status
-bool isCloudConnected = false;
+// Network & Cloud Configuration
+const char* ssid = "YOUR_WIFI_SSID";
+const char* password = "YOUR_WIFI_PASSWORD";
+const char* cloudApiUrl = "https://sourcesense.onrender.com/api/v1/readings"; // Cloud endpoint (no private IPs)
+
+unsigned long lastCloudSend = 0;
+const unsigned long CLOUD_INTERVAL = 120000; // 2 minutes (120,000 ms)
 
 // Instantiate the Classifier
 Eloquent::ML::Port::RandomForest classifier;
@@ -24,6 +31,15 @@ void setup() {
   
   Serial.println("SourceSense Edge-Native Node initialized.");
   Serial.println("TinyML Model Loaded: RandomForest Classifier");
+
+  // Connect to WiFi
+  WiFi.begin(ssid, password);
+  Serial.print("Connecting to WiFi");
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+  Serial.println("\nWiFi connected. Cloud ready.");
 }
 
 //=====================================================
@@ -41,44 +57,67 @@ void loop() {
   // 2. Prepare Feature Vector [pm25, pm10, co, no2, temperature, humidity]
   float features[6] = {pm25, pm10, co, no2, temp, hum};
   
-  // 3. Autonomous Edge Inference
+  // 3. Autonomous Edge Inference (Runs every 5 seconds)
   Serial.print("Running local inference... ");
   int classIdx = classifier.predict(features);
   String classification = classifier.predictLabel(features);
   Serial.println(classification);
   
   // 4. Fail-Safe Local Actuation Logic (Decoupled from Cloud)
-  // Even if LoRaWAN/cellular is down, the edge triggers critical relays.
   if (classification == "vehicle_combustion" || 
       classification == "waste_burning" || 
       classification == "construction_dust") {
         
-      // Ensure local threshold is actually hazardous before spraying
       if (pm25 > 50.0 || pm10 > 80.0) {
         Serial.println("CRITICAL EVENT: Triggering Misting Relays Locally!");
         digitalWrite(RELAY_PIN, HIGH);
       } else {
-        Serial.println("Event detected, but below local actuation threshold.");
         digitalWrite(RELAY_PIN, LOW);
       }
-      
   } else {
-      // "clean" or "humid_haze"
       digitalWrite(RELAY_PIN, LOW);
   }
 
-  // 5. Cloud Telemetry (Fire-and-Forget)
-  if (isCloudConnected) {
-    // Send data to FastAPI backend for spatial analytics and React dashboard
-    sendToCloud(features, classification);
-  } else {
-    Serial.println("Warning: Cloud offline. Relying on Edge-Native Fail-Safe.");
+  // 5. Cloud Telemetry - Only send every 2 minutes!
+  if (millis() - lastCloudSend >= CLOUD_INTERVAL) {
+    if (WiFi.status() == WL_CONNECTED) {
+      sendToCloud(features, classification);
+    } else {
+      Serial.println("Warning: Cloud offline. Relying on Edge-Native Fail-Safe.");
+    }
+    lastCloudSend = millis();
   }
 
-  delay(5000); // 5 second control loop
+  delay(5000); // 5 second control loop for real-time edge responses
 }
 
 void sendToCloud(float* features, String classification) {
-  // Implementation for LoRaWAN / Cellular MQTT payload transmission
-  // (Let the cloud handle historical analytics, predictive forecasting, etc.)
+  HTTPClient http;
+  http.begin(cloudApiUrl);
+  http.addHeader("Content-Type", "application/json");
+
+  // Construct JSON Payload
+  String payload = "{";
+  payload += "\"node_id\": 99,"; // Example hardware node ID
+  payload += "\"Timestamp\": \"2026-10-02T12:00:00Z\","; // Typically generated via NTP or edge RTC
+  payload += "\"PM2.5\": " + String(features[0]) + ",";
+  payload += "\"PM10\": " + String(features[1]) + ",";
+  payload += "\"MQ7\": " + String(features[2]) + ","; // mapping CO to MQ7
+  payload += "\"Temperature_C\": " + String(features[4]) + ",";
+  payload += "\"Humidity_Percent\": " + String(features[5]);
+  // Add other required fields with defaults to satisfy backend...
+  payload += "}";
+
+  Serial.println("Sending data to cloud...");
+  int httpResponseCode = http.POST(payload);
+
+  if (httpResponseCode > 0) {
+    Serial.print("Cloud push successful. Response code: ");
+    Serial.println(httpResponseCode);
+  } else {
+    Serial.print("Cloud push failed. Error code: ");
+    Serial.println(httpResponseCode);
+  }
+  
+  http.end();
 }
