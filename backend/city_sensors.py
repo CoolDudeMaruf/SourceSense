@@ -32,7 +32,9 @@ import argparse
 import sys
 from datetime import datetime, timedelta
 
-API_URL = "http://127.0.0.1:8000/api/v1"
+import os
+PORT = os.environ.get("PORT", "8000")
+API_URL = f"http://127.0.0.1:{PORT}/api/v1"
 
 # ─── Node definitions ─────────────────────────────────────────────────────────
 # Each node maps to a real Dhaka-area landmark with realistic coordinates.
@@ -372,11 +374,20 @@ SCENARIO_LABELS = {
 
 def get_or_create_node(node_info: dict, reset: bool = False) -> int:
     """Find existing node by name or create it."""
-    try:
-        nodes = requests.get(f"{API_URL}/nodes?active_only=false", timeout=30).json()
-    except Exception as e:
-        print(f"  ERROR Cannot reach backend at {API_URL}: {e}")
-        sys.exit(1)
+    # Retry loop to wait for backend to boot
+    max_retries = 10
+    nodes = None
+    for attempt in range(max_retries):
+        try:
+            nodes = requests.get(f"{API_URL}/nodes?active_only=false", timeout=30).json()
+            break
+        except Exception as e:
+            if attempt < max_retries - 1:
+                print(f"  Waiting for backend at {API_URL} (attempt {attempt+1}/{max_retries})...")
+                time.sleep(2)
+            else:
+                print(f"  ERROR Cannot reach backend at {API_URL}: {e}")
+                sys.exit(1)
 
     existing = next((n for n in nodes if n.get("name") == node_info["name"]), None)
 
