@@ -471,6 +471,8 @@ def send_reading(node_id: int, node_info: dict, t: datetime) -> dict | None:
     payload = {
         "node_id": node_id,
         "Timestamp": t.isoformat(),
+        "battery_level": _jitter(85.0, pct=0.05),
+        "is_solar_charging": True,
         **data,
     }
 

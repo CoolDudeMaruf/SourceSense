@@ -1,4 +1,4 @@
-import { Wind, Thermometer, Droplets, AlertTriangle, Flame, Zap } from 'lucide-react';
+import { Wind, Thermometer, Droplets, AlertTriangle, Flame, Zap, Battery, Sun } from 'lucide-react';
 import QualityFlagBadge from './QualityFlagBadge';
 
 function PMBar({ label, value, maxVal, color, spikeThreshold }) {
@@ -165,8 +165,8 @@ export default function LiveReadingsCard({ reading }) {
             Gas & Ambient
           </div>
 
-          {/* Temp + Humidity */}
-          <div style={{ display: 'flex', gap: 12, marginBottom: 8, padding: '5px 0', borderBottom: '1px solid rgba(30,45,69,0.4)' }}>
+          {/* Temp, Humidity & Power */}
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginBottom: 8, padding: '5px 0', borderBottom: '1px solid rgba(30,45,69,0.4)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
               <Thermometer size={11} color="var(--text-muted)" />
               <span style={{ fontSize: '0.72rem', color: 'var(--text-secondary)', fontWeight: 600 }}>
@@ -179,6 +179,22 @@ export default function LiveReadingsCard({ reading }) {
                 {reading.humidity_percent?.toFixed(1) ?? '—'}%{humidityGlitch && ' ⚠'}
               </span>
             </div>
+            {reading.battery_level != null && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                <Battery size={11} color="var(--brand-400)" />
+                <span style={{ fontSize: '0.72rem', color: 'var(--text-secondary)', fontWeight: 600 }}>
+                  {reading.battery_level?.toFixed(0)}%
+                </span>
+              </div>
+            )}
+            {reading.is_solar_charging && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 5 }} title="Solar Charging Active">
+                <Sun size={11} color="#fbbf24" />
+                <span style={{ fontSize: '0.72rem', color: '#fbbf24', fontWeight: 600 }}>
+                  Charging
+                </span>
+              </div>
+            )}
           </div>
 
           {/* MQ Gas Sensors */}

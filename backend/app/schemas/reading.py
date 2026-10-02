@@ -20,6 +20,8 @@ class SensorPayload(BaseModel):
     MQ8: float
     MQ131: float
     MQ135: float
+    battery_level: Optional[float] = None
+    is_solar_charging: Optional[bool] = None
 
     model_config = {"populate_by_name": True}
 
@@ -61,6 +63,7 @@ class ReadingOut(BaseModel):
     forecast_20m: Optional[float] = None
     forecast_30m: Optional[float] = None
     battery_level: Optional[float] = None
+    is_solar_charging: Optional[bool] = None
     power_consumption_w: Optional[float] = None
     created_at: datetime
 

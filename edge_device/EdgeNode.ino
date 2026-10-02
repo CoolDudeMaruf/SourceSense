@@ -267,7 +267,9 @@ void sendToCloud(float temp, float hum, float pm1_0, float pm25, float pm10,
   payload += "\"MQ7\":" + String(features[6]) + ",";
   payload += "\"MQ8\":" + String(features[7]) + ",";
   payload += "\"MQ131\":" + String(features[8]) + ",";
-  payload += "\"MQ135\":" + String(features[9]);
+  payload += "\"MQ135\":" + String(features[9]) + ",";
+  payload += "\"battery_level\": 85.0,";
+  payload += "\"is_solar_charging\": true";
   payload += "}";
 
   int httpResponseCode = http.POST(payload);

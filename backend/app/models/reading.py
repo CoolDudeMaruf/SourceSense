@@ -57,6 +57,7 @@ class Reading(Base):
     
     # ── Telemetry ─────────────────────────────────────────────────────────────
     battery_level: Mapped[float] = mapped_column(Float, nullable=True)
+    is_solar_charging: Mapped[bool] = mapped_column(Boolean, nullable=True, default=False)
     power_consumption_w: Mapped[float] = mapped_column(Float, nullable=True)
 
     # ── Quality flags (JSONB) ─────────────────────────────────────────────────
