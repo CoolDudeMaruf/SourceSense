@@ -61,7 +61,7 @@ async def ingest_reading(payload: SensorPayload, db: AsyncSession = Depends(get_
         # Auto-create node for physical hardware devices (e.g. Node 30) to prevent 404
         node = Node(
             id=payload.node_id,
-            name=f"Physical Edge Node {payload.node_id}",
+            name=f"00 - AI Edge Test Node" if payload.node_id == 30 else f"Physical Edge Node {payload.node_id}",
             location_lat=23.8103,
             location_lon=90.4125,
             zone="Demo",

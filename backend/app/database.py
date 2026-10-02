@@ -61,7 +61,7 @@ async def seed_essential_nodes():
             judge_node = result.scalar_one_or_none()
             if not judge_node:
                 judge_node = Node(
-                    name="00 - Judge View Node",
+                    name="01 - Judge View Node (Sim)",
                     location_lat=23.8105,
                     location_lon=90.4130,
                     zone="Demo",
@@ -125,11 +125,11 @@ async def seed_essential_nodes():
             if not node30:
                 node30 = Node(
                     id=30,
-                    name="Physical Edge Node 30",
+                    name="00 - AI Edge Test Node",
                     location_lat=23.8103,
                     location_lon=90.4125,
                     zone="Demo",
-                    description="Hardware ESP8266 Edge Device (Node 30)",
+                    description="Hardware ESP8266 Edge Device",
                     control_mode="AUTONOMOUS",
                     pm10_threshold=100.0,
                     calib_a=0.33,

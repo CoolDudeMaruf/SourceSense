@@ -42,10 +42,10 @@ API_URL = f"http://127.0.0.1:{PORT}/api/v1"
 
 CITY_NODES = [
     # Judge View Node — Barrier-free fast cycling action demonstrator
-    {"name": "00 - Judge View Node", "location_lat": 23.8105, "location_lon": 90.4130, "zone": "Demo", "description": "Barrier-free demonstrator node — cycles actions every 10 sec", "control_mode": "AUTONOMOUS", "pm10_threshold": 100.0, "scenario": "judge_view_cycling", "calib_a": 0.33, "calib_b": 0.17, "skip_real_aqi": True, "battery_level": 99.0, "is_solar_charging": True},
+    {"name": "01 - Judge View Node (Sim)", "location_lat": 23.8105, "location_lon": 90.4130, "zone": "Demo", "description": "Barrier-free demonstrator node — cycles actions every 10 sec", "control_mode": "AUTONOMOUS", "pm10_threshold": 100.0, "scenario": "judge_view_cycling", "calib_a": 0.33, "calib_b": 0.17, "skip_real_aqi": True, "battery_level": 99.0, "is_solar_charging": True},
 
     # Special Test Node for UI demonstrations
-    {"name": "00 - Edge AI Test Node", "location_lat": 23.8103, "location_lon": 90.4125, "zone": "Demo", "description": "Cycles through all AI classification scenarios", "control_mode": "AUTONOMOUS", "pm10_threshold": 120.0, "scenario": "demo_alternating", "calib_a": 0.33, "calib_b": 0.17, "skip_real_aqi": True},
+    # Note: Physical hardware (Node 30) handles 00 - AI Edge Test Node, not simulated here.
 
     # Top 25 Most Polluted Urban Cities and Areas in Dhaka Region
     {"name": "Gazipur City", "location_lat": 23.9999, "location_lon": 90.4203, "zone": "Industrial", "description": "High Industrial Emissions", "control_mode": "AUTONOMOUS", "pm10_threshold": 170.0, "scenario": "mixed_industrial", "calib_a": 0.35, "calib_b": 0.18},
