@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { RefreshCw, Wifi, WifiOff, Download, Activity, Sun, Moon, Leaf, Zap, Battery } from 'lucide-react';
+import { RefreshCw, Wifi, WifiOff, Download, Activity, Sun, Moon, Leaf, Zap, Battery, ShieldCheck } from 'lucide-react';
 import QualityFlagBadge from '../components/QualityFlagBadge';
 import NodeMap from '../components/NodeMap';
 import LiveReadingsCard from '../components/LiveReadingsCard';
@@ -811,7 +811,9 @@ export default function Dashboard() {
         const nodeList = Array.isArray(data) ? data : [];
         setNodes(nodeList);
         if (nodeList.length > 0) {
-          const defaultNode = nodeList.find(n => n.name.includes("Gulshan") && n.name.startsWith("Node-01"))
+          const judgeNode = nodeList.find(n => n.name.toLowerCase().includes("judge"));
+          const defaultNode = judgeNode
+            || nodeList.find(n => n.name.includes("Gulshan") && n.name.startsWith("Node-01"))
             || nodeList.find(n => n.name.startsWith("Node-01"))
             || nodeList[0];
           setSelectedNodeId(defaultNode.id);
@@ -931,9 +933,17 @@ export default function Dashboard() {
               <button className="osen-nav-item active">
                 <Activity size={15} /> Dashboard
               </button>
+              <a href="/judge" className="osen-nav-item" style={{ color: '#06b6d4', fontWeight: 700, borderLeftColor: '#06b6d4' }}>
+                <ShieldCheck size={15} color="#06b6d4" /> Judge View Page
+              </a>
 
               <div className="osen-nav-section" style={{ marginTop: '1.25rem' }}>AQI Hotspots</div>
-              {[...nodes].sort((a, b) => (latestReadings[b.id]?.aqi || 0) - (latestReadings[a.id]?.aqi || 0)).map((n, idx) => {
+              {(() => {
+                const judgeNodes = nodes.filter(n => n.name.toLowerCase().includes("judge"));
+                const otherNodes = [...nodes.filter(n => !n.name.toLowerCase().includes("judge"))]
+                  .sort((a, b) => (latestReadings[b.id]?.aqi || 0) - (latestReadings[a.id]?.aqi || 0));
+                return [...judgeNodes, ...otherNodes];
+              })().map((n, idx) => {
                 const r = latestReadings[n.id];
                 const isOn = r?.relay_state;
 
@@ -1052,6 +1062,24 @@ export default function Dashboard() {
                 >
                   <Download size={14} /> Export CSV
                 </button>
+
+                {/* Judge View Page Link */}
+                <a
+                  href="/judge"
+                  className="osen-btn"
+                  style={{
+                    background: 'rgba(6,182,212,0.1)',
+                    color: '#06b6d4',
+                    border: '1px solid rgba(6,182,212,0.3)',
+                    fontWeight: 700,
+                    textDecoration: 'none',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px'
+                  }}
+                >
+                  <ShieldCheck size={14} color="#06b6d4" /> Judge View Page
+                </a>
               </div>
             </header>
 
