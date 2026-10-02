@@ -8,7 +8,12 @@ API_URL = "http://localhost:8000/api/v1"
 
 # Define our virtual nodes tailored to Gazipur DUET and surroundings
 VIRTUAL_NODES = [
-    {"name": "Gazipur City", "location_lat": 23.9999, "location_lon": 90.4203, "zone": "Gazipur", "type": "industrial_emissions"},
+    {"name": "Gazipur City 01", "location_lat": 23.9999, "location_lon": 90.4203, "zone": "Gazipur", "type": "industrial_emissions"},
+    {"name": "Gazipur City 02", "location_lat": 24.0010, "location_lon": 90.4215, "zone": "Gazipur", "type": "industrial_emissions"},
+    {"name": "Gazipur City 03", "location_lat": 24.0020, "location_lon": 90.4190, "zone": "Gazipur", "type": "industrial_emissions"},
+    {"name": "Uttara Zone 01", "location_lat": 23.8759, "location_lon": 90.3985, "zone": "Zone 1", "type": "vehicle_emissions"},
+    {"name": "Test Node (Construction)", "location_lat": 23.9500, "location_lon": 90.4000, "zone": "Test Zone", "type": "construction_dust"},
+    {"name": "Test Node (Waste Burning)", "location_lat": 23.9600, "location_lon": 90.4100, "zone": "Test Zone", "type": "waste_burning"},
 ]
 
 
@@ -17,12 +22,15 @@ def get_or_create_node(node_info):
         nodes = requests.get(f"{API_URL}/nodes").json()
         for n in nodes:
             if n.get("name") == node_info["name"]:
-                requests.put(f"{API_URL}/nodes/{n['id']}", json={
+                requests.patch(f"{API_URL}/nodes/{n['id']}", json={
                     "name": node_info["name"],
                     "location_lat": node_info["location_lat"],
                     "location_lon": node_info["location_lon"],
                     "zone": node_info["zone"],
-                    "status": "active"
+                    "status": "active",
+                    "health_score": random.uniform(85.0, 99.5),
+                    "battery_level": random.uniform(40.0, 100.0),
+                    "is_charging": random.choice([True, False])
                 })
                 return n["id"]
         
@@ -32,7 +40,10 @@ def get_or_create_node(node_info):
             "location_lat": node_info["location_lat"],
             "location_lon": node_info["location_lon"],
             "zone": node_info["zone"],
-            "status": "active"
+            "status": "active",
+            "health_score": random.uniform(85.0, 99.5),
+            "battery_level": random.uniform(40.0, 100.0),
+            "is_charging": random.choice([True, False])
         })
         return res.json()["id"]
     except Exception as e:
@@ -63,6 +74,20 @@ def main():
             mq131 = 300 + pm10_val/2 # High NOx / Ozone
             mq135 = 450 + pm10_val   # High NH3 / VOCs
             mq7 = 150 + pm10_val/3
+        elif info["type"] == "construction_dust":
+            pm25 = pm10_val * 0.3
+            pm1_0 = pm25 * 0.4
+            mq131 = 80
+            mq135 = 100
+            mq7 = 100
+            mq2 = 80
+        elif info["type"] == "waste_burning":
+            pm25 = pm10_val * 0.6
+            pm1_0 = pm25 * 0.7
+            mq131 = 150
+            mq135 = 350 + pm10_val
+            mq7 = 200 + pm10_val/2
+            mq2 = 300 + pm10_val/1.5
         else:
             pm25 = pm10_val * 0.4
             pm1_0 = pm25 * 0.6
@@ -78,7 +103,7 @@ def main():
             "PM1.0": pm1_0,
             "PM2.5": pm25,
             "PM10": pm10_val,
-            "MQ2": 150 + pm10_val/2,
+            "MQ2": locals().get("mq2", 150 + pm10_val/2),
             "MQ4": 100 + pm10_val/3,
             "MQ6": 80 + pm10_val/4,
             "MQ7": mq7,
@@ -105,6 +130,8 @@ def main():
         send_scenario_reading(1, t, pm10_val=44 + random.uniform(-2, 2))
         send_scenario_reading(2, t, pm10_val=46 + random.uniform(-2, 2))
         send_scenario_reading(3, t, pm10_val=30 + random.uniform(-2, 2))
+        send_scenario_reading(4, t, pm10_val=40 + random.uniform(-2, 2))
+        send_scenario_reading(5, t, pm10_val=42 + random.uniform(-2, 2))
         time.sleep(0.5)
 
     print("\n--- Phase 2: 07:00 AM - Traffic Increases, Pollution Rises ---")
@@ -121,6 +148,8 @@ def main():
         send_scenario_reading(1, t, pm10_val=pm10_trend + random.uniform(-5, 5))
         send_scenario_reading(2, t, pm10_val=pm10_trend + random.uniform(-5, 5), is_faulty=is_faulty)
         send_scenario_reading(3, t, pm10_val=35 + random.uniform(-2, 2)) # Zone 1 unaffected
+        send_scenario_reading(4, t, pm10_val=pm10_trend + random.uniform(-5, 5)) # Test Construction
+        send_scenario_reading(5, t, pm10_val=pm10_trend + random.uniform(-5, 5)) # Test Waste Burning
         
         if m == 5:
             print("[EVENT] Sensor 03 reports impossible data jump! Trust system should catch this.")

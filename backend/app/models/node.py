@@ -33,6 +33,8 @@ class Node(Base):
     
     # Telemetry and Maintenance
     battery_level: Mapped[float] = mapped_column(Float, default=100.0) # percentage
+    is_charging: Mapped[bool] = mapped_column(default=False)
+    health_score: Mapped[float] = mapped_column(Float, default=100.0)
     power_consumption_w: Mapped[float] = mapped_column(Float, default=2.5) # watts
     last_cleaning_date: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=True)
     last_battery_replacement: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=True)

@@ -14,7 +14,7 @@ def optimize_intervention(zone: str, pm10: float, forecast_30m: float,
     if classifier_label == "humid_haze":
          return {"action": "NONE", "reason": "Weather event (Humid Haze), no mitigation possible.", "confidence": classifier_confidence}
          
-    decision_confidence = (sensor_trust / 100.0) * classifier_confidence * 100.0
+    decision_confidence = sensor_trust * classifier_confidence * 100.0
     
     if aqi <= 100 and pm10 <= 100:
         return {"action": "NONE", "reason": f"AQI Low ({int(aqi)}), below concern threshold.", "confidence": decision_confidence}

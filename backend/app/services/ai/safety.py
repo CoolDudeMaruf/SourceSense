@@ -19,7 +19,7 @@ def safety_gate(node_id: int, control_mode: str, optimizer_decision: dict) -> di
     reason = optimizer_decision.get("reason", "")
     
     # Safety Constraint 1: Minimum Confidence
-    if confidence < 40.0:
+    if confidence < 60.0:
         msg = f"Safety Block: Confidence too low ({confidence}%). {reason}"
         logger.warning(msg)
         return {"relay_action": "OFF", "reason": msg, "is_safe": False}
@@ -37,7 +37,7 @@ def safety_gate(node_id: int, control_mode: str, optimizer_decision: dict) -> di
         if confidence >= 90.0:
             msg = f"Autonomous intervention allowed. {reason}"
             return {"relay_action": "ON", "reason": msg, "is_safe": True, "simulated": False}
-        elif confidence >= 70.0:
+        elif confidence >= 60.0:
             msg = f"Conservative intervention allowed. {reason}"
             return {"relay_action": "ON", "reason": msg, "is_safe": True, "simulated": False}
         else:

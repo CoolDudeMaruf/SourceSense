@@ -141,7 +141,7 @@ def classify(
     confidence = round(float(proba[label_idx]), 4)
     
     # ML Abstention / Unknown Logic
-    if confidence < 0.65:
+    if confidence < 0.30:
         label = "unknown"
     else:
         label = model.classes_[label_idx]

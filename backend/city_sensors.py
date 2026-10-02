@@ -39,6 +39,9 @@ API_URL = "http://127.0.0.1:8000/api/v1"
 # 'scenario' drives the sensor data generation logic.
 
 CITY_NODES = [
+    # Special Test Node for UI demonstrations
+    {"name": "00 - Edge AI Test Node", "location_lat": 23.8103, "location_lon": 90.4125, "zone": "Demo", "description": "Cycles through all AI classification scenarios", "control_mode": "AUTONOMOUS", "pm10_threshold": 120.0, "scenario": "demo_alternating", "calib_a": 0.33, "calib_b": 0.17, "skip_real_aqi": True},
+
     # Top 25 Most Polluted Urban Cities and Areas in Dhaka Region
     {"name": "Gazipur City", "location_lat": 23.9999, "location_lon": 90.4203, "zone": "Industrial", "description": "High Industrial Emissions", "control_mode": "AUTONOMOUS", "pm10_threshold": 170.0, "scenario": "mixed_industrial", "calib_a": 0.35, "calib_b": 0.18},
     {"name": "Tongi", "location_lat": 23.8900, "location_lon": 90.4000, "zone": "Industrial", "description": "Heavy Industrial Activity", "control_mode": "AUTONOMOUS", "pm10_threshold": 160.0, "scenario": "mixed_industrial", "calib_a": 0.35, "calib_b": 0.18},
@@ -278,7 +281,7 @@ _demo_last_switch = datetime.now()
 
 def gen_demo_alternating(t):
     global _demo_state_index, _demo_last_switch
-    if (datetime.now() - _demo_last_switch).total_seconds() >= 5:
+    if (datetime.now() - _demo_last_switch).total_seconds() >= 8:
         _demo_state_index = (_demo_state_index + 1) % 8
         _demo_last_switch = datetime.now()
 
@@ -388,6 +391,10 @@ def get_or_create_node(node_info: dict, reset: bool = False) -> int:
         "calib_a":            node_info.get("calib_a", 0.33),
         "calib_b":            node_info.get("calib_b", 0.17),
         "is_active":          True,
+        "battery_level":      round(random.uniform(25.0, 100.0), 1),
+        "is_charging":        random.choice([True, False]),
+        "health_score":       round(random.uniform(70.0, 100.0), 1),
+        "power_consumption_w":0.15,
     }
 
     if existing:

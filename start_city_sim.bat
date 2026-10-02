@@ -7,6 +7,7 @@ echo  This will start:
 echo    [1] Backend API       (http://localhost:8000)
 echo    [2] Frontend UI       (http://localhost:5173)
 echo    [3] 25-Node City Sim   (continuous readings, 5s interval)
+echo    [4] Test Terminal      (for triggering manual test events)
 echo.
 echo  Each node has a unique pollution scenario that triggers different
 echo  AI actions (SPRAY, Traffic Advisory, Fire Control, Safety Block...)
@@ -18,8 +19,11 @@ start "SourceSense Backend" cmd /k "cd /d "%~dp0backend" && python -m uvicorn ap
 echo [2/3] Starting Frontend UI...
 start "SourceSense Frontend" cmd /k "cd /d "%~dp0frontend" && npm run dev"
 
-echo [3/3] Starting 25-Node City Sensor Simulator (waits 8s for backend)...
+echo [3/4] Starting 25-Node City Sensor Simulator (waits 8s for backend)...
 start "City Sensor Sim" cmd /k "cd /d "%~dp0backend" && timeout /t 8 /nobreak && python city_sensors.py --loop --interval 5"
+
+echo [4/4] Opening Test Sensor Terminal...
+start "Test Sensor Terminal" cmd /k "cd /d "%~dp0backend" && echo ======================================== && echo  SourceSense Test Terminal && echo ======================================== && echo. && echo To trigger a test event, run: && echo python test_sensor.py --type construction_dust --pm10 250 && echo."
 
 echo.
 echo  ================================================================

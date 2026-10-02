@@ -23,7 +23,7 @@ def trigger_infrastructure_webhook(node_id: int, action: str, source: str, aqi: 
     Direct API trigger / webhook to city municipal infrastructure.
     Demonstrates active mitigation based on high AQI and specific pollution sources.
     """
-    webhook_url = f"http://city-infrastructure.local/api/v1/mitigate/{zone}"
+    webhook_base = "http://localhost:8000/api/v1/external"
     
     payload = {
         "node_id": node_id,
@@ -38,17 +38,25 @@ def trigger_infrastructure_webhook(node_id: int, action: str, source: str, aqi: 
         if source == "vehicle_combustion":
             payload["mitigation_systems"].append("adaptive_traffic_lights_divert")
             payload["mitigation_systems"].append("smog_towers_activate")
-        elif source == "construction_dust" or source == "industrial_emissions":
+            system = "traffic_control"
+        elif source == "construction_dust":
             payload["mitigation_systems"].append("automated_water_sprinklers")
             payload["mitigation_systems"].append("smog_towers_activate")
+            system = "water_cannon"
+        elif source == "waste_burning":
+            payload["mitigation_systems"].append("general_air_purification")
+            system = "fire_control"
+        elif source == "industrial_emissions":
+            payload["mitigation_systems"].append("automated_water_sprinklers")
+            system = "industry_control"
         else:
             payload["mitigation_systems"].append("general_air_purification")
+            system = "water_cannon" # fallback
             
     try:
-        # In a real scenario, this would be an actual API call. 
-        # Using a timeout to ensure it doesn't block processing.
-        # response = requests.post(webhook_url, json=payload, timeout=2.0)
-        logger.info(f"Triggered city infrastructure webhook for zone {zone}: {payload}")
+        if action == "ON":
+            requests.post(f"{webhook_base}/{system}", json=payload, timeout=2.0)
+            logger.info(f"Triggered city infrastructure webhook for {system} in zone {zone}: {payload}")
     except Exception as e:
         logger.error(f"Failed to trigger city infrastructure webhook: {e}")
 

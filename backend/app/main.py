@@ -7,7 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
 from app.database import create_all_tables
-from app.routers import readings, nodes, events, export, forecast, classifier, ws
+from app.routers import readings, nodes, events, export, forecast, classifier, ws, external_apis, economics
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s – %(message)s")
 logger = logging.getLogger(__name__)
@@ -54,7 +54,9 @@ app.include_router(events.router)
 app.include_router(export.router)
 app.include_router(forecast.router)
 app.include_router(classifier.router)
+app.include_router(economics.router)
 app.include_router(ws.router)
+app.include_router(external_apis.router)
 
 
 @app.get("/", tags=["health"])

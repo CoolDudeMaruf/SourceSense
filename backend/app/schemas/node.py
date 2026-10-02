@@ -19,6 +19,8 @@ class NodeCreate(BaseModel):
     control_mode: str = "AUTONOMOUS"
     zone: str = "Z1"
     battery_level: float = 100.0
+    is_charging: bool = False
+    health_score: float = 100.0
     power_consumption_w: float = 2.5
     last_cleaning_date: Optional[datetime] = None
     last_battery_replacement: Optional[datetime] = None
@@ -40,6 +42,8 @@ class NodeUpdate(BaseModel):
     control_mode: Optional[str] = None
     zone: Optional[str] = None
     battery_level: Optional[float] = None
+    is_charging: Optional[bool] = None
+    health_score: Optional[float] = None
     power_consumption_w: Optional[float] = None
     last_cleaning_date: Optional[datetime] = None
     last_battery_replacement: Optional[datetime] = None
@@ -62,6 +66,8 @@ class NodeOut(BaseModel):
     control_mode: str
     zone: str
     battery_level: float
+    is_charging: bool
+    health_score: float
     power_consumption_w: float
     last_cleaning_date: Optional[datetime]
     last_battery_replacement: Optional[datetime]

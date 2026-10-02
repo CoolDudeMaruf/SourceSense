@@ -1,11 +1,12 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { RefreshCw, Wifi, WifiOff, Download, Activity, Sun, Moon, Leaf } from 'lucide-react';
+import { RefreshCw, Wifi, WifiOff, Download, Activity, Sun, Moon, Leaf, Zap, Battery } from 'lucide-react';
 import QualityFlagBadge from '../components/QualityFlagBadge';
 import NodeMap from '../components/NodeMap';
 import LiveReadingsCard from '../components/LiveReadingsCard';
 import AQIBadge from '../components/AQIBadge';
 import RelayStatus from '../components/RelayStatus';
 import ActionWindow from '../components/ActionWindow';
+import ExternalSystems from './ExternalSystems';
 import TimelineChart from '../components/TimelineChart';
 import DataQualityPanel from '../components/DataQualityPanel';
 import { useWebSocket } from '../hooks/useWebSocket';
@@ -1112,9 +1113,19 @@ export default function Dashboard() {
                       {n.name}
                     </button>
                   ))}
-                  {selectedNode?.control_mode && (
-                    <div className="osen-mode-badge">
-                      ⚡ {selectedNode.control_mode}
+                  {selectedNode && (
+                    <div style={{ marginLeft: 'auto', display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                      <div className="osen-mode-badge" style={{ margin: 0, color: 'var(--ogs)', borderColor: 'rgba(25,135,84,0.15)', background: 'rgba(25,135,84,0.08)' }}>
+                        <Activity size={11} /> {selectedNode.health_score ?? 100}% Health
+                      </div>
+                      <div className="osen-mode-badge" style={{ margin: 0, color: 'var(--oi)', borderColor: 'rgba(13,202,240,0.15)', background: 'rgba(13,202,240,0.08)' }}>
+                        {selectedNode.is_charging ? <Zap size={11} color="#fbbf24" /> : <Battery size={11} />} {selectedNode.battery_level ?? 100}%
+                      </div>
+                      {selectedNode.control_mode && (
+                        <div className="osen-mode-badge" style={{ margin: 0 }}>
+                          ⚡ {selectedNode.control_mode}
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
@@ -1423,10 +1434,13 @@ export default function Dashboard() {
                     <div className="osen-tab-bar" style={{ padding: '0 1.25rem' }}>
                       <button className={`osen-tab ${tab === 'live' ? 'active' : ''}`} onClick={() => setTab('live')}>Recent Readings</button>
                       <button className={`osen-tab ${tab === 'quality' ? 'active' : ''}`} onClick={() => setTab('quality')}>Data Quality Panel</button>
+                      <button className={`osen-tab ${tab === 'external' ? 'active' : ''}`} onClick={() => setTab('external')}>External Services</button>
                     </div>
-                    <div style={{ padding: '1.25rem' }}>
+                    <div style={{ padding: (tab === 'external') ? 0 : '1.25rem' }}>
                       {tab === 'quality' ? (
                         <DataQualityPanel readings={readings} />
+                      ) : tab === 'external' ? (
+                        <ExternalSystems />
                       ) : (
                         <div className="osen-table-wrap">
                           <table className="osen-table">
