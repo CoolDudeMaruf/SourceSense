@@ -811,7 +811,9 @@ export default function Dashboard() {
         const nodeList = Array.isArray(data) ? data : [];
         setNodes(nodeList);
         if (nodeList.length > 0) {
-          const defaultNode = nodeList.find(n => n.zone === "Demo") || nodeList[0];
+          const defaultNode = nodeList.find(n => n.name.includes("Gulshan") && n.name.startsWith("Node-01"))
+            || nodeList.find(n => n.name.startsWith("Node-01"))
+            || nodeList[0];
           setSelectedNodeId(defaultNode.id);
         }
       })
@@ -1020,10 +1022,7 @@ export default function Dashboard() {
               <div className="osen-header-left">
                 <div>
                   <div className="osen-page-eyebrow">Air Quality Platform</div>
-                  <div className="osen-page-title" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                    Live Dashboard
-                    <span className="osen-badge osen-badge-success" style={{ animation: 'ws-pulse 2s infinite', fontSize: '0.65rem' }}>Live AI Simulation</span>
-                  </div>
+                  <div className="osen-page-title">Live Dashboard</div>
                 </div>
               </div>
               <div className="osen-header-right">
@@ -1053,60 +1052,57 @@ export default function Dashboard() {
             {/* ── Page content ── */}
             <main className="osen-content">
 
-              
-              
               {/* ── KPI Row ── */}
               <div className="osen-kpi-grid osen-section">
-                <div className="osen-kpi-card" style={{ background: currentReading?.relay_state ? 'rgba(220,53,69,0.05)' : 'rgba(25,135,84,0.05)', border: currentReading?.relay_state ? '1px solid rgba(220,53,69,0.3)' : '1px solid var(--be)' }}>
+                <div className="osen-kpi-card">
                   <div className="osen-kpi-label">
-                    <span style={{ width: 8, height: 8, borderRadius: '50%', background: currentReading?.relay_state ? 'var(--ogd)' : 'var(--ogs)', display: 'inline-block' }} />
-                    AI Brain Status
+                    <span style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--ogs)', display: 'inline-block' }} />
+                    Total Nodes
                   </div>
-                  <div className="osen-kpi-value" style={{ color: currentReading?.relay_state ? 'var(--ogd)' : 'var(--ogs)', fontSize: '1.4rem' }}>
-                    {currentReading?.relay_state ? '● AUTONOMOUS ACTION' : '○ MONITORING STANDBY'}
-                  </div>
-                  <div className="osen-kpi-trend">
-                    Node {selectedNode?.name ?? '—'}
+                  <div className="osen-kpi-value">{nodes.length}</div>
+                  <div className="osen-kpi-trend osen-trend-up">
+                    ↑ {nodes.length - activeNodes} monitoring, {activeNodes} active
                   </div>
                 </div>
 
                 <div className="osen-kpi-card">
                   <div className="osen-kpi-label">
-                    <span style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--op)', display: 'inline-block' }} />
-                    Active City Interventions
+                    <span style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--oi)', display: 'inline-block' }} />
+                    Avg. AQI
                   </div>
-                  <div className="osen-kpi-value">{activeNodes}</div>
+                  <div className="osen-kpi-value">{avgAqi}</div>
                   <div className="osen-kpi-trend osen-trend-neutral">
-                    ∑ Nodes currently mitigated
+                    ◉ Cross-node average
                   </div>
                 </div>
 
                 <div className="osen-kpi-card">
                   <div className="osen-kpi-label">
                     <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#0dcaf0', display: 'inline-block' }} />
-                    Total Dust Suppressed
+                    Dust Suppressed
                   </div>
                   <div className="osen-kpi-value" style={{ color: 'var(--oi)' }}>
                     {dustSuppressedKg} <span style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--ts)' }}>gram</span>
                   </div>
                   <div className="osen-kpi-trend">
-                    Since session start
+                    ∑ Cumulative since session start
                   </div>
                 </div>
-                
+
                 <div className="osen-kpi-card">
                   <div className="osen-kpi-label">
-                    <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#f59e0b', display: 'inline-block' }} />
-                    Current AI Confidence
+                    <span style={{ width: 8, height: 8, borderRadius: '50%', background: currentReading?.relay_state ? 'var(--ogd)' : 'var(--ogs)', display: 'inline-block' }} />
+                    Relay State
                   </div>
-                  <div className="osen-kpi-value" style={{ color: '#f59e0b' }}>
-                    {currentReading?.classifier_confidence ? ((currentReading.classifier_confidence) * 100).toFixed(1) : '—'}%
+                  <div className="osen-kpi-value" style={{ color: currentReading?.relay_state ? 'var(--ogd)' : 'var(--ogs)', fontSize: '1.4rem' }}>
+                    {currentReading?.relay_state ? '● ACTIVE' : '○ STANDBY'}
                   </div>
                   <div className="osen-kpi-trend">
-                    Source: {currentReading?.classifier_label?.replace(/_/g, ' ') || 'None'}
+                    Node {selectedNode?.name ?? '—'}
                   </div>
                 </div>
               </div>
+
               {/* ── Node selector bar ── */}
               {nodes.length > 0 && (
                 <div className="osen-node-bar osen-section">
@@ -1150,7 +1146,27 @@ export default function Dashboard() {
                 <>
                   {/* Row 1: Map + Action Window */}
                   <div className="osen-grid-2 osen-section">
-                    <div className="osen-card" style={{ border: currentReading?.relay_state ? '2px solid var(--ogd)' : '1px solid var(--be)', boxShadow: currentReading?.relay_state ? '0 0 20px rgba(220,53,69,0.15)' : 'var(--osha)', transition: 'all 0.3s' }}>
+                    <div className="osen-card">
+                      <div className="osen-card-inner" style={{ padding: 0 }}>
+                        <div className="osen-card-header" style={{ padding: '0.85rem 1.25rem' }}>
+                          <span className="osen-card-title">
+                            <span className="osen-card-title-dot" />
+                            Geospatial Node Map
+                          </span>
+                          <span className="osen-badge osen-badge-success">{nodes.length} nodes</span>
+                        </div>
+                        <div style={{ padding: '0 1.25rem 1.25rem' }}>
+                          <NodeMap
+                            nodes={nodes}
+                            latestReadings={latestReadings}
+                            selectedNodeId={selectedNodeId}
+                            onSelectNode={setSelectedNodeId}
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="osen-card">
                       <div className="osen-card-inner" style={{ padding: 0 }}>
                         <div className="osen-card-header" style={{ padding: '0.85rem 1.25rem' }}>
                           <span className="osen-card-title">
@@ -1417,12 +1433,19 @@ export default function Dashboard() {
                     </div>
                   </div>
 
-                  {/* Row 5: Recent Readings */}
+                  {/* Row 5: Recent Readings / Data Quality tabs */}
                   <div className="osen-card osen-section" style={{ padding: 0 }}>
                     <div className="osen-tab-bar" style={{ padding: '0 1.25rem' }}>
-                      <button className="osen-tab active">Recent Readings</button>
+                      <button className={`osen-tab ${tab === 'live' ? 'active' : ''}`} onClick={() => setTab('live')}>Recent Readings</button>
+                      <button className={`osen-tab ${tab === 'quality' ? 'active' : ''}`} onClick={() => setTab('quality')}>Data Quality Panel</button>
+                      <button className={`osen-tab ${tab === 'external' ? 'active' : ''}`} onClick={() => setTab('external')}>External Services</button>
                     </div>
-                    <div style={{ padding: '1.25rem' }}>
+                    <div style={{ padding: (tab === 'external') ? 0 : '1.25rem' }}>
+                      {tab === 'quality' ? (
+                        <DataQualityPanel readings={readings} />
+                      ) : tab === 'external' ? (
+                        <div>External systems feature temporarily disabled</div>
+                      ) : (
                         <div className="osen-table-wrap">
                           <table className="osen-table">
                             <thead>
@@ -1467,6 +1490,7 @@ export default function Dashboard() {
                             </tbody>
                           </table>
                         </div>
+                      )}
                     </div>
                   </div>
                 </>
