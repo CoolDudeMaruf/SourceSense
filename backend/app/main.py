@@ -6,7 +6,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
-from app.database import create_all_tables
+from app.database import create_all_tables, seed_essential_nodes
 from app.routers import readings, nodes, events, export, forecast, classifier, ws
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s – %(message)s")
@@ -15,9 +15,10 @@ logger = logging.getLogger(__name__)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Startup: create tables + pre-load classifier model."""
+    """Startup: create tables + pre-load classifier model + seed nodes."""
     logger.info("SourceSense starting up…")
     await create_all_tables()
+    await seed_essential_nodes()
     # Pre-warm the classifier (trains if no model.pkl exists)
     from app.services.classifier import get_model
     get_model()
