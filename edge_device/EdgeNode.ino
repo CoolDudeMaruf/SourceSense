@@ -1,123 +1,194 @@
 #include "model.h"
-#include <WiFi.h>
-#include <HTTPClient.h>
+#include <ESP8266HTTPClient.h>
+#include <ESP8266WiFi.h>
+#include <WiFiClientSecure.h>
+#include <time.h>
 
-// Define GPIO Pins
-const int RELAY_PIN = 12;
-const int SENSOR_PM25_PIN = 34; // Analog pin for PM2.5
-const int SENSOR_PM10_PIN = 35; // Analog pin for PM10
-const int SENSOR_CO_PIN = 32;   // Analog pin for CO
-const int SENSOR_NO2_PIN = 33;  // Analog pin for NO2
-const int SENSOR_TEMP_PIN = 25; // Analog pin for Temperature
-const int SENSOR_HUM_PIN = 26;  // Analog pin for Humidity
-
-// Network & Cloud Configuration
-const char* ssid = "YOUR_WIFI_SSID";
-const char* password = "YOUR_WIFI_PASSWORD";
-const char* cloudApiUrl = "https://sourcesense.onrender.com/api/v1/readings"; // Cloud endpoint (no private IPs)
+// WiFi & API Configuration
+const char *ssid = "Head_Quarter";
+const char *password = "35622659";
+const char *serverUrl = "https://sourcesense.onrender.com/api/v1/readings"; // Cloud endpoint
+const int node_id = 30; // Node ID we created in the backend
 
 unsigned long lastCloudSend = 0;
-const unsigned long CLOUD_INTERVAL = 120000; // 2 minutes (120,000 ms)
+const unsigned long CLOUD_INTERVAL = 120000; // 2 minutes in milliseconds
+
+// Define GPIO Pins for ESP8266 (e.g. NodeMCU/Wemos)
+const int RELAY_PIN = D1;
+// Note: ESP8266 only has ONE analog pin (A0).
+// For this simulation, we'll map all analog reads to A0.
+// (In a real hardware setup with multiple MQ sensors, you'd need an ADC like ADS1115)
+const int SENSOR_PIN = A0;
+
+// Network Status
+bool isCloudConnected = false;
 
 // Instantiate the Classifier
 Eloquent::ML::Port::RandomForest classifier;
 
+void sendToCloud(float temp, float hum, float pm1_0, float pm25, float pm10,
+                 float *features, String classification);
+
 void setup() {
   Serial.begin(115200);
-  
+
   // Configure Pins
   pinMode(RELAY_PIN, OUTPUT);
   digitalWrite(RELAY_PIN, LOW); // Default off
-  
-  Serial.println("SourceSense Edge-Native Node initialized.");
-  Serial.println("TinyML Model Loaded: RandomForest Classifier");
 
-  // Connect to WiFi
+  Serial.print("\nConnecting to WiFi...");
   WiFi.begin(ssid, password);
-  Serial.print("Connecting to WiFi");
-  while (WiFi.status() != WL_CONNECTED) {
+  int retries = 0;
+  while (WiFi.status() != WL_CONNECTED && retries < 20) {
     delay(500);
     Serial.print(".");
+    retries++;
   }
-  Serial.println("\nWiFi connected. Cloud ready.");
+
+  if (WiFi.status() == WL_CONNECTED) {
+    isCloudConnected = true;
+    Serial.println("\nConnected to WiFi!");
+
+    // Configure NTP time (UTC)
+    configTime(0, 0, "pool.ntp.org", "time.nist.gov");
+    Serial.print("Waiting for NTP time sync: ");
+    time_t now = time(nullptr);
+    while (now < 8 * 3600 * 2) {
+      delay(500);
+      Serial.print(".");
+      now = time(nullptr);
+    }
+    Serial.println("");
+  } else {
+    Serial.println("\nFailed to connect to WiFi. Running in offline mode.");
+  }
+
+  Serial.println("SourceSense Edge-Native Node initialized (ESP8266).");
+  Serial.println("TinyML Model Loaded: RandomForest Classifier");
 }
 
-//=====================================================
-// LOOP
-//=====================================================
 void loop() {
   // 1. Read Sensor Data (Simulated analog reads mapped to physical values)
-  float pm25 = analogRead(SENSOR_PM25_PIN) * (150.0 / 4095.0); // Scale 0-150 ug/m3
-  float pm10 = analogRead(SENSOR_PM10_PIN) * (200.0 / 4095.0);
-  float co   = analogRead(SENSOR_CO_PIN) * (5.0 / 4095.0);
-  float no2  = analogRead(SENSOR_NO2_PIN) * (100.0 / 4095.0);
-  float temp = analogRead(SENSOR_TEMP_PIN) * (45.0 / 4095.0);
-  float hum  = analogRead(SENSOR_HUM_PIN) * (100.0 / 4095.0);
+  // ESP8266 ADC is 10-bit (0-1023), unlike ESP32 which is 12-bit (0-4095).
+  int rawAnalog = analogRead(SENSOR_PIN);
 
-  // 2. Prepare Feature Vector [pm25, pm10, co, no2, temperature, humidity]
-  float features[6] = {pm25, pm10, co, no2, temp, hum};
-  
-  // 3. Autonomous Edge Inference (Runs every 5 seconds)
+  // To make the simulation interesting, we'll add some random variance since
+  // they all share A0
+  float pm25 = (rawAnalog + random(-50, 50)) * (150.0 / 1023.0); // Scale 0-150 ug/m3
+  float pm10 = (rawAnalog + random(-50, 50)) * (200.0 / 1023.0);
+  float co = (rawAnalog + random(-20, 20)) * (5.0 / 1023.0);
+  float no2 = (rawAnalog + random(-20, 20)) * (100.0 / 1023.0);
+  float temp = (rawAnalog + random(-10, 10)) * (45.0 / 1023.0);
+  float hum = (rawAnalog + random(-10, 10)) * (100.0 / 1023.0);
+
+  // Prevent negative values from random variance
+  if (pm25 < 0.0) pm25 = 0.0;
+  if (pm10 < 0.0) pm10 = 0.0;
+  if (co < 0.0) co = 0.0;
+  if (no2 < 0.0) no2 = 0.0;
+  if (temp < 0.0) temp = 0.0;
+  if (hum < 0.0) hum = 0.0;
+
+  // 2. Prepare 11-Feature Vector [pm10_pm25_ratio, pm2_5, pm10, MQ2, MQ4, MQ6, MQ7, MQ8, MQ131, MQ135, humidity]
+  float ratio = (pm25 > 0) ? (pm10 / pm25) : -1.0;
+
+  // Synthesize missing MQ sensors to align with backend 11-feature model for edge inference.
+  float features[11] = {
+      ratio, pm25, pm10, co + 100, no2 + 50,
+      80.0, co * 1.5, 100.0, 50.0, co + 80, // MQs
+      hum
+  };
+
+  float pm1_0 = pm25 * 0.8; // Simulated PM1.0
+
+  // 3. Autonomous Edge Inference
   Serial.print("Running local inference... ");
   int classIdx = classifier.predict(features);
   String classification = classifier.predictLabel(features);
   Serial.println(classification);
-  
+
   // 4. Fail-Safe Local Actuation Logic (Decoupled from Cloud)
-  if (classification == "vehicle_combustion" || 
-      classification == "waste_burning" || 
+  if (classification == "vehicle_combustion" ||
+      classification == "waste_burning" ||
       classification == "construction_dust") {
-        
-      if (pm25 > 50.0 || pm10 > 80.0) {
-        Serial.println("CRITICAL EVENT: Triggering Misting Relays Locally!");
-        digitalWrite(RELAY_PIN, HIGH);
-      } else {
-        digitalWrite(RELAY_PIN, LOW);
-      }
-  } else {
+
+    if (pm25 > 50.0 || pm10 > 80.0) {
+      Serial.println("CRITICAL EVENT: Triggering Misting Relays Locally!");
+      digitalWrite(RELAY_PIN, HIGH);
+    } else {
+      Serial.println("Event detected, but below local actuation threshold.");
       digitalWrite(RELAY_PIN, LOW);
+    }
+
+  } else {
+    digitalWrite(RELAY_PIN, LOW);
   }
 
-  // 5. Cloud Telemetry - Only send every 2 minutes!
+  // 5. Cloud Telemetry (Fire-and-Forget, only every 2 minutes)
   if (millis() - lastCloudSend >= CLOUD_INTERVAL) {
-    if (WiFi.status() == WL_CONNECTED) {
-      sendToCloud(features, classification);
+    if (isCloudConnected && WiFi.status() == WL_CONNECTED) {
+      sendToCloud(temp, hum, pm1_0, pm25, pm10, features, classification);
     } else {
       Serial.println("Warning: Cloud offline. Relying on Edge-Native Fail-Safe.");
     }
     lastCloudSend = millis();
   }
 
-  delay(5000); // 5 second control loop for real-time edge responses
+  delay(5000); // 5 second control loop
 }
 
-void sendToCloud(float* features, String classification) {
+void sendToCloud(float temp, float hum, float pm1_0, float pm25, float pm10,
+                 float *features, String classification) {
+                 
+  WiFiClientSecure client;
+  client.setInsecure(); // Allow connecting to HTTPS without verifying the certificate chain
+  
   HTTPClient http;
-  http.begin(cloudApiUrl);
+  http.begin(client, serverUrl);
   http.addHeader("Content-Type", "application/json");
+
+  // Get current time from NTP
+  time_t now = time(nullptr);
+  struct tm timeinfo;
+  gmtime_r(&now, &timeinfo);
+
+  char timeStringBuff[50];
+  if (timeinfo.tm_year < (2020 - 1900)) {
+    strcpy(timeStringBuff, "2026-10-02T12:00:00Z"); // Fallback static time if NTP fails
+  } else {
+    // Note the 'Z' appended to ensure standard ISO 8601 UTC string for backend
+    strftime(timeStringBuff, sizeof(timeStringBuff), "%Y-%m-%dT%H:%M:%SZ", &timeinfo);
+  }
 
   // Construct JSON Payload
   String payload = "{";
-  payload += "\"node_id\": 99,"; // Example hardware node ID
-  payload += "\"Timestamp\": \"2026-10-02T12:00:00Z\","; // Typically generated via NTP or edge RTC
-  payload += "\"PM2.5\": " + String(features[0]) + ",";
-  payload += "\"PM10\": " + String(features[1]) + ",";
-  payload += "\"MQ7\": " + String(features[2]) + ","; // mapping CO to MQ7
-  payload += "\"Temperature_C\": " + String(features[4]) + ",";
-  payload += "\"Humidity_Percent\": " + String(features[5]);
-  // Add other required fields with defaults to satisfy backend...
+  payload += "\"node_id\":" + String(node_id) + ",";
+  payload += "\"Timestamp\":\"" + String(timeStringBuff) + "\",";
+  payload += "\"Temperature_C\":" + String(temp) + ",";
+  payload += "\"Humidity_Percent\":" + String(hum) + ",";
+  payload += "\"PM1.0\":" + String(pm1_0) + ",";
+  payload += "\"PM2.5\":" + String(pm25) + ",";
+  payload += "\"PM10\":" + String(pm10) + ",";
+  payload += "\"MQ2\":" + String(features[3]) + ",";
+  payload += "\"MQ4\":" + String(features[4]) + ",";
+  payload += "\"MQ6\":" + String(features[5]) + ",";
+  payload += "\"MQ7\":" + String(features[6]) + ",";
+  payload += "\"MQ8\":" + String(features[7]) + ",";
+  payload += "\"MQ131\":" + String(features[8]) + ",";
+  payload += "\"MQ135\":" + String(features[9]);
   payload += "}";
 
-  Serial.println("Sending data to cloud...");
   int httpResponseCode = http.POST(payload);
+  Serial.print("HTTP POST Response code: ");
+  Serial.println(httpResponseCode);
 
   if (httpResponseCode > 0) {
-    Serial.print("Cloud push successful. Response code: ");
-    Serial.println(httpResponseCode);
+    String response = http.getString();
+    Serial.println(response);
   } else {
-    Serial.print("Cloud push failed. Error code: ");
+    Serial.print("Error code: ");
     Serial.println(httpResponseCode);
   }
-  
+
   http.end();
 }
