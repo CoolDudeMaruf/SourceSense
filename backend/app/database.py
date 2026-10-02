@@ -41,3 +41,8 @@ async def create_all_tables():
             await conn.execute(text("ALTER TABLE readings ADD COLUMN is_solar_charging BOOLEAN;"))
         except Exception:
             pass
+        try:
+            from sqlalchemy import text
+            await conn.execute(text("ALTER TABLE readings ADD COLUMN battery_level FLOAT;"))
+        except Exception:
+            pass

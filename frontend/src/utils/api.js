@@ -1,4 +1,18 @@
-const API_BASE = import.meta.env.VITE_API_URL !== undefined ? import.meta.env.VITE_API_URL : (import.meta.env.MODE === 'development' ? 'http://localhost:8000' : '');
+// Robustly build the API base URL.
+// Render injects VITE_API_URL as just a hostname (e.g. "sourcesense-backend-xxxx.onrender.com"),
+// without the https:// scheme. We detect this and fix it automatically.
+function buildApiBase() {
+  const raw = import.meta.env.VITE_API_URL;
+  if (!raw) {
+    // No env var - use relative URL in production (served from same origin) or localhost in dev
+    return import.meta.env.MODE === 'development' ? 'http://localhost:8000' : '';
+  }
+  // If the value is already a full URL, use it as-is
+  if (raw.startsWith('http://') || raw.startsWith('https://')) return raw;
+  // Otherwise it's just a hostname injected by Render - prepend https://
+  return `https://${raw}`;
+}
+const API_BASE = buildApiBase();
 
 export const api = {
   // Nodes
@@ -36,8 +50,14 @@ export const api = {
   getForecast: (nodeId) => fetch(`${API_BASE}/api/v1/forecast/${nodeId}`).then(r => r.json()),
 };
 
-export const WS_BASE = import.meta.env.VITE_WS_URL !== undefined 
-  ? import.meta.env.VITE_WS_URL 
-  : (import.meta.env.MODE === 'development' 
-      ? 'ws://localhost:8000' 
-      : (window.location.protocol === 'https:' ? 'wss://' : 'ws://') + window.location.host);
+export const WS_BASE = (() => {
+  const raw = import.meta.env.VITE_WS_URL;
+  if (!raw) {
+    if (import.meta.env.MODE === 'development') return 'ws://localhost:8000';
+    return (window.location.protocol === 'https:' ? 'wss://' : 'ws://') + window.location.host;
+  }
+  // If it's already a ws/wss URL, use as-is
+  if (raw.startsWith('ws://') || raw.startsWith('wss://')) return raw;
+  // Render injects a bare hostname - convert to wss://
+  return `wss://${raw}`;
+})();
