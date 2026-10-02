@@ -7,7 +7,7 @@
 // WiFi & API Configuration
 const char *ssid = "Head_Quarter";
 const char *password = "35622659";
-const char *serverUrl = "https://sourcesense-backend.onrender.com/api/v1/readings"; // Cloud endpoint
+const char *serverUrl = "https://sourcesense-4.onrender.com/api/v1/readings"; // Cloud endpoint
 const int node_id = 30; // Node ID we created in the backend
 
 unsigned long lastCloudSend = 0;
