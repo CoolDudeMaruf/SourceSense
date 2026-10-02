@@ -153,11 +153,11 @@ void loop() {
 
   unsigned long currentInterval;
   if (localAqi > 50) {
-    // Local AQI is Moderate/Bad. Send data immediately (bypass 5-min timer)
+    // Local AQI is Moderate/Bad. Send data immediately (bypass 2-min timer)
     currentInterval = 0; 
   } else {
-    // Air is Good. Save bandwidth, only send every 5 minutes (300,000 ms)
-    currentInterval = 300000; 
+    // Air is Good. Save bandwidth, only send every 2 minutes (120,000 ms)
+    currentInterval = 120000; 
   }
 
   if (millis() - lastCloudSend >= currentInterval) {
