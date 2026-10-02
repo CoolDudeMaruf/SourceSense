@@ -841,13 +841,17 @@ export default function Dashboard() {
   }, []);
 
   // Load history ONLY when node selection changes
-  useEffect(() => {
+  const loadReadings = useCallback(() => {
     if (!selectedNodeId) return;
     api.getReadings(selectedNodeId, 100).then(data => {
       const list = Array.isArray(data) ? data : [];
       setReadings(list);
     }).catch(() => {});
   }, [selectedNodeId]);
+
+  useEffect(() => {
+    loadReadings();
+  }, [loadReadings]);
 
   useEffect(() => {
     if (!lastReading) return;
