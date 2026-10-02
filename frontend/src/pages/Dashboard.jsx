@@ -1054,6 +1054,7 @@ export default function Dashboard() {
             <main className="osen-content">
 
               
+              
               {/* ── KPI Row ── */}
               <div className="osen-kpi-grid osen-section">
                 <div className="osen-kpi-card" style={{ background: currentReading?.relay_state ? 'rgba(220,53,69,0.05)' : 'rgba(25,135,84,0.05)', border: currentReading?.relay_state ? '1px solid rgba(220,53,69,0.3)' : '1px solid var(--be)' }}>
@@ -1421,7 +1422,7 @@ export default function Dashboard() {
                     <div className="osen-tab-bar" style={{ padding: '0 1.25rem' }}>
                       <button className="osen-tab active">Recent Readings</button>
                     </div>
-                    <div style={{ padding: '1.25rem' }}>(
+                    <div style={{ padding: '1.25rem' }}>
                         <div className="osen-table-wrap">
                           <table className="osen-table">
                             <thead>
@@ -1466,7 +1467,6 @@ export default function Dashboard() {
                             </tbody>
                           </table>
                         </div>
-                      )}
                     </div>
                   </div>
                 </>
