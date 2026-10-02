@@ -789,7 +789,7 @@ export default function Dashboard() {
       const s = (diff % 60).toString().padStart(2, '0');
       setUptimeStr(`${m}:${s}`);
     }, 1000);
-    return () => clearInterval(interval);
+    // return () => clearInterval
   }, [sessionStartTime]);
 
   // Lock the window scroll so only our fixed osen-root scrolls — prevents the startup jump
@@ -844,8 +844,8 @@ export default function Dashboard() {
 
   useEffect(() => {
     loadReadings();
-    const interval = setInterval(loadReadings, 5000);
-    return () => clearInterval(interval);
+    // const interval removed
+    // return () => clearInterval
   }, [loadReadings]);
 
   useEffect(() => {
