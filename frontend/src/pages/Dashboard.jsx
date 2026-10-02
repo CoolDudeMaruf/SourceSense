@@ -820,32 +820,34 @@ export default function Dashboard() {
       .finally(() => setLoading(false));
   }, []);
 
-  const loadReadings = useCallback(() => {
-    // 1. Fetch latest reading for ALL nodes via global endpoint
-    api.getReadings(null, 100).then(results => {
-      const list = Array.isArray(results) ? results : [];
-      const latestMap = {};
-      list.forEach(r => {
-        if (r && r.node_id && !latestMap[r.node_id]) {
-          latestMap[r.node_id] = r;
-        }
-      });
-      setLatestReadings(prev => ({ ...prev, ...latestMap }));
-    }).catch(() => {});
+  // Poll global latest for map & KPIs
+  useEffect(() => {
+    const loadGlobalLatest = () => {
+      api.getReadings(null, 100).then(results => {
+        const list = Array.isArray(results) ? results : [];
+        const latestMap = {};
+        list.forEach(r => {
+          if (r && r.node_id && !latestMap[r.node_id]) {
+            latestMap[r.node_id] = r;
+          }
+        });
+        setLatestReadings(prev => ({ ...prev, ...latestMap }));
+      }).catch(() => {});
+    };
+    
+    loadGlobalLatest();
+    const interval = setInterval(loadGlobalLatest, 5000);
+    return () => clearInterval(interval);
+  }, []);
 
-    // 2. Fetch history for the SELECTED node
+  // Load history ONLY when node selection changes
+  useEffect(() => {
     if (!selectedNodeId) return;
     api.getReadings(selectedNodeId, 100).then(data => {
       const list = Array.isArray(data) ? data : [];
       setReadings(list);
-    }).catch(() => { });
+    }).catch(() => {});
   }, [selectedNodeId]);
-
-  useEffect(() => {
-    loadReadings();
-    // const interval removed
-    // return () => clearInterval
-  }, [loadReadings]);
 
   useEffect(() => {
     if (!lastReading) return;
