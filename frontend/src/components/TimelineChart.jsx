@@ -53,15 +53,15 @@ export default function TimelineChart({ readings = [], pm10Threshold = 50 }) {
       </div>
       <ResponsiveContainer width="100%" height={200}>
         <LineChart data={data} margin={{ top: 5, right: 10, left: -10, bottom: 0 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#1e2d45" />
+          <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
           <XAxis
             dataKey="time"
-            tick={{ fontSize: 10, fill: '#4a5876' }}
+            tick={{ fontSize: 10, fill: '#64748b' }}
             tickLine={false}
             axisLine={false}
           />
           <YAxis
-            tick={{ fontSize: 10, fill: '#4a5876' }}
+            tick={{ fontSize: 10, fill: '#64748b' }}
             tickLine={false}
             axisLine={false}
             unit=" µg"

@@ -17,14 +17,15 @@ const unsigned long CLOUD_INTERVAL = 120000; // 2 minutes in milliseconds
 const int RELAY_PIN = D1;
 // Note: ESP8266 only has ONE analog pin (A0).
 // For this simulation, we'll map all analog reads to A0.
-// (In a real hardware setup with multiple MQ sensors, you'd need an ADC like ADS1115)
+// (In a real hardware setup with multiple MQ sensors, you'd need an ADC like
+// ADS1115)
 const int SENSOR_PIN = A0;
 
 // Network Status
 bool isCloudConnected = false;
 
 // Edge Preprocessing (Exponential Moving Average Filter)
-float filteredAnalog = -1; 
+float filteredAnalog = -1;
 const float EMA_ALPHA = 0.2; // Smoothing factor (lower = smoother, less noise)
 
 // Instantiate the Classifier
@@ -34,18 +35,27 @@ Eloquent::ML::Port::RandomForest classifier;
 int calculateAQI(float pm25, float pm10) {
   // Simplified EPA AQI calculation for PM2.5
   int aqi25 = 0;
-  if (pm25 <= 12.0) aqi25 = (50.0 / 12.0) * pm25;
-  else if (pm25 <= 35.4) aqi25 = ((49.0) / (23.3)) * (pm25 - 12.1) + 51;
-  else if (pm25 <= 55.4) aqi25 = ((49.0) / (19.9)) * (pm25 - 35.5) + 101;
-  else if (pm25 <= 150.4) aqi25 = ((49.0) / (94.9)) * (pm25 - 55.5) + 151;
-  else aqi25 = 201; // Very Unhealthy / Hazardous
+  if (pm25 <= 12.0)
+    aqi25 = (50.0 / 12.0) * pm25;
+  else if (pm25 <= 35.4)
+    aqi25 = ((49.0) / (23.3)) * (pm25 - 12.1) + 51;
+  else if (pm25 <= 55.4)
+    aqi25 = ((49.0) / (19.9)) * (pm25 - 35.5) + 101;
+  else if (pm25 <= 150.4)
+    aqi25 = ((49.0) / (94.9)) * (pm25 - 55.5) + 151;
+  else
+    aqi25 = 201; // Very Unhealthy / Hazardous
 
   // Simplified EPA AQI calculation for PM10
   int aqi10 = 0;
-  if (pm10 <= 54) aqi10 = (50.0 / 54.0) * pm10;
-  else if (pm10 <= 154) aqi10 = ((49.0) / (99.0)) * (pm10 - 55.0) + 51;
-  else if (pm10 <= 254) aqi10 = ((49.0) / (99.0)) * (pm10 - 155.0) + 101;
-  else aqi10 = 151;
+  if (pm10 <= 54)
+    aqi10 = (50.0 / 54.0) * pm10;
+  else if (pm10 <= 154)
+    aqi10 = ((49.0) / (99.0)) * (pm10 - 55.0) + 51;
+  else if (pm10 <= 254)
+    aqi10 = ((49.0) / (99.0)) * (pm10 - 155.0) + 101;
+  else
+    aqi10 = 151;
 
   // Return the higher of the two (driving pollutant)
   return (aqi25 > aqi10) ? aqi25 : aqi10;
@@ -99,16 +109,19 @@ void loop() {
   // ESP8266 ADC is 10-bit (0-1023), unlike ESP32 which is 12-bit (0-4095).
   int rawAnalog = analogRead(SENSOR_PIN);
 
-  // Apply Exponential Moving Average (EMA) Low-Pass Filter to remove hardware noise
+  // Apply Exponential Moving Average (EMA) Low-Pass Filter to remove hardware
+  // noise
   if (filteredAnalog < 0) {
     filteredAnalog = rawAnalog; // Initialize on first read
   } else {
-    filteredAnalog = (EMA_ALPHA * rawAnalog) + ((1.0 - EMA_ALPHA) * filteredAnalog);
+    filteredAnalog =
+        (EMA_ALPHA * rawAnalog) + ((1.0 - EMA_ALPHA) * filteredAnalog);
   }
 
   // To make the simulation interesting, we use the smoothed analog value
   // but still add a tiny bit of random variance for realism
-  float pm25 = (filteredAnalog + random(-20, 20)) * (150.0 / 1023.0); // Scale 0-150 ug/m3
+  float pm25 = (filteredAnalog + random(-20, 20)) *
+               (150.0 / 1023.0); // Scale 0-150 ug/m3
   float pm10 = (filteredAnalog + random(-20, 20)) * (200.0 / 1023.0);
   float co = (filteredAnalog + random(-10, 10)) * (5.0 / 1023.0);
   float no2 = (filteredAnalog + random(-10, 10)) * (100.0 / 1023.0);
@@ -116,22 +129,28 @@ void loop() {
   float hum = (filteredAnalog + random(-5, 5)) * (100.0 / 1023.0);
 
   // Prevent negative values from random variance
-  if (pm25 < 0.0) pm25 = 0.0;
-  if (pm10 < 0.0) pm10 = 0.0;
-  if (co < 0.0) co = 0.0;
-  if (no2 < 0.0) no2 = 0.0;
-  if (temp < 0.0) temp = 0.0;
-  if (hum < 0.0) hum = 0.0;
+  if (pm25 < 0.0)
+    pm25 = 0.0;
+  if (pm10 < 0.0)
+    pm10 = 0.0;
+  if (co < 0.0)
+    co = 0.0;
+  if (no2 < 0.0)
+    no2 = 0.0;
+  if (temp < 0.0)
+    temp = 0.0;
+  if (hum < 0.0)
+    hum = 0.0;
 
-  // 2. Prepare 11-Feature Vector [pm10_pm25_ratio, pm2_5, pm10, MQ2, MQ4, MQ6, MQ7, MQ8, MQ131, MQ135, humidity]
+  // 2. Prepare 11-Feature Vector [pm10_pm25_ratio, pm2_5, pm10, MQ2, MQ4, MQ6,
+  // MQ7, MQ8, MQ131, MQ135, humidity]
   float ratio = (pm25 > 0) ? (pm10 / pm25) : -1.0;
 
-  // Synthesize missing MQ sensors to align with backend 11-feature model for edge inference.
-  float features[11] = {
-      ratio, pm25, pm10, co + 100, no2 + 50,
-      80.0, co * 1.5, 100.0, 50.0, co + 80, // MQs
-      hum
-  };
+  // Synthesize missing MQ sensors to align with backend 11-feature model for
+  // edge inference.
+  float features[11] = {ratio, pm25,     pm10,  co + 100, no2 + 50,
+                        80.0,  co * 1.5, 100.0, 50.0,     co + 80, // MQs
+                        hum};
 
   float pm1_0 = pm25 * 0.8; // Simulated PM1.0
 
@@ -175,10 +194,10 @@ void loop() {
   unsigned long currentInterval;
   if (localAqi > 50) {
     // Local AQI is Moderate/Bad. Send data immediately (bypass 2-min timer)
-    currentInterval = 0; 
+    currentInterval = 0;
   } else {
     // Air is Good. Save bandwidth, only send every 2 minutes (120,000 ms)
-    currentInterval = 120000; 
+    currentInterval = 120000;
   }
 
   if (millis() - lastCloudSend >= currentInterval) {
@@ -200,10 +219,11 @@ void loop() {
 
 void sendToCloud(float temp, float hum, float pm1_0, float pm25, float pm10,
                  float *features, String classification) {
-                 
+
   WiFiClientSecure client;
-  client.setInsecure(); // Allow connecting to HTTPS without verifying the certificate chain
-  
+  client.setInsecure(); // Allow connecting to HTTPS without verifying the
+                        // certificate chain
+
   HTTPClient http;
   http.setTimeout(20000); // 20-second timeout to handle Render cold starts
   http.begin(client, serverUrl);
@@ -216,10 +236,12 @@ void sendToCloud(float temp, float hum, float pm1_0, float pm25, float pm10,
 
   char timeStringBuff[50];
   if (timeinfo.tm_year < (2020 - 1900)) {
-    strcpy(timeStringBuff, "2026-10-02T12:00:00Z"); // Fallback static time if NTP fails
+    strcpy(timeStringBuff,
+           "2026-10-02T12:00:00Z"); // Fallback static time if NTP fails
   } else {
     // Note the 'Z' appended to ensure standard ISO 8601 UTC string for backend
-    strftime(timeStringBuff, sizeof(timeStringBuff), "%Y-%m-%dT%H:%M:%SZ", &timeinfo);
+    strftime(timeStringBuff, sizeof(timeStringBuff), "%Y-%m-%dT%H:%M:%SZ",
+             &timeinfo);
   }
 
   // Construct JSON Payload

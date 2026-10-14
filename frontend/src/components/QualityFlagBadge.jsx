@@ -1,11 +1,11 @@
 import { AlertTriangle, Zap, Droplets, Clock, CheckCircle, Wind } from 'lucide-react';
 
 const FLAG_CONFIG = {
-  failed_read:      { label: 'Failed Read',      cls: 'flag-failed',  Icon: Zap },
-  below_detection:  { label: 'Below Detection',  cls: 'flag-below',   Icon: Wind },
-  possible_warmup:  { label: 'Warming Up',        cls: 'flag-warmup',  Icon: Clock },
-  sensor_glitch:    { label: 'Sensor Glitch',    cls: 'flag-glitch',  Icon: AlertTriangle },
-  logging_gap:      { label: 'Data Gap',          cls: 'flag-gap',     Icon: Clock },
+  failed_read: { label: 'Failed Read', cls: 'flag-failed', Icon: Zap },
+  below_detection: { label: 'Below Detection', cls: 'flag-below', Icon: Wind },
+  possible_warmup: { label: 'Warming Up', cls: 'flag-warmup', Icon: Clock },
+  sensor_glitch: { label: 'Sensor Glitch', cls: 'flag-glitch', Icon: AlertTriangle },
+  logging_gap: { label: 'Data Gap', cls: 'flag-gap', Icon: Clock },
 };
 
 /**

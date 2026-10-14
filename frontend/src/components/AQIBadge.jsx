@@ -25,8 +25,8 @@ export default function AQIBadge({ aqi, category, size = 'md', pm25Subindex, pm1
   // Trend indicator
   const trend = prevAqi != null && aqi != null
     ? aqi > prevAqi + 5 ? 'up'
-    : aqi < prevAqi - 5 ? 'down'
-    : 'stable'
+      : aqi < prevAqi - 5 ? 'down'
+        : 'stable'
     : null;
 
   return (

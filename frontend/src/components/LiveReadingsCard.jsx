@@ -34,10 +34,10 @@ function PMBar({ label, value, maxVal, color, spikeThreshold }) {
 function MQRow({ label, value, warningAbove, color }) {
   const isHigh = value != null && warningAbove != null && value > warningAbove;
   return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '3px 0', borderBottom: '1px solid rgba(30,45,69,0.4)' }}>
-      <span style={{ fontSize: '0.62rem', color: 'var(--text-muted)', fontWeight: 600 }}>{label}</span>
-      <span style={{ fontSize: '0.62rem', fontWeight: 700, color: isHigh ? color : 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: 3 }}>
-        {isHigh && <AlertTriangle size={9} color={color} />}
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '4px 0', borderBottom: '1px solid #f1f5f9' }}>
+      <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)', fontWeight: 600 }}>{label}</span>
+      <span style={{ fontSize: '0.65rem', fontWeight: 700, color: isHigh ? color : 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: 4 }}>
+        {isHigh && <AlertTriangle size={10} color={color} />}
         {value != null ? Number(value).toFixed(0) : '—'}
       </span>
     </div>
@@ -166,7 +166,7 @@ export default function LiveReadingsCard({ reading }) {
           </div>
 
           {/* Temp, Humidity & Power */}
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginBottom: 8, padding: '5px 0', borderBottom: '1px solid rgba(30,45,69,0.4)' }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginBottom: 8, padding: '5px 0', borderBottom: '1px solid #f1f5f9' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
               <Thermometer size={11} color="var(--text-muted)" />
               <span style={{ fontSize: '0.72rem', color: 'var(--text-secondary)', fontWeight: 600 }}>

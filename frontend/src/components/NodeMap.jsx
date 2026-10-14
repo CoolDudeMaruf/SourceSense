@@ -12,7 +12,7 @@ export default function NodeMap({ nodes = [], latestReadings = {}, selectedNodeI
     pitch: 0,
     bearing: 0
   });
-  
+
   const [popupInfo, setPopupInfo] = useState(null);
   const [mapType, setMapType] = useState('street');
 
@@ -21,7 +21,7 @@ export default function NodeMap({ nodes = [], latestReadings = {}, selectedNodeI
     const tileUrl = mapType === 'satellite'
       ? 'https://mt1.google.com/vt/lyrs=y&hl=en&x={x}&y={y}&z={z}'
       : 'https://mt1.google.com/vt/lyrs=m&hl=en&x={x}&y={y}&z={z}';
-      
+
     return {
       version: 8,
       sources: {
@@ -48,13 +48,13 @@ export default function NodeMap({ nodes = [], latestReadings = {}, selectedNodeI
     <div className="glass-card overflow-hidden relative" style={{ height: 500 }}>
       {/* Map Type Toggle */}
       <div style={{ position: 'absolute', top: 10, right: 10, zIndex: 10, display: 'flex', gap: '4px', background: 'rgba(10, 15, 26, 0.8)', padding: '4px', borderRadius: '8px', backdropFilter: 'blur(4px)', border: '1px solid rgba(255,255,255,0.1)' }}>
-        <button 
+        <button
           onClick={() => setMapType('street')}
           style={{ padding: '4px 12px', fontSize: '0.75rem', borderRadius: '4px', border: 'none', background: mapType === 'street' ? 'var(--brand-500, #38bdf8)' : 'transparent', color: mapType === 'street' ? '#fff' : '#aaa', cursor: 'pointer', fontWeight: 600, transition: 'all 0.2s' }}
         >
           Street
         </button>
-        <button 
+        <button
           onClick={() => setMapType('satellite')}
           style={{ padding: '4px 12px', fontSize: '0.75rem', borderRadius: '4px', border: 'none', background: mapType === 'satellite' ? 'var(--brand-500, #38bdf8)' : 'transparent', color: mapType === 'satellite' ? '#fff' : '#aaa', cursor: 'pointer', fontWeight: 600, transition: 'all 0.2s' }}
         >
@@ -107,7 +107,7 @@ export default function NodeMap({ nodes = [], latestReadings = {}, selectedNodeI
                   }}
                   className={isSpike ? "pulse-node" : "live-pulse"}
                 />
-                
+
                 {/* Dust Animation for high AQI */}
                 {isSpike && (
                   <div className="dust-container" style={{ position: 'absolute', top: 0, left: 0, pointerEvents: 'none' }}>

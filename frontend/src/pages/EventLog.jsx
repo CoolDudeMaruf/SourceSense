@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Download } from 'lucide-react';
+import AppNavbar from '../components/AppNavbar';
 import EventLogTable from '../components/EventLogTable';
 import { api } from '../utils/api';
 
@@ -10,50 +11,72 @@ export default function EventLog() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    api.getNodes().then(d => setNodes(Array.isArray(d) ? d : []));
+    api.getNodes().then((d) => setNodes(Array.isArray(d) ? d : []));
   }, []);
 
   useEffect(() => {
     setLoading(true);
     api.getEvents({ node_id: selectedNode || undefined, limit: 200 })
-      .then(d => setEvents(Array.isArray(d) ? d : []))
+      .then((d) => setEvents(Array.isArray(d) ? d : []))
       .finally(() => setLoading(false));
   }, [selectedNode]);
 
   return (
-    <div className="animate-fade-in">
-      <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
-        <div>
-          <h1 style={{ fontSize: '1.4rem', fontWeight: 800, margin: 0 }}>Suppression Events</h1>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.78rem', margin: '2px 0 0' }}>
-            Full log of relay ON/OFF events with source classification
-          </p>
+    <div className="min-h-screen bg-[#f8fafc] text-slate-900 flex flex-col font-sans">
+      <AppNavbar nodes={nodes} />
+
+      <main className="flex-1 max-w-[1780px] w-full mx-auto px-4 py-4 space-y-4">
+        {/* Header Ribbon */}
+        <div className="tech-card p-4 flex items-center justify-between flex-wrap gap-3 bg-white border border-slate-200 shadow-sm">
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="font-extrabold text-base text-slate-900 tracking-wide">
+                PHYSICAL MITIGATION LEDGER & AUDIT TRAIL
+              </span>
+              <span className="tech-badge tech-badge-muted">CPCB REGULATORY COMPLIANCE</span>
+            </div>
+            <p className="text-xs text-slate-500 m-0">
+              Immutable sequence log of automated actuator relay state transitions, pollution classifications, and suppression verification
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <select
+              className="tech-select font-mono text-xs"
+              value={selectedNode}
+              onChange={(e) => setSelectedNode(e.target.value)}
+            >
+              <option value="">All Fleet Nodes</option>
+              {nodes.map((n) => (
+                <option key={n.id} value={n.id}>
+                  {n.name}
+                </option>
+              ))}
+            </select>
+
+            <button
+              className="tech-btn tech-btn-primary"
+              onClick={() => api.exportCSV(selectedNode || undefined)}
+            >
+              <Download size={13} /> Export Regulatory CSV
+            </button>
+          </div>
         </div>
-        <div className="flex gap-2">
-          <select
-            className="ss-input"
-            value={selectedNode}
-            onChange={e => setSelectedNode(e.target.value)}
-          >
-            <option value="">All Nodes</option>
-            {nodes.map(n => <option key={n.id} value={n.id}>{n.name}</option>)}
-          </select>
-          <button
-            className="btn-primary flex items-center gap-1.5"
-            onClick={() => api.exportCSV(selectedNode || undefined)}
-          >
-            <Download size={13} /> Export CSV
-          </button>
-        </div>
-      </div>
-      {loading ? (
-        <div style={{ color: 'var(--text-muted)', padding: 24 }}>Loading events…</div>
-      ) : (
-        <EventLogTable
-          events={events}
-          onExport={() => api.exportCSV(selectedNode || undefined)}
-        />
-      )}
+
+        {/* Table Container */}
+        {loading ? (
+          <div className="tech-card p-12 text-center text-slate-400 font-mono text-xs bg-white border border-slate-200">
+            Loading mitigation ledger from backend database...
+          </div>
+        ) : (
+          <div className="tech-card p-4 bg-white border border-slate-200 shadow-sm">
+            <EventLogTable
+              events={events}
+              onExport={() => api.exportCSV(selectedNode || undefined)}
+            />
+          </div>
+        )}
+      </main>
     </div>
   );
 }

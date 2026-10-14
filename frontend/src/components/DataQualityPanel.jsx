@@ -100,9 +100,9 @@ export default function DataQualityPanel({ readings = [] }) {
         </div>
         <ResponsiveContainer width="100%" height={120}>
           <BarChart data={stats.barData} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#1e2d45" />
-            <XAxis dataKey="name" tick={{ fontSize: 9, fill: '#4a5876' }} tickLine={false} axisLine={false} />
-            <YAxis tick={{ fontSize: 9, fill: '#4a5876' }} tickLine={false} axisLine={false} />
+            <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+            <XAxis dataKey="name" tick={{ fontSize: 9, fill: '#64748b' }} tickLine={false} axisLine={false} />
+            <YAxis tick={{ fontSize: 9, fill: '#64748b' }} tickLine={false} axisLine={false} />
             <Tooltip
               contentStyle={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 8, fontSize: '0.75rem' }}
               labelStyle={{ color: 'var(--text-muted)' }}
