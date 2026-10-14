@@ -4,73 +4,73 @@
 @tailwind utilities;
 
 /* ══════════════════════════════════════════════════════════════════════════
-   SourceSense OS – Clean, Human-Engineered Enterprise Light Design System
-   Aesthetic: Clean Professional Industrial Engineering (Stripe / Apple / Grafana Light)
+   SourceSense OS – Premium Aero-Glass Engineered Design System
+   Aesthetic: High-End Industrial Glassmorphism (Apple / Linear / Aero-Defense)
    ══════════════════════════════════════════════════════════════════════════ */
 
 :root {
-  /* Crisp Light Theme Canvas */
+  /* Canvas & Glassmorphic Tokens */
   --bg-deep: #f8fafc;
-  --bg-primary: #f8fafc;
-  --bg-surface: #ffffff;
-  --bg-surface-elevated: #ffffff;
-  --bg-surface-hover: #f1f5f9;
-  --bg-panel: rgba(255, 255, 255, 0.95);
+  --bg-canvas: #f8fafc;
+  --bg-glass-card: rgba(255, 255, 255, 0.78);
+  --bg-glass-card-hover: rgba(255, 255, 255, 0.9);
+  --bg-glass-header: rgba(255, 255, 255, 0.65);
+  --bg-glass-inset: rgba(241, 245, 249, 0.6);
+  --bg-glass-pill: rgba(255, 255, 255, 0.75);
 
-  /* Clean, Subtle Borders */
+  /* Hairline Precision Borders */
+  --border-glass: rgba(255, 255, 255, 0.85);
+  --border-glass-subtle: rgba(226, 232, 240, 0.75);
+  --border-glass-active: rgba(14, 165, 233, 0.45);
   --border-subtle: #e2e8f0;
   --border-medium: #cbd5e1;
   --border-strong: #94a3b8;
-  --border-accent: #0284c7;
 
   /* Human Typography Hierarchy */
   --text-primary: #0f172a;
-  --text-secondary: #475569;
+  --text-secondary: #334155;
   --text-muted: #64748b;
   --text-dim: #94a3b8;
 
-  /* Functional Status Colors (Light Mode Accessible) */
+  /* Functional Status Colors */
   --status-clean: #16a34a;
-  --status-clean-bg: #dcfce7;
-  --status-clean-border: #86efac;
+  --status-clean-bg: rgba(220, 252, 231, 0.75);
+  --status-clean-border: rgba(134, 239, 172, 0.85);
 
   --status-moderate: #d97706;
-  --status-moderate-bg: #fef3c7;
-  --status-moderate-border: #fcd34d;
+  --status-moderate-bg: rgba(254, 243, 199, 0.75);
+  --status-moderate-border: rgba(252, 211, 77, 0.85);
 
   --status-warning: #ea580c;
-  --status-warning-bg: #ffedd5;
-  --status-warning-border: #fdba74;
+  --status-warning-bg: rgba(255, 237, 213, 0.75);
+  --status-warning-border: rgba(253, 186, 116, 0.85);
 
   --status-critical: #dc2626;
-  --status-critical-bg: #fee2e2;
-  --status-critical-border: #fca5a5;
+  --status-critical-bg: rgba(254, 226, 226, 0.85);
+  --status-critical-border: rgba(252, 165, 165, 0.85);
 
   --status-cyber: #0284c7;
-  --status-cyber-bg: #e0f2fe;
-  --status-cyber-border: #7dd3fc;
+  --status-cyber-bg: rgba(224, 242, 254, 0.75);
+  --status-cyber-border: rgba(125, 211, 252, 0.85);
 
-  --status-purple: #9333ea;
-  --status-purple-bg: #f3e8ff;
-  --status-purple-border: #d8b4fe;
-
-  --brand-primary: #0284c7;
-  --brand-cyan: #0284c7;
-  --brand-emerald: #16a34a;
+  --status-indigo: #4f46e5;
+  --status-indigo-bg: rgba(238, 242, 255, 0.75);
+  --status-indigo-border: rgba(199, 210, 254, 0.85);
 
   /* Geometry & Elevation */
   --radius-sm: 6px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
-  --radius-xl: 16px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 18px;
 
-  /* Soft Human Shadows */
-  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
+  /* Specular Highlight Glass Shadows */
+  --glass-shadow-sm: 0 2px 8px -1px rgba(15, 23, 42, 0.04), 0 1px 2px 0 rgba(15, 23, 42, 0.03), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  --glass-shadow-md: 0 8px 24px -3px rgba(15, 23, 42, 0.06), 0 2px 6px -1px rgba(15, 23, 42, 0.03), inset 0 1px 1px rgba(255, 255, 255, 0.95);
+  --glass-shadow-lg: 0 16px 36px -4px rgba(15, 23, 42, 0.08), 0 4px 12px -2px rgba(15, 23, 42, 0.04), inset 0 1px 1.5px rgba(255, 255, 255, 1);
+  --glass-shadow-hover: 0 20px 40px -4px rgba(14, 165, 233, 0.12), 0 6px 16px -2px rgba(15, 23, 42, 0.04), inset 0 1px 1.5px #ffffff;
 }
 
-/* ── Base Styles ────────────────────────────────────────────────────────── */
+/* ── Base Styles & Atmospheric Mesh Canvas ──────────────────────────────── */
 *, *::before, *::after {
   box-sizing: border-box;
 }
@@ -85,9 +85,18 @@ html, body {
   -moz-osx-font-smoothing: grayscale;
   min-height: 100vh;
   overflow-x: hidden;
+  /* Atmospheric multi-light radial ambient layer + micro-grid */
+  background-image:
+    radial-gradient(1200px 700px at 15% -5%, rgba(14, 165, 233, 0.07), transparent 60%),
+    radial-gradient(1000px 600px at 85% 10%, rgba(99, 102, 241, 0.05), transparent 55%),
+    radial-gradient(1300px 800px at 50% 105%, rgba(16, 185, 129, 0.04), transparent 60%),
+    linear-gradient(to right, rgba(148, 163, 184, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(148, 163, 184, 0.05) 1px, transparent 1px);
+  background-size: 100% 100%, 100% 100%, 100% 100%, 36px 36px, 36px 36px;
+  background-attachment: fixed;
 }
 
-/* Tabular Numbers */
+/* Tabular Numbers for Telemetry */
 .font-mono,
 .tech-num,
 .tabular-nums {
@@ -95,58 +104,66 @@ html, body {
   font-feature-settings: 'tnum' 1, 'zero' 1;
 }
 
-/* ── Clean Scrollbar ────────────────────────────────────────────────────── */
+/* ── Clean Frosted Scrollbar ────────────────────────────────────────────── */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #f1f5f9;
+  background: rgba(241, 245, 249, 0.6);
+  backdrop-filter: blur(8px);
 }
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: rgba(148, 163, 184, 0.5);
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: rgba(100, 116, 139, 0.8);
 }
 
-/* ── Human Engineering Cards ───────────────────────────────────────────── */
+/* ── Engineered Glassmorphism Cards ─────────────────────────────────────── */
 .tech-card,
 .glass-card {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
+  background: var(--bg-glass-card);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid var(--border-glass-subtle);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--glass-shadow-md);
   position: relative;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.25s ease;
   overflow: hidden;
 }
 
 .tech-card:hover,
 .glass-card:hover {
-  border-color: #cbd5e1;
-  box-shadow: var(--shadow-md);
+  border-color: rgba(14, 165, 233, 0.35);
+  box-shadow: var(--glass-shadow-hover);
+  transform: translateY(-2px);
 }
 
+/* Card Header with Frosted Glass Surface */
 .tech-card-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0.85rem 1.15rem;
-  border-bottom: 1px solid #f1f5f9;
-  background: #ffffff;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.7);
+  background: var(--bg-glass-header);
+  backdrop-filter: blur(12px);
 }
 
 .tech-card-title {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 0.78rem;
+  font-size: 0.76rem;
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: #334155;
+  color: #1e293b;
 }
 
 .tech-card-title-dot {
@@ -154,13 +171,22 @@ html, body {
   height: 7px;
   border-radius: 50%;
   background: #0284c7;
+  box-shadow: 0 0 6px rgba(2, 132, 199, 0.4);
 }
 
 .tech-card-body {
   padding: 1.15rem;
 }
 
-/* ── Interactive Buttons & Form Elements ────────────────────────────────── */
+/* Inset Chamber for Telemetry Readings */
+.glass-inset {
+  background: var(--bg-glass-inset);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(226, 232, 240, 0.75);
+  border-radius: var(--radius-md);
+}
+
+/* ── Interactive Buttons & Glass Controls ───────────────────────────────── */
 .tech-btn,
 .btn-ghost {
   display: inline-flex;
@@ -171,20 +197,23 @@ html, body {
   font-size: 0.75rem;
   font-weight: 600;
   border-radius: var(--radius-md);
-  border: 1px solid #cbd5e1;
-  background: #ffffff;
+  border: 1px solid rgba(203, 213, 225, 0.8);
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(8px);
   color: #334155;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   white-space: nowrap;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.9);
 }
 
 .tech-btn:hover,
 .btn-ghost:hover {
-  background: #f8fafc;
-  border-color: #94a3b8;
-  color: #0f172a;
+  background: #ffffff;
+  border-color: #0284c7;
+  color: #0284c7;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(2, 132, 199, 0.12);
 }
 
 .tech-btn:active,
@@ -203,23 +232,27 @@ html, body {
   font-weight: 600;
   border-radius: var(--radius-md);
   border: 1px solid #0284c7;
-  background: #0284c7;
+  background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
   color: #ffffff;
   cursor: pointer;
-  transition: all 0.15s ease;
-  box-shadow: 0 1px 2px rgba(2, 132, 199, 0.2);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 2px 6px rgba(2, 132, 199, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
+
 .tech-btn-primary:hover,
 .btn-primary:hover {
-  background: #0369a1;
+  background: linear-gradient(135deg, #0369a1 0%, #075985 100%);
   border-color: #0369a1;
   color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(2, 132, 199, 0.35);
 }
 
 .tech-btn-danger {
-  background: #fef2f2;
-  border-color: #fca5a5;
+  background: rgba(254, 242, 242, 0.85);
+  border-color: rgba(252, 165, 165, 0.9);
   color: #dc2626;
+  backdrop-filter: blur(8px);
 }
 .tech-btn-danger:hover {
   background: #fee2e2;
@@ -228,9 +261,10 @@ html, body {
 }
 
 .tech-btn-cyan {
-  background: #f0f9ff;
-  border-color: #bae6fd;
+  background: rgba(240, 249, 255, 0.85);
+  border-color: rgba(186, 230, 253, 0.9);
   color: #0284c7;
+  backdrop-filter: blur(8px);
 }
 .tech-btn-cyan:hover {
   background: #e0f2fe;
@@ -241,21 +275,24 @@ html, body {
 .tech-input,
 .tech-select,
 .ss-input {
-  background: #ffffff;
-  border: 1px solid #cbd5e1;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(203, 213, 225, 0.85);
   color: #0f172a;
   padding: 6px 10px;
   font-size: 0.78rem;
   border-radius: var(--radius-md);
   outline: none;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  transition: all 0.2s ease;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.02);
 }
 
 .tech-input:focus,
 .tech-select:focus,
 .ss-input:focus {
+  background: #ffffff;
   border-color: #0284c7;
-  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
+  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15), inset 0 1px 2px rgba(0, 0, 0, 0.02);
 }
 
 /* ── Badges & Status Indicators ─────────────────────────────────────────── */
@@ -263,13 +300,14 @@ html, body {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  padding: 2px 8px;
-  font-size: 0.68rem;
+  padding: 2.5px 8.5px;
+  font-size: 0.67rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.04em;
   border-radius: var(--radius-sm);
   border: 1px solid transparent;
+  backdrop-filter: blur(6px);
 }
 
 .tech-badge-clean {
@@ -297,12 +335,12 @@ html, body {
 }
 
 .tech-badge-muted {
-  background: #f1f5f9;
-  border-color: #e2e8f0;
+  background: rgba(241, 245, 249, 0.8);
+  border-color: rgba(226, 232, 240, 0.9);
   color: #64748b;
 }
 
-/* ── Stat Labels and Values ─────────────────────────────────────────────── */
+/* ── Stat Labels & Values ───────────────────────────────────────────────── */
 .stat-label {
   font-size: 0.68rem;
   color: #64748b;
@@ -312,13 +350,13 @@ html, body {
 }
 
 .stat-value {
-  font-size: 1.4rem;
+  font-size: 1.45rem;
   font-weight: 800;
   color: #0f172a;
   font-family: 'JetBrains Mono', monospace;
 }
 
-/* ── Clean Table Styling ────────────────────────────────────────────────── */
+/* ── Clean Frosted Table Styling ────────────────────────────────────────── */
 .ss-table {
   width: 100%;
   border-collapse: collapse;
@@ -326,31 +364,33 @@ html, body {
   text-align: left;
 }
 .ss-table th {
-  padding: 10px 12px;
+  padding: 10px 14px;
   color: #64748b;
   font-weight: 700;
   font-size: 0.68rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  border-bottom: 1px solid #e2e8f0;
-  background: #f8fafc;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+  background: rgba(248, 250, 252, 0.75);
+  backdrop-filter: blur(8px);
 }
 .ss-table td {
-  padding: 10px 12px;
-  border-bottom: 1px solid #f1f5f9;
+  padding: 10px 14px;
+  border-bottom: 1px solid rgba(241, 245, 249, 0.8);
   color: #334155;
+  transition: background 0.15s ease;
 }
 .ss-table tr:hover td {
-  background: #f8fafc;
+  background: rgba(241, 245, 249, 0.6);
 }
 
-/* ── Subtle Micro-Animations ────────────────────────────────────────────── */
+/* ── Purposeful System Animations ───────────────────────────────────────── */
 @keyframes beacon-pulse {
   0% {
-    box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.4);
+    box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.5);
   }
   70% {
-    box-shadow: 0 0 0 6px rgba(22, 163, 74, 0);
+    box-shadow: 0 0 0 8px rgba(22, 163, 74, 0);
   }
   100% {
     box-shadow: 0 0 0 0 rgba(22, 163, 74, 0);
@@ -362,15 +402,15 @@ html, body {
   height: 8px;
   border-radius: 50%;
   background: #16a34a;
-  animation: beacon-pulse 2s infinite;
+  animation: beacon-pulse 2s infinite cubic-bezier(0.4, 0, 0.6, 1);
 }
 
 @keyframes relay-active-pulse {
   0% {
-    box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.5);
+    box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.6);
   }
   70% {
-    box-shadow: 0 0 0 8px rgba(220, 38, 38, 0);
+    box-shadow: 0 0 0 10px rgba(220, 38, 38, 0);
   }
   100% {
     box-shadow: 0 0 0 0 rgba(220, 38, 38, 0);
@@ -382,5 +422,31 @@ html, body {
   height: 8px;
   border-radius: 50%;
   background: #dc2626;
-  animation: relay-active-pulse 1.5s infinite;
+  animation: relay-active-pulse 1.4s infinite cubic-bezier(0.4, 0, 0.6, 1);
+}
+
+/* Pipeline Light Beam Flow Animation */
+@keyframes pipeline-beam-flow {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.pipeline-stream-line {
+  position: relative;
+  overflow: hidden;
+}
+
+.pipeline-stream-line::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, transparent, rgba(14, 165, 233, 0.8), transparent);
+  animation: pipeline-beam-flow 2.2s infinite ease-in-out;
 }

@@ -1,4 +1,4 @@
-import { AlertTriangle, Zap, Droplets, Clock, CheckCircle, Wind } from 'lucide-react';
+import { AlertTriangle, Zap, Clock, CheckCircle, Wind } from 'lucide-react';
 
 const FLAG_CONFIG = {
   failed_read: { label: 'Failed Read', cls: 'flag-failed', Icon: Zap },

@@ -1,30 +1,28 @@
-import { Wind, Thermometer, Droplets, AlertTriangle, Flame, Zap, Battery, Sun } from 'lucide-react';
+import React from 'react';
+import { Wind, Thermometer, Droplets, AlertTriangle, Battery, Sun, Cpu } from 'lucide-react';
 import QualityFlagBadge from './QualityFlagBadge';
 
 function PMBar({ label, value, maxVal, color, spikeThreshold }) {
   const pct = value != null ? Math.min((value / maxVal) * 100, 100) : 0;
   const isSpiking = value != null && spikeThreshold != null && value > spikeThreshold;
   return (
-    <div style={{ marginBottom: 6 }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 3 }}>
-        <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)', fontWeight: 600 }}>{label}</span>
-        <span style={{ fontSize: '0.65rem', fontWeight: 700, color: isSpiking ? '#f87171' : 'var(--text-secondary)' }}>
+    <div className="mb-2">
+      <div className="flex justify-between items-center mb-1">
+        <span className="text-[10.5px] text-slate-500 font-medium">{label}</span>
+        <span className={`text-[11px] font-mono font-bold ${isSpiking ? 'text-rose-600' : 'text-slate-800'}`}>
           {value != null ? `${Number(value).toFixed(1)} µg/m³` : '—'}
-          {isSpiking && <span style={{ marginLeft: 4, color: '#f87171' }}>▲ SPIKE</span>}
+          {isSpiking && <span className="ml-1 text-[9px] text-rose-600 bg-rose-50 px-1 py-0.2 rounded border border-rose-200">SPIKE</span>}
         </span>
       </div>
-      <div style={{ height: 5, borderRadius: 3, background: 'var(--border)', overflow: 'hidden' }}>
+      <div className="h-1.5 rounded-full bg-slate-200/70 overflow-hidden">
         <div
           style={{
             width: `${pct}%`,
-            height: '100%',
             background: isSpiking
               ? 'linear-gradient(90deg, #f97316, #ef4444)'
               : `linear-gradient(90deg, ${color}99, ${color})`,
-            borderRadius: 3,
-            transition: 'width 0.6s ease',
-            boxShadow: isSpiking ? `0 0 8px ${color}88` : 'none',
           }}
+          className="h-full rounded-full transition-all duration-500"
         />
       </div>
     </div>
@@ -34,26 +32,21 @@ function PMBar({ label, value, maxVal, color, spikeThreshold }) {
 function MQRow({ label, value, warningAbove, color }) {
   const isHigh = value != null && warningAbove != null && value > warningAbove;
   return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '4px 0', borderBottom: '1px solid #f1f5f9' }}>
-      <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)', fontWeight: 600 }}>{label}</span>
-      <span style={{ fontSize: '0.65rem', fontWeight: 700, color: isHigh ? color : 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: 4 }}>
-        {isHigh && <AlertTriangle size={10} color={color} />}
+    <div className="flex justify-between items-center py-1 border-b border-slate-100/80">
+      <span className="text-[10px] text-slate-500 font-mono font-medium">{label}</span>
+      <span className={`text-[10.5px] font-mono font-bold flex items-center gap-1 ${isHigh ? color : 'text-slate-800'}`}>
+        {isHigh && <AlertTriangle size={10} className="text-amber-500" />}
         {value != null ? Number(value).toFixed(0) : '—'}
       </span>
     </div>
   );
 }
 
-/**
- * LiveReadingsCard – shows all sensor readings: PM1.0/PM2.5/PM10 with spike bars,
- * gas sensor readings (MQ2/4/6/7/8/131/135), temp, humidity with quality indicators.
- * Highlights which PM band caused any AQI spike.
- */
 export default function LiveReadingsCard({ reading }) {
   if (!reading) {
     return (
-      <div className="glass-card p-6 flex items-center justify-center" style={{ minHeight: 180 }}>
-        <span style={{ color: 'var(--text-muted)' }}>Waiting for data…</span>
+      <div className="tech-card p-6 flex items-center justify-center min-h-[180px] bg-white/75 backdrop-blur-xl border border-slate-200/80 rounded-2xl">
+        <span className="text-slate-400 font-mono text-xs">Waiting for telemetry packets...</span>
       </div>
     );
   }
@@ -70,7 +63,6 @@ export default function LiveReadingsCard({ reading }) {
   const pm25Driving = pm25SI != null && pm10SI != null && pm25SI >= pm10SI;
   const pm10Driving = pm25SI != null && pm10SI != null && pm10SI > pm25SI;
 
-  // Build spike reason message
   let spikeReason = null;
   if (reading.aqi >= 200) {
     if (pm25Driving) spikeReason = `PM2.5 sub-index (${pm25SI}) is driving AQI to ${reading.aqi_category} level`;
@@ -80,169 +72,158 @@ export default function LiveReadingsCard({ reading }) {
   const hasMQData = reading.mq2 != null || reading.mq7 != null || reading.mq135 != null;
 
   return (
-    <div className="glass-card p-5 animate-slide-up">
+    <div className="tech-card bg-white/80 backdrop-blur-xl border border-slate-200/80 rounded-2xl p-4 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
       {/* Header */}
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between mb-3 pb-2 border-b border-slate-100">
         <div className="flex items-center gap-2">
-          <Wind size={16} color="var(--brand-400)" />
-          <span style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', fontWeight: 600 }}>
-            Live Sensor Readings
+          <div className="w-6 h-6 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center">
+            <Wind size={13} />
+          </div>
+          <span className="text-xs font-extrabold text-slate-800 tracking-wide uppercase">
+            Live Telemetry Arrays
           </span>
         </div>
-        <span style={{ color: 'var(--text-muted)', fontSize: '0.7rem' }}>
+        <span className="text-[10px] font-mono text-slate-500 bg-slate-100/80 px-2 py-0.5 rounded-md border border-slate-200/80">
           {reading.timestamp ? new Date(reading.timestamp).toLocaleTimeString() : '—'}
         </span>
       </div>
 
-      {/* Spike Banner */}
+      {/* Spike Alert Banner */}
       {spikeReason && (
-        <div style={{
-          marginBottom: 12,
-          padding: '7px 12px',
-          background: 'rgba(239,68,68,0.1)',
-          border: '1px solid rgba(239,68,68,0.35)',
-          borderRadius: 8,
-          display: 'flex',
-          alignItems: 'center',
-          gap: 8,
-        }}>
-          <AlertTriangle size={13} color="#f87171" style={{ flexShrink: 0 }} />
-          <span style={{ fontSize: '0.7rem', color: '#f87171', fontWeight: 600 }}>{spikeReason}</span>
+        <div className="mb-3 p-2 rounded-xl bg-rose-50/80 backdrop-blur-md border border-rose-200 text-rose-700 flex items-center gap-2 text-xs">
+          <AlertTriangle size={13} className="text-rose-600 shrink-0" />
+          <span className="font-semibold text-[10.5px]">{spikeReason}</span>
         </div>
       )}
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 20px' }}>
-        {/* Left: PM values with bars */}
-        <div>
-          <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 8 }}>
-            Particulate Matter
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Left Column: Particulate Matter Metering */}
+        <div className="bg-slate-50/60 backdrop-blur-md p-3 rounded-xl border border-slate-200/80">
+          <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2 font-mono flex items-center justify-between">
+            <span>PARTICULATE CHANNELS</span>
+            <span className="text-blue-700 font-extrabold">µg/m³</span>
           </div>
+
           <PMBar
-            label="PM1.0"
+            label="PM1.0 (Sub-micron)"
             value={reading.pm1_0_raw}
             maxVal={200}
-            color="#60a5fa"
+            color="#0ea5e9"
             spikeThreshold={null}
           />
           <PMBar
-            label="PM2.5 raw"
+            label="PM2.5 (Fine particulate)"
             value={reading.pm2_5_raw}
             maxVal={250}
-            color={pm25Driving ? '#f87171' : '#4ade80'}
+            color={pm25Driving ? '#f43f5e' : '#10b981'}
             spikeThreshold={60}
           />
           <PMBar
-            label="PM2.5 corr."
+            label="PM2.5 Corrected"
             value={reading.pm2_5_corrected}
             maxVal={250}
-            color="#4ade80"
+            color="#10b981"
             spikeThreshold={null}
           />
           <PMBar
-            label={`PM10 raw${pm10Failed ? ' ⚠ FAILED' : ''}`}
+            label={`PM10 Raw${pm10Failed ? ' (SENSOR FAULT)' : ''}`}
             value={pm10Failed ? null : reading.pm10_raw}
             maxVal={430}
-            color={pm10Driving ? '#f87171' : '#38bdf8'}
+            color={pm10Driving ? '#f43f5e' : '#0284c7'}
             spikeThreshold={100}
           />
           <PMBar
-            label="PM10 corr."
+            label="PM10 Corrected"
             value={reading.pm10_corrected}
             maxVal={430}
-            color="#38bdf8"
+            color="#0284c7"
             spikeThreshold={null}
           />
+
           {(pm1Warming || pm1Below) && (
-            <div style={{ fontSize: '0.6rem', color: '#60a5fa', marginTop: 4 }}>
-              ⓘ Sensor may be in warmup / below detection limit
+            <div className="text-[9.5px] text-sky-700 bg-sky-50 p-1.5 rounded-lg border border-sky-200 mt-2">
+              ⓘ PM1.0 optical sensor in stabilization cycle
             </div>
           )}
         </div>
 
-        {/* Right: Gas sensors + ambient */}
-        <div>
-          <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 8 }}>
-            Gas & Ambient
-          </div>
+        {/* Right Column: 7-Channel Gas Matrix & Environmental Vitals */}
+        <div className="bg-slate-50/60 backdrop-blur-md p-3 rounded-xl border border-slate-200/80 flex flex-col justify-between">
+          <div>
+            <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2 font-mono flex items-center justify-between">
+              <span>7-CHANNEL GAS MATRIX</span>
+              <Cpu size={12} className="text-slate-400" />
+            </div>
 
-          {/* Temp, Humidity & Power */}
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginBottom: 8, padding: '5px 0', borderBottom: '1px solid #f1f5f9' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-              <Thermometer size={11} color="var(--text-muted)" />
-              <span style={{ fontSize: '0.72rem', color: 'var(--text-secondary)', fontWeight: 600 }}>
-                {reading.temperature_c?.toFixed(1) ?? '—'}°C
-              </span>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-              <Droplets size={11} color={humidityGlitch ? '#c084fc' : 'var(--text-muted)'} />
-              <span style={{ fontSize: '0.72rem', color: humidityGlitch ? '#c084fc' : 'var(--text-secondary)', fontWeight: 600 }}>
-                {reading.humidity_percent?.toFixed(1) ?? '—'}%{humidityGlitch && ' ⚠'}
-              </span>
-            </div>
-            {reading.battery_level != null && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-                <Battery size={11} color="var(--brand-400)" />
-                <span style={{ fontSize: '0.72rem', color: 'var(--text-secondary)', fontWeight: 600 }}>
-                  {reading.battery_level?.toFixed(0)}%
+            {/* Environmental Micro-Pills */}
+            <div className="flex items-center gap-2 mb-2 p-1.5 rounded-lg bg-white/70 border border-slate-200/60 text-xs">
+              <div className="flex items-center gap-1">
+                <Thermometer size={12} className="text-amber-500" />
+                <span className="font-mono font-bold text-slate-800 text-[11px]">
+                  {reading.temperature_c?.toFixed(1) ?? '—'}°C
                 </span>
               </div>
-            )}
-            {reading.is_solar_charging && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: 5 }} title="Solar Charging Active">
-                <Sun size={11} color="#fbbf24" />
-                <span style={{ fontSize: '0.72rem', color: '#fbbf24', fontWeight: 600 }}>
-                  Charging
+              <div className="w-px h-3 bg-slate-200" />
+              <div className="flex items-center gap-1">
+                <Droplets size={12} className={humidityGlitch ? 'text-purple-500' : 'text-blue-500'} />
+                <span className={`font-mono font-bold text-[11px] ${humidityGlitch ? 'text-purple-700' : 'text-slate-800'}`}>
+                  {reading.humidity_percent?.toFixed(1) ?? '—'}%
                 </span>
+              </div>
+              {reading.battery_level != null && (
+                <>
+                  <div className="w-px h-3 bg-slate-200" />
+                  <div className="flex items-center gap-1">
+                    <Battery size={12} className="text-emerald-500" />
+                    <span className="font-mono font-bold text-slate-800 text-[11px]">
+                      {reading.battery_level?.toFixed(0)}%
+                    </span>
+                  </div>
+                </>
+              )}
+              {reading.is_solar_charging && (
+                <div className="ml-auto flex items-center gap-1 text-[9px] text-amber-700 font-bold bg-amber-50 px-1 py-0.5 rounded border border-amber-200">
+                  <Sun size={10} className="text-amber-500 animate-spin" /> SOLAR
+                </div>
+              )}
+            </div>
+
+            {/* MQ Sensor Readouts */}
+            {hasMQData ? (
+              <div className="space-y-0.5">
+                <MQRow label="MQ-2 (Combustion/Smoke)" value={reading.mq2} warningAbove={400} color="text-amber-600" />
+                <MQRow label="MQ-4 (Methane Gas)" value={reading.mq4} warningAbove={350} color="text-orange-600" />
+                <MQRow label="MQ-6 (LPG/Butane)" value={reading.mq6} warningAbove={350} color="text-orange-600" />
+                <MQRow label="MQ-7 (Carbon Monoxide)" value={reading.mq7} warningAbove={300} color="text-rose-600" />
+                <MQRow label="MQ-8 (Hydrogen)" value={reading.mq8} warningAbove={400} color="text-purple-600" />
+                <MQRow label="MQ-131 (Oxidizing/Ozone)" value={reading.mq131} warningAbove={300} color="text-emerald-600" />
+                <MQRow label="MQ-135 (Air Quality Index)" value={reading.mq135} warningAbove={400} color="text-blue-600" />
+              </div>
+            ) : (
+              <div className="text-[11px] text-slate-400 py-4 text-center font-mono">
+                Analog gas matrix calibrating...
               </div>
             )}
           </div>
 
-          {/* MQ Gas Sensors */}
-          {hasMQData ? (
-            <>
-              <MQRow label="MQ2 (LPG/Smoke)" value={reading.mq2} warningAbove={400} color="#fbbf24" />
-              <MQRow label="MQ4 (Methane)" value={reading.mq4} warningAbove={350} color="#fb923c" />
-              <MQRow label="MQ6 (Butane)" value={reading.mq6} warningAbove={350} color="#fb923c" />
-              <MQRow label="MQ7 (CO)" value={reading.mq7} warningAbove={300} color="#f87171" />
-              <MQRow label="MQ8 (H₂)" value={reading.mq8} warningAbove={400} color="#a78bfa" />
-              <MQRow label="MQ131 (Ozone)" value={reading.mq131} warningAbove={300} color="#34d399" />
-              <MQRow label="MQ135 (Air Q)" value={reading.mq135} warningAbove={400} color="#f472b6" />
-            </>
-          ) : (
-            <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', paddingTop: 8 }}>
-              Gas sensor readings not available
+          {/* Sensor Trust Progress */}
+          <div className="mt-2 pt-2 border-t border-slate-200/60">
+            <div className="flex justify-between items-center text-[10px] font-mono mb-1">
+              <span className="text-slate-500 font-medium">SENSOR NETWORK TRUST</span>
+              <span className="font-extrabold text-emerald-700">{reading.sensor_trust_score || 100}%</span>
             </div>
-          )}
-
-          {/* Sensor Trust Score */}
-          <div style={{ marginTop: 8, paddingTop: 8, borderTop: '1px solid var(--border)' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontSize: '0.62rem', color: 'var(--text-muted)', fontWeight: 600 }}>SENSOR TRUST</span>
-              <span style={{
-                fontSize: '0.72rem',
-                fontWeight: 800,
-                color: (reading.sensor_trust_score || 100) > 80 ? '#4ade80'
-                  : (reading.sensor_trust_score || 100) > 50 ? '#fbbf24' : '#f87171'
-              }}>
-                {reading.sensor_trust_score || 100}%
-              </span>
-            </div>
-            <div style={{ height: 3, borderRadius: 2, background: 'var(--border)', marginTop: 3, overflow: 'hidden' }}>
-              <div style={{
-                width: `${reading.sensor_trust_score || 100}%`,
-                height: '100%',
-                background: (reading.sensor_trust_score || 100) > 80 ? '#4ade80'
-                  : (reading.sensor_trust_score || 100) > 50 ? '#fbbf24' : '#f87171',
-                borderRadius: 2,
-                transition: 'width 0.6s ease',
-              }} />
+            <div className="h-1.5 w-full bg-slate-200/70 rounded-full overflow-hidden">
+              <div
+                className="h-full bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full transition-all duration-700"
+                style={{ width: `${reading.sensor_trust_score || 100}%` }}
+              />
             </div>
           </div>
         </div>
       </div>
 
-      {/* Quality Flags */}
-      <div style={{ marginTop: 12, paddingTop: 10, borderTop: '1px solid var(--border)' }}>
+      {/* Quality Flags Ribbon */}
+      <div className="mt-3 pt-2.5 border-t border-slate-100">
         <QualityFlagBadge flags={flags} />
       </div>
     </div>

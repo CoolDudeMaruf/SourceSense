@@ -1,74 +1,46 @@
+import React from 'react';
 import { Battery, Sun, AlertTriangle, CheckCircle, Wrench, Wifi, WifiOff, Activity } from 'lucide-react';
 
-/**
- * Device Health Monitor
- *
- * HEALTH LOGIC (scored 0–100):
- *
- * 1. BATTERY SCORE (35pts):
- *    - battery_level >= 50%  →  35pts (Healthy)
- *    - battery_level >= 20%  →  20pts (Low)
- *    - battery_level >= 10%  →  10pts (Critical)
- *    - battery_level <  10%  →   0pts (Dead / Replace)
- *
- * 2. SOLAR CHARGING SCORE (20pts):
- *    - is_solar_charging = true  →  20pts (Panel OK)
- *    - is_solar_charging = false →   0pts (Panel Fault or Night)
- *
- * 3. SENSOR TRUST SCORE (30pts):
- *    - trust >= 80  →  30pts
- *    - trust >= 50  →  15pts
- *    - trust <  50  →   0pts (Sensor degraded)
- *
- * 4. DATA FRESHNESS (15pts):
- *    - Last reading < 5min ago  →  15pts (Online)
- *    - Last reading < 15min ago →   8pts (Delayed)
- *    - No data in 15min+        →   0pts (Offline)
- *
- * MAINTENANCE THRESHOLD: Overall score < 50 → "Needs Maintenance"
- * CRITICAL THRESHOLD:    Overall score < 25 → "CRITICAL - Immediate Action"
- */
-
 function getBatteryScore(level) {
-  if (level == null) return { score: 0, label: 'Unknown', color: '#6c757d' };
-  if (level >= 50) return { score: 35, label: 'Healthy', color: '#198754' };
-  if (level >= 20) return { score: 20, label: 'Low', color: '#ffc107' };
-  if (level >= 10) return { score: 10, label: 'Critical', color: '#fd7e14' };
-  return { score: 0, label: 'Dead — Replace', color: '#dc3545' };
+  if (level == null) return { score: 0, label: 'Unknown', color: '#64748b' };
+  if (level >= 50) return { score: 35, label: 'Healthy', color: '#16a34a' };
+  if (level >= 20) return { score: 20, label: 'Low', color: '#d97706' };
+  if (level >= 10) return { score: 10, label: 'Critical', color: '#ea580c' };
+  return { score: 0, label: 'Dead — Replace', color: '#dc2626' };
 }
 
 function getSolarScore(charging) {
-  if (charging == null) return { score: 0, label: 'Unknown', color: '#6c757d' };
+  if (charging == null) return { score: 0, label: 'Unknown', color: '#64748b' };
   return charging
-    ? { score: 20, label: 'Charging', color: '#198754' }
-    : { score: 0, label: 'Panel Offline', color: '#dc3545' };
+    ? { score: 20, label: 'Charging', color: '#16a34a' }
+    : { score: 0, label: 'Panel Offline', color: '#dc2626' };
 }
 
 function getTrustScore(trust) {
   const t = trust ?? 100;
-  if (t >= 80) return { score: 30, label: 'Good', color: '#198754' };
-  if (t >= 50) return { score: 15, label: 'Degraded', color: '#ffc107' };
-  return { score: 0, label: 'Faulty', color: '#dc3545' };
+  if (t >= 80) return { score: 30, label: 'Good', color: '#16a34a' };
+  if (t >= 50) return { score: 15, label: 'Degraded', color: '#d97706' };
+  return { score: 0, label: 'Faulty', color: '#dc2626' };
 }
 
 function getFreshnessScore(timestamp) {
-  if (!timestamp) return { score: 0, label: 'Offline', color: '#dc3545', ageMin: null };
+  if (!timestamp) return { score: 0, label: 'Offline', color: '#dc2626', ageMin: null };
   const ageMs = Date.now() - new Date(timestamp).getTime();
   const ageMin = Math.floor(ageMs / 60000);
-  if (ageMs < 5 * 60 * 1000) return { score: 15, label: 'Live', color: '#198754', ageMin };
-  if (ageMs < 15 * 60 * 1000) return { score: 8, label: 'Delayed', color: '#ffc107', ageMin };
-  return { score: 0, label: 'Offline', color: '#dc3545', ageMin };
+  if (ageMs < 5 * 60 * 1000) return { score: 15, label: 'Live', color: '#16a34a', ageMin };
+  if (ageMs < 15 * 60 * 1000) return { score: 8, label: 'Delayed', color: '#d97706', ageMin };
+  return { score: 0, label: 'Offline', color: '#dc2626', ageMin };
 }
 
 function MetricPill({ icon, label, value, color, subLabel }) {
   return (
-    <div style={{ background: '#fff', border: '1px solid #e9ecef', borderRadius: 7, padding: '5px 8px' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 2 }}>
+    <div className="bg-white/80 backdrop-blur-md border border-slate-200/80 rounded-xl p-2 shadow-sm">
+      <div className="flex items-center gap-1.5 mb-1">
         <span style={{ color }}>{icon}</span>
-        <span style={{ fontSize: '0.58rem', color: '#6c757d', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{label}</span>
+        <span className="text-[9px] text-slate-500 font-extrabold uppercase tracking-wider font-mono">{label}</span>
       </div>
-      <div style={{ fontSize: '0.78rem', fontWeight: 800, color }}>{value}</div>
-      <div style={{ fontSize: '0.58rem', color: '#adb5bd', marginTop: 1 }}>{subLabel}</div>
+      <div className="text-xs font-extrabold font-mono" style={{ color }}>{value}</div>
+      <div className="text-[9.5px] text-slate-400 font-medium truncate mt-0.5">{subLabel}</div>
     </div>
   );
 }
@@ -82,37 +54,42 @@ function NodeHealthRow({ node, reading }) {
 
   let status, statusColor, statusBg, StatusIcon;
   if (totalScore >= 75) {
-    status = 'Healthy'; statusColor = '#198754'; statusBg = 'rgba(25,135,84,0.08)'; StatusIcon = CheckCircle;
+    status = 'Healthy'; statusColor = '#16a34a'; statusBg = 'bg-emerald-50/70 border-emerald-200/80'; StatusIcon = CheckCircle;
   } else if (totalScore >= 50) {
-    status = 'Monitor'; statusColor = '#ffc107'; statusBg = 'rgba(255,193,7,0.08)'; StatusIcon = AlertTriangle;
+    status = 'Monitor'; statusColor = '#d97706'; statusBg = 'bg-amber-50/70 border-amber-200/80'; StatusIcon = AlertTriangle;
   } else if (totalScore >= 25) {
-    status = 'Maintenance Needed'; statusColor = '#fd7e14'; statusBg = 'rgba(253,126,20,0.10)'; StatusIcon = Wrench;
+    status = 'Maintenance Needed'; statusColor = '#ea580c'; statusBg = 'bg-orange-50/70 border-orange-200/80'; StatusIcon = Wrench;
   } else {
-    status = 'CRITICAL'; statusColor = '#dc3545'; statusBg = 'rgba(220,53,69,0.12)'; StatusIcon = AlertTriangle;
+    status = 'CRITICAL'; statusColor = '#dc2626'; statusBg = 'bg-rose-50/70 border-rose-200/80'; StatusIcon = AlertTriangle;
   }
 
   const isOnline = fresh.score > 0;
 
   return (
-    <div style={{ background: statusBg, border: `1px solid ${statusColor}30`, borderRadius: 10, padding: '10px 14px', marginBottom: 8, transition: 'all 0.3s ease' }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          {isOnline ? <Wifi size={13} color="#198754" /> : <WifiOff size={13} color="#dc3545" />}
-          <span style={{ fontSize: '0.78rem', fontWeight: 700, color: '#212529', maxWidth: 160, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+    <div className={`backdrop-blur-md border rounded-2xl p-3.5 mb-2.5 transition-all duration-200 ${statusBg}`}>
+      <div className="flex items-center justify-between mb-2.5">
+        <div className="flex items-center gap-2">
+          {isOnline ? <Wifi size={14} className="text-emerald-600" /> : <WifiOff size={14} className="text-rose-600" />}
+          <span className="text-xs font-bold text-slate-900 truncate max-w-[200px]">
             {node?.name ?? 'Unknown Node'}
           </span>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-          <StatusIcon size={12} color={statusColor} />
-          <span style={{ fontSize: '0.68rem', fontWeight: 800, color: statusColor }}>{status}</span>
-          <span style={{ fontSize: '0.68rem', color: '#6c757d', fontWeight: 600, background: '#f0f2f5', borderRadius: 4, padding: '1px 5px' }}>{totalScore}/100</span>
+        <div className="flex items-center gap-2">
+          <span className="flex items-center gap-1 text-[11px] font-extrabold font-mono" style={{ color: statusColor }}>
+            <StatusIcon size={12} />
+            {status}
+          </span>
+          <span className="text-[10px] font-mono font-bold text-slate-700 bg-white/80 px-2 py-0.5 rounded-md border border-slate-200/80 shadow-sm">
+            {totalScore}/100 PTS
+          </span>
         </div>
       </div>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 6 }}>
-        <MetricPill icon={<Battery size={10} />} label="Battery" value={`${reading?.battery_level?.toFixed(0) ?? '?'}%`} color={battery.color} subLabel={battery.label} />
-        <MetricPill icon={<Sun size={10} />} label="Solar" value={reading?.is_solar_charging == null ? '?' : reading.is_solar_charging ? 'ON' : 'OFF'} color={solar.color} subLabel={solar.label} />
-        <MetricPill icon={<Activity size={10} />} label="Trust" value={`${(reading?.sensor_trust_score ?? 100).toFixed(0)}%`} color={trust.color} subLabel={trust.label} />
-        <MetricPill icon={<Wifi size={10} />} label="Signal" value={fresh.ageMin != null ? `${fresh.ageMin}m` : '—'} color={fresh.color} subLabel={fresh.label} />
+
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+        <MetricPill icon={<Battery size={11} />} label="Battery" value={`${reading?.battery_level?.toFixed(0) ?? '?'}%`} color={battery.color} subLabel={battery.label} />
+        <MetricPill icon={<Sun size={11} />} label="Solar" value={reading?.is_solar_charging == null ? '?' : reading.is_solar_charging ? 'ON' : 'OFF'} color={solar.color} subLabel={solar.label} />
+        <MetricPill icon={<Activity size={11} />} label="Trust" value={`${(reading?.sensor_trust_score ?? 100).toFixed(0)}%`} color={trust.color} subLabel={trust.label} />
+        <MetricPill icon={<Wifi size={11} />} label="Signal" value={fresh.ageMin != null ? `${fresh.ageMin}m ago` : 'Offline'} color={fresh.color} subLabel={fresh.label} />
       </div>
     </div>
   );
@@ -120,22 +97,22 @@ function NodeHealthRow({ node, reading }) {
 
 function SummaryChip({ count, label, color, pulse }) {
   return (
-    <div style={{ flex: 1, background: `${color}12`, border: `1px solid ${color}30`, borderRadius: 8, padding: '6px 10px', textAlign: 'center', position: 'relative' }}>
+    <div className="flex-1 bg-white/80 backdrop-blur-md border border-slate-200/80 rounded-2xl p-3 text-center relative shadow-sm">
       {pulse && count > 0 && (
-        <span style={{ position: 'absolute', top: 4, right: 4, width: 7, height: 7, borderRadius: '50%', background: color, boxShadow: `0 0 0 0 ${color}66` }} />
+        <span className="absolute top-2.5 right-2.5 w-2 h-2 rounded-full bg-rose-500 animate-ping" />
       )}
-      <div style={{ fontSize: '1.1rem', fontWeight: 800, color }}>{count}</div>
-      <div style={{ fontSize: '0.6rem', color, fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase' }}>{label}</div>
+      <div className="text-xl font-extrabold font-mono" style={{ color }}>{count}</div>
+      <div className="text-[10px] font-bold uppercase tracking-wider mt-0.5" style={{ color }}>{label}</div>
     </div>
   );
 }
 
 export default function DeviceHealthMonitor({ nodes, latestReadings }) {
   if (!nodes || nodes.length === 0) {
-    return <div style={{ padding: 20, color: '#6c757d', fontSize: '0.8rem', textAlign: 'center' }}>No nodes to monitor.</div>;
+    return <div className="p-8 text-slate-400 font-mono text-xs text-center">No nodes configured for SCADA monitoring.</div>;
   }
 
-  const scored = nodes.map(node => {
+  const scored = nodes.map((node) => {
     const reading = latestReadings?.[node.id];
     const b = getBatteryScore(reading?.battery_level).score;
     const s = getSolarScore(reading?.is_solar_charging).score;
@@ -144,18 +121,19 @@ export default function DeviceHealthMonitor({ nodes, latestReadings }) {
     return { node, reading, totalScore: b + s + t + f };
   }).sort((a, b) => a.totalScore - b.totalScore);
 
-  const criticalCount = scored.filter(s => s.totalScore < 25).length;
-  const maintenanceCount = scored.filter(s => s.totalScore >= 25 && s.totalScore < 50).length;
-  const healthyCount = scored.filter(s => s.totalScore >= 75).length;
+  const criticalCount = scored.filter((s) => s.totalScore < 25).length;
+  const maintenanceCount = scored.filter((s) => s.totalScore >= 25 && s.totalScore < 50).length;
+  const healthyCount = scored.filter((s) => s.totalScore >= 75).length;
 
   return (
-    <div>
-      <div style={{ display: 'flex', gap: 8, marginBottom: 14 }}>
-        <SummaryChip count={healthyCount} label="Healthy" color="#198754" />
-        <SummaryChip count={maintenanceCount} label="Maintenance" color="#fd7e14" />
-        <SummaryChip count={criticalCount} label="Critical" color="#dc3545" pulse={criticalCount > 0} />
+    <div className="space-y-3">
+      <div className="flex gap-3 mb-3">
+        <SummaryChip count={healthyCount} label="Healthy Nodes" color="#16a34a" />
+        <SummaryChip count={maintenanceCount} label="Needs Maintenance" color="#ea580c" />
+        <SummaryChip count={criticalCount} label="Critical Alerts" color="#dc2626" pulse={criticalCount > 0} />
       </div>
-      <div style={{ maxHeight: 420, overflowY: 'auto', paddingRight: 2 }}>
+
+      <div className="max-h-[460px] overflow-y-auto pr-1 space-y-1">
         {scored.map(({ node, reading }) => (
           <NodeHealthRow key={node.id} node={node} reading={reading} />
         ))}

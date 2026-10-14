@@ -8,7 +8,8 @@ import {
   BarChart3,
   Server,
   DollarSign,
-  FileText
+  FileText,
+  Radio
 } from 'lucide-react';
 import AppNavbar from '../components/AppNavbar';
 import CyberPhysicalPipeline from '../components/CyberPhysicalPipeline';
@@ -160,8 +161,8 @@ export default function Dashboard() {
   }, [nodes, latestReadings]);
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] text-slate-900 flex flex-col font-sans">
-      {/* ── Clean Light Navbar ── */}
+    <div className="min-h-screen bg-[#f8fafc] text-slate-900 flex flex-col font-sans selection:bg-blue-100 selection:text-blue-900">
+      {/* ── Clean Frosted Navbar ── */}
       <AppNavbar
         nodes={nodes}
         selectedNodeId={selectedNodeId}
@@ -178,10 +179,10 @@ export default function Dashboard() {
           dustSuppressed={dustSuppressedKg}
         />
 
-        {/* ── Fleet Operations KPI Ribbon ── */}
+        {/* ── Fleet Operations KPI Ribbon (5 Transparent Glass Cards) ── */}
         <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
           {/* Card 1: Monitored Nodes */}
-          <div className="tech-card p-3.5 flex items-center justify-between">
+          <div className="tech-card p-3.5 flex items-center justify-between bg-white/80 backdrop-blur-xl border border-slate-200/80 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.03)] hover:border-slate-300 transition-all">
             <div>
               <div className="text-[10px] font-mono font-bold text-slate-500 uppercase tracking-wide">
                 Fleet Deployment
@@ -190,13 +191,13 @@ export default function Dashboard() {
                 {nodes.length} <span className="text-xs font-semibold text-emerald-600">Active</span>
               </div>
             </div>
-            <div className="w-9 h-9 rounded-lg bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600">
+            <div className="w-10 h-10 rounded-xl bg-emerald-50/80 border border-emerald-200/80 flex items-center justify-center text-emerald-600 shadow-sm">
               <Server size={18} />
             </div>
           </div>
 
           {/* Card 2: Fleet Avg AQI */}
-          <div className="tech-card p-3.5 flex items-center justify-between">
+          <div className="tech-card p-3.5 flex items-center justify-between bg-white/80 backdrop-blur-xl border border-slate-200/80 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.03)] hover:border-slate-300 transition-all">
             <div>
               <div className="text-[10px] font-mono font-bold text-slate-500 uppercase tracking-wide">
                 Network Avg AQI
@@ -205,13 +206,13 @@ export default function Dashboard() {
                 {fleetAvgAqi} <span className="text-xs font-normal text-slate-500">CPCB</span>
               </div>
             </div>
-            <div className="w-9 h-9 rounded-lg bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-600">
+            <div className="w-10 h-10 rounded-xl bg-amber-50/80 border border-amber-200/80 flex items-center justify-center text-amber-600 shadow-sm">
               <Activity size={18} />
             </div>
           </div>
 
           {/* Card 3: Active Relays */}
-          <div className="tech-card p-3.5 flex items-center justify-between">
+          <div className="tech-card p-3.5 flex items-center justify-between bg-white/80 backdrop-blur-xl border border-slate-200/80 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.03)] hover:border-slate-300 transition-all">
             <div>
               <div className="text-[10px] font-mono font-bold text-slate-500 uppercase tracking-wide">
                 Active Mitigations
@@ -220,13 +221,17 @@ export default function Dashboard() {
                 {activeRelaysCount} <span className="text-xs font-normal text-slate-500">Actuators</span>
               </div>
             </div>
-            <div className={`w-9 h-9 rounded-lg flex items-center justify-center border ${activeRelaysCount > 0 ? 'bg-rose-50 border-rose-200 text-rose-600 animate-pulse' : 'bg-slate-50 border-slate-200 text-slate-400'}`}>
+            <div className={`w-10 h-10 rounded-xl flex items-center justify-center border shadow-sm transition-all ${
+              activeRelaysCount > 0
+                ? 'bg-rose-50/90 border-rose-300 text-rose-600 ring-2 ring-rose-500/20 animate-pulse'
+                : 'bg-slate-50/80 border-slate-200/80 text-slate-400'
+            }`}>
               <Zap size={18} />
             </div>
           </div>
 
           {/* Card 4: Extracted Dust Impact */}
-          <div className="tech-card p-3.5 flex items-center justify-between">
+          <div className="tech-card p-3.5 flex items-center justify-between bg-white/80 backdrop-blur-xl border border-slate-200/80 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.03)] hover:border-slate-300 transition-all">
             <div>
               <div className="text-[10px] font-mono font-bold text-slate-500 uppercase tracking-wide">
                 Particulate Captured
@@ -235,13 +240,13 @@ export default function Dashboard() {
                 {dustSuppressedKg} <span className="text-xs font-normal text-slate-500">kg Mass</span>
               </div>
             </div>
-            <div className="w-9 h-9 rounded-lg bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600">
+            <div className="w-10 h-10 rounded-xl bg-blue-50/80 border border-blue-200/80 flex items-center justify-center text-blue-600 shadow-sm">
               <TrendingUp size={18} />
             </div>
           </div>
 
           {/* Card 5: Sensor Trust Index */}
-          <div className="tech-card p-3.5 flex items-center justify-between col-span-2 md:col-span-1">
+          <div className="tech-card p-3.5 flex items-center justify-between col-span-2 md:col-span-1 bg-white/80 backdrop-blur-xl border border-slate-200/80 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.03)] hover:border-slate-300 transition-all">
             <div>
               <div className="text-[10px] font-mono font-bold text-slate-500 uppercase tracking-wide">
                 Sensor Network Trust
@@ -250,7 +255,7 @@ export default function Dashboard() {
                 {fleetAvgTrust}% <span className="text-xs font-normal text-slate-500">Coherence</span>
               </div>
             </div>
-            <div className="w-9 h-9 rounded-lg bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600">
+            <div className="w-10 h-10 rounded-xl bg-emerald-50/80 border border-emerald-200/80 flex items-center justify-center text-emerald-600 shadow-sm">
               <ShieldCheck size={18} />
             </div>
           </div>
@@ -260,7 +265,7 @@ export default function Dashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
           {/* Left Column (7 cols): Map & Hotspot Drawer */}
           <div className="lg:col-span-7 flex flex-col gap-3">
-            <div className="tech-card overflow-hidden flex-1">
+            <div className="tech-card overflow-hidden flex-1 bg-white/80 backdrop-blur-xl border border-slate-200/80 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
               <div className="tech-card-header">
                 <span className="tech-card-title">
                   <span className="tech-card-title-dot" />
@@ -277,7 +282,7 @@ export default function Dashboard() {
               </div>
 
               {/* Map View */}
-              <div className="p-2 relative bg-slate-100">
+              <div className="p-2 relative bg-slate-100/50">
                 <NodeMap
                   nodes={nodes}
                   latestReadings={latestReadings}
@@ -287,8 +292,9 @@ export default function Dashboard() {
               </div>
 
               {/* Hotspots Quick Scroller */}
-              <div className="p-2.5 bg-slate-50 border-t border-slate-200 flex items-center gap-2 overflow-x-auto">
-                <span className="text-[10px] font-mono font-bold text-slate-500 uppercase shrink-0 mr-1">
+              <div className="p-2.5 bg-slate-50/70 backdrop-blur-md border-t border-slate-200/80 flex items-center gap-2 overflow-x-auto">
+                <span className="text-[10px] font-mono font-bold text-slate-500 uppercase shrink-0 mr-1 flex items-center gap-1">
+                  <Radio size={11} className="text-blue-600" />
                   HOTSPOTS:
                 </span>
                 {sortedHotspots.slice(0, 6).map((n) => {
@@ -297,25 +303,25 @@ export default function Dashboard() {
                   const isActuated = !!r?.relay_state;
                   const isSelected = selectedNodeId === n.id;
 
-                  let aqiBadgeColor = 'text-emerald-700 bg-emerald-50 border-emerald-200';
+                  let aqiBadgeColor = 'text-emerald-700 bg-emerald-50/90 border-emerald-200';
                   if (typeof aqi === 'number') {
-                    if (aqi > 200) aqiBadgeColor = 'text-rose-700 bg-rose-50 border-rose-200';
-                    else if (aqi > 100) aqiBadgeColor = 'text-amber-700 bg-amber-50 border-amber-200';
+                    if (aqi > 200) aqiBadgeColor = 'text-rose-700 bg-rose-50/90 border-rose-200';
+                    else if (aqi > 100) aqiBadgeColor = 'text-amber-700 bg-amber-50/90 border-amber-200';
                   }
 
                   return (
                     <button
                       key={n.id}
                       onClick={() => setSelectedNodeId(n.id)}
-                      className={`flex items-center gap-2 px-2.5 py-1 rounded text-xs font-mono transition-all shrink-0 border ${
+                      className={`flex items-center gap-2 px-3 py-1 rounded-xl text-xs font-mono transition-all shrink-0 border backdrop-blur-md ${
                         isSelected
-                          ? 'bg-blue-50 border-blue-300 text-blue-900 shadow-sm font-semibold'
-                          : 'bg-white border-slate-200 text-slate-700 hover:border-slate-300'
+                          ? 'bg-blue-50/90 border-blue-400 text-blue-900 shadow-sm font-bold ring-1 ring-blue-500/20'
+                          : 'bg-white/80 border-slate-200/80 text-slate-700 hover:border-slate-300 hover:bg-white'
                       }`}
                     >
                       <span className={`w-1.5 h-1.5 rounded-full ${isActuated ? 'bg-rose-500 animate-pulse' : 'bg-emerald-500'}`} />
                       <span className="truncate max-w-[120px] font-sans font-medium">{n.name}</span>
-                      <span className={`px-1.5 py-0.2 rounded border text-[10px] font-bold ${aqiBadgeColor}`}>
+                      <span className={`px-1.5 py-0.2 rounded-md border text-[10px] font-extrabold ${aqiBadgeColor}`}>
                         {aqi}
                       </span>
                     </button>
@@ -353,7 +359,7 @@ export default function Dashboard() {
         {/* ── Secondary Row: 4-Card Intelligence & Vitals ── */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* Card 1: CPCB AQI Matrix */}
-          <div className="tech-card flex flex-col justify-between">
+          <div className="tech-card flex flex-col justify-between bg-white/80 backdrop-blur-xl border border-slate-200/80 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.03)]">
             <div className="tech-card-header">
               <span className="tech-card-title">
                 <span className="tech-card-title-dot bg-amber-500" />
@@ -374,7 +380,7 @@ export default function Dashboard() {
           </div>
 
           {/* Card 2: TinyML Source Classification */}
-          <div className="tech-card flex flex-col justify-between">
+          <div className="tech-card flex flex-col justify-between bg-white/80 backdrop-blur-xl border border-slate-200/80 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.03)]">
             <div className="tech-card-header">
               <span className="tech-card-title">
                 <span className="tech-card-title-dot bg-blue-500" />
@@ -385,25 +391,25 @@ export default function Dashboard() {
             <div className="tech-card-body">
               {currentReading?.classifier_label ? (
                 <div>
-                  <div className="text-xs font-mono text-slate-500 uppercase">IDENTIFIED POLLUTANT</div>
-                  <div className="text-lg font-extrabold text-blue-700 tracking-tight mt-0.5">
+                  <div className="text-[10px] font-mono text-slate-500 uppercase">IDENTIFIED POLLUTANT</div>
+                  <div className="text-lg font-extrabold text-blue-700 tracking-tight mt-0.5 font-sans">
                     {currentReading.classifier_label.replace(/_/g, ' ').toUpperCase()}
                   </div>
                   <div className="mt-3">
                     <div className="flex justify-between text-xs font-mono mb-1">
                       <span className="text-slate-500">MODEL CONFIDENCE</span>
-                      <span className="text-slate-900 font-bold">
+                      <span className="text-slate-900 font-extrabold">
                         {((currentReading.classifier_confidence || 0.85) * 100).toFixed(1)}%
                       </span>
                     </div>
-                    <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+                    <div className="h-1.5 w-full bg-slate-200/70 rounded-full overflow-hidden">
                       <div
-                        className="h-full bg-blue-600 rounded-full transition-all duration-700"
+                        className="h-full bg-gradient-to-r from-blue-600 to-cyan-500 rounded-full transition-all duration-700"
                         style={{ width: `${(currentReading.classifier_confidence || 0.85) * 100}%` }}
                       />
                     </div>
                   </div>
-                  <div className="mt-4 p-2.5 rounded bg-slate-50 border border-slate-200 font-mono text-[11px] text-slate-600 space-y-1">
+                  <div className="mt-4 p-2.5 rounded-xl bg-slate-50/70 backdrop-blur-md border border-slate-200/80 font-mono text-[10.5px] text-slate-600 space-y-1">
                     <div className="flex justify-between">
                       <span>Gas Sensor Array:</span>
                       <span className="text-emerald-700 font-bold">7-Channel Active</span>
@@ -423,7 +429,7 @@ export default function Dashboard() {
           </div>
 
           {/* Card 3: 30-Min Predictive Horizon */}
-          <div className="tech-card flex flex-col justify-between">
+          <div className="tech-card flex flex-col justify-between bg-white/80 backdrop-blur-xl border border-slate-200/80 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.03)]">
             <div className="tech-card-header">
               <span className="tech-card-title">
                 <span className="tech-card-title-dot bg-indigo-500" />
@@ -433,34 +439,34 @@ export default function Dashboard() {
             </div>
             <div className="tech-card-body space-y-3">
               <div className="grid grid-cols-3 gap-2 text-center">
-                <div className="p-2 rounded bg-slate-50 border border-slate-200">
-                  <div className="text-[10px] font-mono text-slate-500">+10 MIN</div>
-                  <div className="text-sm font-mono font-bold text-slate-800 mt-1">
+                <div className="p-2 rounded-xl bg-slate-50/70 backdrop-blur-md border border-slate-200/80">
+                  <div className="text-[9.5px] font-mono text-slate-500">+10 MIN</div>
+                  <div className="text-sm font-mono font-extrabold text-slate-800 mt-0.5">
                     {currentReading?.forecast_10m ? Math.round(currentReading.forecast_10m) : '—'} <span className="text-[9px] text-slate-400">µg</span>
                   </div>
                 </div>
-                <div className="p-2 rounded bg-slate-50 border border-slate-200">
-                  <div className="text-[10px] font-mono text-slate-500">+20 MIN</div>
-                  <div className="text-sm font-mono font-bold text-slate-800 mt-1">
+                <div className="p-2 rounded-xl bg-slate-50/70 backdrop-blur-md border border-slate-200/80">
+                  <div className="text-[9.5px] font-mono text-slate-500">+20 MIN</div>
+                  <div className="text-sm font-mono font-extrabold text-slate-800 mt-0.5">
                     {currentReading?.forecast_20m ? Math.round(currentReading.forecast_20m) : '—'} <span className="text-[9px] text-slate-400">µg</span>
                   </div>
                 </div>
-                <div className="p-2 rounded bg-slate-50 border border-slate-200">
-                  <div className="text-[10px] font-mono text-slate-500">+30 MIN</div>
-                  <div className="text-sm font-mono font-bold text-blue-700 mt-1">
+                <div className="p-2 rounded-xl bg-slate-50/70 backdrop-blur-md border border-slate-200/80">
+                  <div className="text-[9.5px] font-mono text-slate-500">+30 MIN</div>
+                  <div className="text-sm font-mono font-extrabold text-blue-700 mt-0.5">
                     {currentReading?.forecast_30m ? Math.round(currentReading.forecast_30m) : '—'} <span className="text-[9px] text-slate-400">µg</span>
                   </div>
                 </div>
               </div>
 
-              <div className="p-2.5 rounded bg-blue-50/60 border border-blue-200 text-xs">
-                <div className="flex items-center justify-between text-slate-600 font-mono text-[11px] mb-1">
+              <div className="p-2.5 rounded-xl bg-blue-50/70 backdrop-blur-md border border-blue-200/80 text-xs">
+                <div className="flex items-center justify-between text-slate-600 font-mono text-[10.5px] mb-1">
                   <span>TREND TRAJECTORY:</span>
-                  <span className={`font-bold ${(currentReading?.forecast_30m || 0) > (currentReading?.pm10_corrected || 0) ? 'text-rose-600' : 'text-emerald-600'}`}>
+                  <span className={`font-extrabold ${(currentReading?.forecast_30m || 0) > (currentReading?.pm10_corrected || 0) ? 'text-rose-600' : 'text-emerald-600'}`}>
                     {(currentReading?.forecast_30m || 0) > (currentReading?.pm10_corrected || 0) ? '▲ ELEVATING' : '▼ DECLINING'}
                   </span>
                 </div>
-                <p className="text-[11px] text-slate-600 m-0">
+                <p className="text-[10.5px] text-slate-600 m-0 leading-relaxed">
                   Predictive intervention prevents PM threshold overshoot before visible smog accumulation.
                 </p>
               </div>
@@ -468,7 +474,7 @@ export default function Dashboard() {
           </div>
 
           {/* Card 4: Sensor Trust & Quality Score */}
-          <div className="tech-card flex flex-col justify-between">
+          <div className="tech-card flex flex-col justify-between bg-white/80 backdrop-blur-xl border border-slate-200/80 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.03)]">
             <div className="tech-card-header">
               <span className="tech-card-title">
                 <span className="tech-card-title-dot bg-emerald-500" />
@@ -486,24 +492,24 @@ export default function Dashboard() {
                 </div>
                 <div className="text-right">
                   <div className="text-[10px] font-mono text-slate-500">CALIBRATION OFFSET</div>
-                  <div className="text-xs font-mono text-slate-700 mt-1">
+                  <div className="text-xs font-mono text-slate-700 mt-1 font-semibold">
                     a: {selectedNode?.calib_a || 0.33} | b: {selectedNode?.calib_b || 0.17}
                   </div>
                 </div>
               </div>
 
-              <div className="space-y-1.5 font-mono text-[11px] text-slate-600 border-t border-slate-100 pt-2">
+              <div className="space-y-1.5 font-mono text-[10.5px] text-slate-600 border-t border-slate-200/60 pt-2">
                 <div className="flex justify-between">
                   <span>Relative Humidity Factor:</span>
                   <span className="text-slate-900 font-medium">{currentReading?.humidity_used || currentReading?.humidity_percent || 0}%</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Stuck-Value Detector:</span>
-                  <span className="text-emerald-700 font-semibold">PASS (Variance OK)</span>
+                  <span className="text-emerald-700 font-bold">PASS (Variance OK)</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Cross-Gas Consistency:</span>
-                  <span className="text-emerald-700 font-semibold">COHERENT</span>
+                  <span className="text-emerald-700 font-bold">COHERENT</span>
                 </div>
               </div>
             </div>
@@ -523,15 +529,15 @@ export default function Dashboard() {
           />
         </div>
 
-        {/* ── Deep Technical Console (Tabbed) ── */}
-        <div className="tech-card">
-          <div className="tech-card-header border-b border-slate-200 flex items-center justify-between flex-wrap gap-2">
-            <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-lg border border-slate-200">
+        {/* ── Deep Technical Console (Tabbed Frosted Glass Center) ── */}
+        <div className="tech-card bg-white/80 backdrop-blur-xl border border-slate-200/80 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden">
+          <div className="tech-card-header border-b border-slate-200/80 flex items-center justify-between flex-wrap gap-2">
+            <div className="flex items-center gap-1 bg-slate-100/70 backdrop-blur-md p-1 rounded-xl border border-slate-200/80">
               <button
                 onClick={() => setActiveTab('health')}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-semibold tracking-normal transition-all ${
+                className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold tracking-normal transition-all ${
                   activeTab === 'health'
-                    ? 'bg-white text-blue-700 shadow-sm border border-slate-200'
+                    ? 'bg-white text-blue-700 shadow-sm border border-slate-200/80 font-bold'
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
@@ -541,9 +547,9 @@ export default function Dashboard() {
 
               <button
                 onClick={() => setActiveTab('quality')}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-semibold tracking-normal transition-all ${
+                className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold tracking-normal transition-all ${
                   activeTab === 'quality'
-                    ? 'bg-white text-blue-700 shadow-sm border border-slate-200'
+                    ? 'bg-white text-blue-700 shadow-sm border border-slate-200/80 font-bold'
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
@@ -553,9 +559,9 @@ export default function Dashboard() {
 
               <button
                 onClick={() => setActiveTab('economics')}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-semibold tracking-normal transition-all ${
+                className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold tracking-normal transition-all ${
                   activeTab === 'economics'
-                    ? 'bg-white text-blue-700 shadow-sm border border-slate-200'
+                    ? 'bg-white text-blue-700 shadow-sm border border-slate-200/80 font-bold'
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
@@ -565,9 +571,9 @@ export default function Dashboard() {
 
               <button
                 onClick={() => setActiveTab('events')}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-semibold tracking-normal transition-all ${
+                className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold tracking-normal transition-all ${
                   activeTab === 'events'
-                    ? 'bg-white text-blue-700 shadow-sm border border-slate-200'
+                    ? 'bg-white text-blue-700 shadow-sm border border-slate-200/80 font-bold'
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
@@ -587,7 +593,7 @@ export default function Dashboard() {
             </div>
           </div>
 
-          <div className="p-4 bg-white">
+          <div className="p-4 bg-white/60 backdrop-blur-sm">
             {activeTab === 'health' && (
               <DeviceHealthMonitor nodes={nodes} latestReadings={latestReadings} />
             )}
@@ -606,7 +612,7 @@ export default function Dashboard() {
                   <div className="text-xs font-mono text-slate-500 uppercase tracking-wide">
                     RECENT ACTUATION TRANSITIONS (LAST {eventLogs.length} EVENTS)
                   </div>
-                  <span className="text-xs text-slate-400">Live Transition Log</span>
+                  <span className="text-xs text-slate-400 font-mono">Live Transition Log</span>
                 </div>
 
                 {eventLogs.length === 0 ? (
@@ -614,9 +620,9 @@ export default function Dashboard() {
                     No relay state transitions recorded in current telemetry window.
                   </div>
                 ) : (
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-left font-mono text-xs border border-slate-200 rounded-lg overflow-hidden">
-                      <thead className="bg-slate-50 text-slate-600 uppercase text-[10px] border-b border-slate-200">
+                  <div className="overflow-x-auto rounded-xl border border-slate-200/80">
+                    <table className="w-full text-left font-mono text-xs">
+                      <thead className="bg-slate-50/80 backdrop-blur-md text-slate-600 uppercase text-[10px] border-b border-slate-200/80">
                         <tr>
                           <th className="p-2.5">Timestamp</th>
                           <th className="p-2.5">Relay State</th>
@@ -625,14 +631,14 @@ export default function Dashboard() {
                           <th className="p-2.5">Action Rationale</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-slate-100">
+                      <tbody className="divide-y divide-slate-100 bg-white/70">
                         {eventLogs.map((log, idx) => (
-                          <tr key={idx} className="hover:bg-slate-50">
+                          <tr key={idx} className="hover:bg-slate-50/80 transition-colors">
                             <td className="p-2.5 text-slate-600">
                               {new Date(log.timestamp).toLocaleTimeString()}
                             </td>
                             <td className="p-2.5">
-                              <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${log.relay_state ? 'text-rose-700 bg-rose-50 border border-rose-200' : 'text-slate-600 bg-slate-100'}`}>
+                              <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold ${log.relay_state ? 'text-rose-700 bg-rose-50 border border-rose-200' : 'text-slate-600 bg-slate-100'}`}>
                                 {log.relay_state ? 'ENGAGED' : 'DISENGAGED'}
                               </span>
                             </td>
@@ -657,13 +663,13 @@ export default function Dashboard() {
         </div>
       </main>
 
-      {/* ── Clean Light Footer ── */}
-      <footer className="w-full border-t border-slate-200 bg-white py-3 px-4 text-center text-xs text-slate-500 font-mono mt-8">
+      {/* ── Clean Frosted Footer ── */}
+      <footer className="w-full border-t border-slate-200/80 bg-white/70 backdrop-blur-xl py-3 px-4 text-center text-xs text-slate-500 font-mono mt-8 shadow-sm">
         <div className="max-w-[1780px] mx-auto flex items-center justify-between flex-wrap gap-2">
           <span>SourceSense OS • IIT Bombay Techfest Finalist Architecture</span>
           <span>Edge Micro-Inference • TinyML Random Forest • Closed-Loop SCADA</span>
-          <span className="text-emerald-700 flex items-center gap-1.5 font-medium">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> All Node Gateways Synchronized
+          <span className="text-emerald-700 flex items-center gap-1.5 font-semibold">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> All Node Gateways Synchronized
           </span>
         </div>
       </footer>

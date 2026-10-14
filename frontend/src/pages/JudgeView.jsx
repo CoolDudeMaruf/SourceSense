@@ -1,7 +1,7 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useMemo } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, Box, Sphere } from '@react-three/drei';
-import { Activity, AlertTriangle, ShieldCheck, Server, Leaf, Settings2, Sliders, CheckCircle, RefreshCcw, Zap } from 'lucide-react';
+import { Activity, AlertTriangle, Server, Leaf, Settings2, Sliders, CheckCircle, RefreshCcw, Zap, Radio } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer } from 'recharts';
 import AppNavbar from '../components/AppNavbar';
 
@@ -76,15 +76,15 @@ const DigitalTwin = ({ nodeState, overrideLevel }) => {
 
   return (
     <>
-      <ambientLight intensity={0.8} />
-      <directionalLight position={[10, 15, 10]} intensity={1.3} />
+      <ambientLight intensity={0.9} />
+      <directionalLight position={[10, 15, 10]} intensity={1.4} />
 
       {/* Hardware Base */}
       <Box ref={meshRef} args={[2, 2, 2]} wireframe={nodeState === NODE_STATES.FAULT}>
         <meshStandardMaterial
           color={STATE_COLORS[nodeState]}
-          metalness={0.6}
-          roughness={0.3}
+          metalness={0.5}
+          roughness={0.25}
         />
       </Box>
 
@@ -94,8 +94,8 @@ const DigitalTwin = ({ nodeState, overrideLevel }) => {
           <meshStandardMaterial
             color="#bae6fd"
             transparent
-            opacity={0.4}
-            roughness={0.9}
+            opacity={0.45}
+            roughness={0.8}
           />
         </Sphere>
       )}
@@ -113,12 +113,14 @@ export default function JudgeView() {
   const activeCount = nodes.filter((n) => n.state === NODE_STATES.ACTIVE).length;
   const faultCount = nodes.filter((n) => n.state === NODE_STATES.FAULT).length;
 
-  // Mock Timeseries Data
-  const sparklineData = Array.from({ length: 20 }).map((_, i) => ({
-    time: i,
-    pm25: selectedNode.state === NODE_STATES.FAULT ? 0 : selectedNode.pm25 + Math.random() * 8 - 4,
-    pm10: selectedNode.state === NODE_STATES.FAULT ? 0 : selectedNode.pm10 + Math.random() * 12 - 6,
-  }));
+  // Deterministic Timeseries Data
+  const sparklineData = useMemo(() => {
+    return Array.from({ length: 20 }).map((_, i) => ({
+      time: i,
+      pm25: selectedNode.state === NODE_STATES.FAULT ? 0 : Math.round(selectedNode.pm25 + Math.sin(i * 0.8) * 4),
+      pm10: selectedNode.state === NODE_STATES.FAULT ? 0 : Math.round(selectedNode.pm10 + Math.cos(i * 0.8) * 8),
+    }));
+  }, [selectedNode]);
 
   const handleNodeClick = (n) => {
     setSelectedNode(n);
@@ -162,7 +164,7 @@ export default function JudgeView() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] text-slate-900 flex flex-col font-sans">
+    <div className="min-h-screen bg-[#f8fafc] text-slate-900 flex flex-col font-sans selection:bg-blue-100 selection:text-blue-900">
       <AppNavbar
         nodes={nodes.map((n) => ({ id: n.id, name: `${n.id} - ${n.location}` }))}
         selectedNodeId={selectedNode.id}
@@ -175,17 +177,17 @@ export default function JudgeView() {
 
       <main className="flex-1 max-w-[1780px] w-full mx-auto px-4 py-4 space-y-4">
         {/* Judge Protocol Banner */}
-        <div className="tech-card p-4 bg-white border border-slate-200 shadow-sm flex items-center justify-between flex-wrap gap-3">
+        <div className="tech-card p-4 bg-white/80 backdrop-blur-xl border border-slate-200/80 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.03)] flex items-center justify-between flex-wrap gap-3">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-700">
+            <div className="w-10 h-10 rounded-xl bg-blue-50/90 border border-blue-200/80 flex items-center justify-center text-blue-700 shadow-sm">
               <Sliders size={20} />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="font-extrabold text-base text-slate-900">
+                <span className="font-extrabold text-[15px] text-slate-900 tracking-tight">
                   IIT BOMBAY TECHFEST — EVALUATION SUITE
                 </span>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200 uppercase">
+                <span className="text-[9.5px] font-bold px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 border border-blue-200/80 uppercase">
                   JUDGE SANDBOX
                 </span>
               </div>
@@ -203,50 +205,56 @@ export default function JudgeView() {
           </div>
         </div>
 
-        {/* Fleet Status KPIs */}
+        {/* Fleet Status KPIs (4 Transparent Glass Cards) */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <div className="tech-card p-3.5 flex items-center justify-between">
+          <div className="tech-card p-3.5 flex items-center justify-between bg-white/80 backdrop-blur-xl border border-slate-200/80 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.03)]">
             <div>
-              <div className="text-[10px] font-mono text-slate-500 uppercase">STATE MACHINE HEALTH</div>
-              <div className="text-xl font-mono font-bold text-emerald-600 mt-0.5">
+              <div className="text-[10px] font-mono font-bold text-slate-500 uppercase">STATE MACHINE HEALTH</div>
+              <div className="text-xl font-mono font-extrabold text-emerald-600 mt-0.5">
                 {faultCount === 0 ? 'NOMINAL (100%)' : `${faultCount} FAULTED`}
               </div>
             </div>
-            <Server size={18} className="text-emerald-600" />
+            <div className="w-9 h-9 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600">
+              <Server size={18} />
+            </div>
           </div>
 
-          <div className="tech-card p-3.5 flex items-center justify-between">
+          <div className="tech-card p-3.5 flex items-center justify-between bg-white/80 backdrop-blur-xl border border-slate-200/80 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.03)]">
             <div>
-              <div className="text-[10px] font-mono text-slate-500 uppercase">ACTIVE ACTUATORS</div>
-              <div className="text-xl font-mono font-bold text-blue-600 mt-0.5">
+              <div className="text-[10px] font-mono font-bold text-slate-500 uppercase">ACTIVE ACTUATORS</div>
+              <div className="text-xl font-mono font-extrabold text-blue-600 mt-0.5">
                 {activeCount} / {nodes.length}
               </div>
             </div>
-            <Activity size={18} className="text-blue-600" />
+            <div className="w-9 h-9 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600">
+              <Activity size={18} />
+            </div>
           </div>
 
-          <div className="tech-card p-3.5 flex items-center justify-between">
+          <div className="tech-card p-3.5 flex items-center justify-between bg-white/80 backdrop-blur-xl border border-slate-200/80 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.03)]">
             <div>
-              <div className="text-[10px] font-mono text-slate-500 uppercase">SIMULATED EXTRACTION</div>
-              <div className="text-xl font-mono font-bold text-amber-600 mt-0.5">
+              <div className="text-[10px] font-mono font-bold text-slate-500 uppercase">SIMULATED EXTRACTION</div>
+              <div className="text-xl font-mono font-extrabold text-amber-600 mt-0.5">
                 {totalDust} kg
               </div>
             </div>
-            <Leaf size={18} className="text-amber-600" />
+            <div className="w-9 h-9 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-600">
+              <Leaf size={18} />
+            </div>
           </div>
 
-          <div className="tech-card p-3.5 flex items-center justify-between">
+          <div className="tech-card p-3.5 flex items-center justify-between bg-white/80 backdrop-blur-xl border border-slate-200/80 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.03)]">
             <div>
-              <div className="text-[10px] font-mono text-slate-500 uppercase">INSPECTED NODE</div>
-              <div className="text-xl font-mono font-bold text-slate-900 mt-0.5">
+              <div className="text-[10px] font-mono font-bold text-slate-500 uppercase">INSPECTED NODE</div>
+              <div className="text-xl font-mono font-extrabold text-slate-900 mt-0.5">
                 {selectedNode.id}
               </div>
             </div>
             <span
-              className="w-3.5 h-3.5 rounded-full"
+              className="w-4 h-4 rounded-full border-2 border-white shadow-sm"
               style={{
                 backgroundColor: STATE_COLORS[selectedNode.state],
-                boxShadow: `0 0 8px ${STATE_COLORS[selectedNode.state]}`,
+                boxShadow: `0 0 10px ${STATE_COLORS[selectedNode.state]}`,
               }}
             />
           </div>
@@ -257,29 +265,30 @@ export default function JudgeView() {
           {/* Left: Spatial Node Matrix & Telemetry */}
           <div className="lg:col-span-8 flex flex-col gap-4">
             {/* Spatial Grid */}
-            <div className="tech-card p-4">
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-xs font-mono font-bold text-slate-700 uppercase tracking-wide">
-                  25-NODE URBAN TOPOLOGY (CLICK TO INSPECT)
+            <div className="tech-card p-4 bg-white/80 backdrop-blur-xl border border-slate-200/80 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+              <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
+                <span className="text-xs font-mono font-bold text-slate-800 uppercase tracking-wide flex items-center gap-1.5">
+                  <Radio size={12} className="text-blue-600" />
+                  25-NODE URBAN TOPOLOGY (INTERACTIVE MATRIX)
                 </span>
-                <div className="flex items-center gap-3 text-[11px] font-mono">
-                  <span className="flex items-center gap-1.5 text-emerald-700 font-medium">
+                <div className="flex items-center gap-3 text-[10.5px] font-mono">
+                  <span className="flex items-center gap-1.5 text-emerald-700 font-bold">
                     <span className="w-2 h-2 rounded-full bg-emerald-500" /> NORMAL
                   </span>
-                  <span className="flex items-center gap-1.5 text-blue-700 font-medium">
+                  <span className="flex items-center gap-1.5 text-blue-700 font-bold">
                     <span className="w-2 h-2 rounded-full bg-blue-600" /> ACTIVE
                   </span>
-                  <span className="flex items-center gap-1.5 text-amber-700 font-medium">
+                  <span className="flex items-center gap-1.5 text-amber-700 font-bold">
                     <span className="w-2 h-2 rounded-full bg-amber-500" /> PENDING
                   </span>
-                  <span className="flex items-center gap-1.5 text-rose-700 font-medium">
+                  <span className="flex items-center gap-1.5 text-rose-700 font-bold">
                     <span className="w-2 h-2 rounded-full bg-rose-600" /> FAULT
                   </span>
                 </div>
               </div>
 
               {/* Grid Layout */}
-              <div className="grid grid-cols-5 gap-3 p-3 bg-slate-50 rounded-xl border border-slate-200">
+              <div className="grid grid-cols-5 gap-2.5 p-3 bg-slate-50/70 backdrop-blur-md rounded-xl border border-slate-200/80">
                 {nodes.map((node) => {
                   const isSelected = selectedNode.id === node.id;
                   const stateColor = STATE_COLORS[node.state];
@@ -288,26 +297,26 @@ export default function JudgeView() {
                     <button
                       key={node.id}
                       onClick={() => handleNodeClick(node)}
-                      className={`p-3 rounded-lg border text-left transition-all relative overflow-hidden ${
+                      className={`p-2.5 rounded-xl border text-left transition-all duration-200 relative overflow-hidden backdrop-blur-md ${
                         isSelected
-                          ? 'bg-blue-50/80 border-blue-400 shadow-md ring-2 ring-blue-500/20'
-                          : 'bg-white border-slate-200 hover:border-slate-300'
+                          ? 'bg-blue-50/90 border-blue-400 shadow-md ring-2 ring-blue-500/20'
+                          : 'bg-white/80 border-slate-200/80 hover:border-slate-300 hover:bg-white'
                       }`}
                     >
-                      <div className="flex items-center justify-between mb-1.5">
-                        <span className="font-mono text-xs font-bold text-slate-900">{node.id}</span>
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="font-mono text-xs font-extrabold text-slate-900">{node.id}</span>
                         <span
-                          className="w-2.5 h-2.5 rounded-full"
+                          className="w-2.5 h-2.5 rounded-full border border-white"
                           style={{
                             backgroundColor: stateColor,
                             boxShadow: `0 0 6px ${stateColor}`,
                           }}
                         />
                       </div>
-                      <div className="text-[11px] text-slate-500 font-medium truncate">{node.location}</div>
-                      <div className="mt-2 flex items-center justify-between text-[10px] font-mono">
+                      <div className="text-[10.5px] text-slate-600 font-medium truncate">{node.location}</div>
+                      <div className="mt-1.5 flex items-center justify-between text-[10px] font-mono">
                         <span className="text-slate-400">PM10:</span>
-                        <span className="text-slate-800 font-bold">{node.pm10}</span>
+                        <span className="text-slate-900 font-bold">{node.pm10}</span>
                       </div>
                     </button>
                   );
@@ -316,12 +325,12 @@ export default function JudgeView() {
             </div>
 
             {/* Sparkline Telemetry */}
-            <div className="tech-card p-4">
+            <div className="tech-card p-4 bg-white/80 backdrop-blur-xl border border-slate-200/80 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-mono font-bold text-slate-700 uppercase tracking-wide">
-                  REAL-TIME TELEMETRY STREAM ({selectedNode.id} - {selectedNode.location})
+                <span className="text-xs font-mono font-bold text-slate-800 uppercase tracking-wide">
+                  REAL-TIME TELEMETRY STREAM ({selectedNode.id} — {selectedNode.location})
                 </span>
-                <span className="text-xs font-mono text-blue-700 font-medium">PM2.5 (Blue) vs PM10 (Amber)</span>
+                <span className="text-[11px] font-mono text-blue-700 font-semibold">PM2.5 (Blue) vs PM10 (Amber)</span>
               </div>
               <div className="h-[200px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
@@ -340,13 +349,14 @@ export default function JudgeView() {
                     <YAxis stroke="#94a3b8" fontSize={10} tickFormatter={(val) => `${val}µg`} />
                     <RechartsTooltip
                       contentStyle={{
-                        backgroundColor: '#ffffff',
+                        backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                        backdropFilter: 'blur(12px)',
                         borderColor: '#e2e8f0',
-                        borderRadius: '8px',
+                        borderRadius: '10px',
                         color: '#0f172a',
                         fontSize: '11px',
                         fontFamily: 'monospace',
-                        boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)',
+                        boxShadow: '0 8px 24px -3px rgba(15,23,42,0.1)',
                       }}
                     />
                     <Area type="monotone" dataKey="pm25" stroke="#0284C7" fill="url(#judgePm25)" isAnimationActive={false} />
@@ -359,17 +369,17 @@ export default function JudgeView() {
 
           {/* Right: Node Inspector Drawer & Digital Twin */}
           <div className="lg:col-span-4 flex flex-col gap-4">
-            <div className="tech-card p-4 flex flex-col h-full justify-between">
+            <div className="tech-card p-4 flex flex-col h-full justify-between bg-white/80 backdrop-blur-xl border border-slate-200/80 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
               <div>
                 <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-3">
                   <div>
                     <div className="text-[10px] font-mono text-slate-500 uppercase">INSPECTED NODE</div>
-                    <div className="text-lg font-extrabold text-slate-900">
+                    <div className="text-lg font-extrabold text-slate-900 font-sans">
                       {selectedNode.id} — {selectedNode.location}
                     </div>
                   </div>
                   <span
-                    className="text-xs font-mono font-bold px-2 py-0.5 rounded border uppercase"
+                    className="text-xs font-mono font-bold px-2 py-0.5 rounded-lg border uppercase backdrop-blur-sm"
                     style={{
                       color: STATE_COLORS[selectedNode.state],
                       borderColor: `${STATE_COLORS[selectedNode.state]}55`,
@@ -381,24 +391,24 @@ export default function JudgeView() {
                 </div>
 
                 {/* 3D WebGL Digital Twin */}
-                <div className="h-[220px] bg-slate-50 rounded-xl overflow-hidden border border-slate-200 relative mb-4">
+                <div className="h-[220px] bg-gradient-to-b from-slate-100/70 to-slate-200/50 rounded-xl overflow-hidden border border-slate-200/80 relative mb-4">
                   <Canvas camera={{ position: [0, 2, 5] }}>
                     <OrbitControls enableZoom={false} autoRotate={selectedNode.state !== NODE_STATES.FAULT} />
                     <DigitalTwin nodeState={selectedNode.state} overrideLevel={overrideLevel} />
                   </Canvas>
-                  <div className="absolute top-2 left-2 px-2 py-0.5 rounded bg-white/90 border border-slate-200 font-mono text-[9px] text-blue-700 shadow-sm font-semibold">
+                  <div className="absolute top-2 left-2 px-2 py-0.5 rounded-md bg-white/90 backdrop-blur-md border border-slate-200/80 font-mono text-[9px] text-blue-700 shadow-sm font-bold">
                     DIGITAL TWIN SIMULATOR | 60 FPS
                   </div>
                 </div>
 
                 {/* Diagnostic Overrides */}
-                <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-3">
-                  <div className="flex items-center justify-between text-xs font-bold text-slate-700">
+                <div className="p-3.5 bg-slate-50/70 backdrop-blur-md rounded-xl border border-slate-200/80 space-y-3">
+                  <div className="flex items-center justify-between text-xs font-bold text-slate-800">
                     <span className="flex items-center gap-1.5">
                       <Settings2 size={13} className="text-blue-700" />
                       Judge Override & Fault Injection
                     </span>
-                    <span className="font-mono text-blue-700">{overrideLevel}% Flow</span>
+                    <span className="font-mono text-blue-700 font-bold">{overrideLevel}% Flow</span>
                   </div>
 
                   <div>
@@ -423,7 +433,7 @@ export default function JudgeView() {
 
                     <button
                       onClick={triggerPending}
-                      className="tech-btn text-xs justify-center py-2 text-amber-800 border-amber-300 bg-amber-50 hover:bg-amber-100"
+                      className="tech-btn text-xs justify-center py-2 text-amber-800 border-amber-300 bg-amber-50/80 hover:bg-amber-100"
                     >
                       <span>Simulate Delay</span>
                     </button>
@@ -438,7 +448,7 @@ export default function JudgeView() {
 
                     <button
                       onClick={triggerNormal}
-                      className="tech-btn text-xs justify-center py-2 text-emerald-800 border-emerald-300 bg-emerald-50 hover:bg-emerald-100"
+                      className="tech-btn text-xs justify-center py-2 text-emerald-800 border-emerald-300 bg-emerald-50/80 hover:bg-emerald-100"
                     >
                       <CheckCircle size={12} />
                       <span>Restore Normal</span>
@@ -447,7 +457,7 @@ export default function JudgeView() {
                 </div>
               </div>
 
-              <div className="text-[11px] text-slate-500 font-mono text-center pt-3 border-t border-slate-100">
+              <div className="text-[10.5px] text-slate-500 font-mono text-center pt-3 border-t border-slate-100">
                 Safety interlock halts physical relays when FAULT is confirmed.
               </div>
             </div>

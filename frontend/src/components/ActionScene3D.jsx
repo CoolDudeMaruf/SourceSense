@@ -14,36 +14,38 @@ function MiniWaterSprinkler({ isRelayOn, intensity = 75 }) {
   const activeCount = Math.round(500 + (Math.max(20, Math.min(100, intensity)) / 100) * 2000);
   const speedMult = 0.5 + (intensity / 100) * 0.8;
 
-  // Mist physics
-  const particles = useMemo(() => {
-    return Array.from({ length: MAX_PARTICLES }, () => {
-      const angle = Math.random() * Math.PI * 2;
-      const radius = Math.random() * 1.5;
+  // Mist physics stored in mutable ref for Three.js animation
+  const particlesRef = useRef(null);
+  if (!particlesRef.current) {
+    particlesRef.current = Array.from({ length: MAX_PARTICLES }, (_, i) => {
+      const angle = (i * 0.137) % (Math.PI * 2);
+      const radius = ((i % 100) / 100) * 1.5;
       return {
         position: new THREE.Vector3(0, 0, 0),
         velocity: new THREE.Vector3(
           Math.cos(angle) * radius,
           Math.sin(angle) * radius + 0.5,
-          (Math.random() * 8 + 4) * speedMult
+          (4 + ((i % 50) / 50) * 8) * speedMult
         ),
-        life: Math.random() * 200,
+        life: (i % 200),
       };
     });
-  }, [speedMult]);
+  }
 
   useFrame(() => {
     if (!meshRef.current || !isRelayOn) return;
+    const particles = particlesRef.current;
     for (let i = 0; i < activeCount; i++) {
       const p = particles[i];
       p.life -= 1;
       if (p.life <= 0) {
         p.position.set(0, 0, 0);
-        const angle = Math.random() * Math.PI * 2;
-        const radius = Math.random() * 1.5;
+        const angle = (i * 0.23 + Date.now() * 0.001) % (Math.PI * 2);
+        const radius = ((i % 80) / 80) * 1.5;
         p.velocity.set(
           Math.cos(angle) * radius,
           Math.sin(angle) * radius + 0.5,
-          (Math.random() * 8 + 4) * speedMult
+          (4 + ((i % 40) / 40) * 8) * speedMult
         );
         p.life = 200;
       }

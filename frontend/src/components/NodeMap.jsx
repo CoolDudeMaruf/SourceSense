@@ -3,6 +3,7 @@ import Map, { Marker, Popup } from 'react-map-gl/maplibre';
 import * as maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { getAQIInfo } from '../utils/aqiColors';
+import { Layers, MapPin } from 'lucide-react';
 
 export default function NodeMap({ nodes = [], latestReadings = {}, selectedNodeId, onSelectNode }) {
   const [viewState, setViewState] = useState({
@@ -16,7 +17,7 @@ export default function NodeMap({ nodes = [], latestReadings = {}, selectedNodeI
   const [popupInfo, setPopupInfo] = useState(null);
   const [mapType, setMapType] = useState('street');
 
-  // Using a custom raster style for MapLibre so we don't need API keys
+  // Using custom raster style for MapLibre so we don't need API keys
   const mapStyle = useMemo(() => {
     const tileUrl = mapType === 'satellite'
       ? 'https://mt1.google.com/vt/lyrs=y&hl=en&x={x}&y={y}&z={z}'
@@ -45,18 +46,26 @@ export default function NodeMap({ nodes = [], latestReadings = {}, selectedNodeI
   }, [mapType]);
 
   return (
-    <div className="glass-card overflow-hidden relative" style={{ height: 500 }}>
-      {/* Map Type Toggle */}
-      <div style={{ position: 'absolute', top: 10, right: 10, zIndex: 10, display: 'flex', gap: '4px', background: 'rgba(10, 15, 26, 0.8)', padding: '4px', borderRadius: '8px', backdropFilter: 'blur(4px)', border: '1px solid rgba(255,255,255,0.1)' }}>
+    <div className="relative overflow-hidden rounded-xl border border-slate-200/80 shadow-inner" style={{ height: 490 }}>
+      {/* Frosted Map Layer Toggle */}
+      <div className="absolute top-3 right-3 z-10 flex items-center gap-1 bg-white/85 backdrop-blur-md p-1 rounded-xl border border-slate-200/80 shadow-md">
         <button
           onClick={() => setMapType('street')}
-          style={{ padding: '4px 12px', fontSize: '0.75rem', borderRadius: '4px', border: 'none', background: mapType === 'street' ? 'var(--brand-500, #38bdf8)' : 'transparent', color: mapType === 'street' ? '#fff' : '#aaa', cursor: 'pointer', fontWeight: 600, transition: 'all 0.2s' }}
+          className={`px-3 py-1 text-xs font-semibold rounded-lg transition-all ${
+            mapType === 'street'
+              ? 'bg-blue-600 text-white shadow-sm'
+              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+          }`}
         >
           Street
         </button>
         <button
           onClick={() => setMapType('satellite')}
-          style={{ padding: '4px 12px', fontSize: '0.75rem', borderRadius: '4px', border: 'none', background: mapType === 'satellite' ? 'var(--brand-500, #38bdf8)' : 'transparent', color: mapType === 'satellite' ? '#fff' : '#aaa', cursor: 'pointer', fontWeight: 600, transition: 'all 0.2s' }}
+          className={`px-3 py-1 text-xs font-semibold rounded-lg transition-all ${
+            mapType === 'satellite'
+              ? 'bg-blue-600 text-white shadow-sm'
+              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+          }`}
         >
           Satellite
         </button>
@@ -67,15 +76,14 @@ export default function NodeMap({ nodes = [], latestReadings = {}, selectedNodeI
         onMove={evt => setViewState(evt.viewState)}
         mapLib={maplibregl}
         mapStyle={mapStyle}
-        style={{ width: '100%', height: '100%', background: '#0a0f1a' }}
+        style={{ width: '100%', height: '100%', background: '#f1f5f9' }}
       >
         {nodes.map(node => {
           const reading = latestReadings[node.id];
           const aqi = reading?.aqi;
           const info = getAQIInfo(aqi);
           const isSelected = node.id === selectedNodeId;
-          // Trigger spike visually when AQI is Severe/Hazardous (>=300)
-          const isSpike = aqi >= 300;
+          const isSpike = aqi >= 250;
           const isRelayOn = reading?.relay_state;
 
           return (
@@ -90,35 +98,30 @@ export default function NodeMap({ nodes = [], latestReadings = {}, selectedNodeI
                 setPopupInfo(node);
               }}
             >
-              <div style={{ position: 'relative' }}>
-                {/* Node Circle */}
+              <div className="relative cursor-pointer group">
+                {/* Node Beacon Circle */}
                 <div
                   style={{
-                    width: isSelected ? 40 : 28,
-                    height: isSelected ? 40 : 28,
+                    width: isSelected ? 36 : 24,
+                    height: isSelected ? 36 : 24,
                     backgroundColor: info.color,
                     borderRadius: '50%',
-                    border: `2px solid ${isSelected ? '#fff' : 'rgba(255,255,255,0.5)'}`,
-                    opacity: 0.9,
+                    border: `2px solid ${isSelected ? '#ffffff' : 'rgba(255,255,255,0.8)'}`,
+                    boxShadow: isSelected
+                      ? `0 0 0 4px rgba(14, 165, 233, 0.4), 0 4px 10px rgba(0,0,0,0.2)`
+                      : `0 2px 6px rgba(0,0,0,0.15)`,
                     transform: 'translate(-50%, -50%)',
-                    cursor: 'pointer',
-                    transition: 'all 0.3s',
-                    '--pulse-color': info.color,
+                    transition: 'all 0.25s ease',
                   }}
-                  className={isSpike ? "pulse-node" : "live-pulse"}
+                  className={isSpike || isRelayOn ? 'animate-pulse' : ''}
                 />
 
-                {/* Dust Animation for high AQI */}
-                {isSpike && (
-                  <div className="dust-container" style={{ position: 'absolute', top: 0, left: 0, pointerEvents: 'none' }}>
-                    <div className="dust-particle" style={{ '--tx': '30px', '--ty': '-40px', '--duration': '3s', '--delay': '0s' }}></div>
-                    <div className="dust-particle" style={{ '--tx': '-20px', '--ty': '-35px', '--duration': '2.5s', '--delay': '0.5s' }}></div>
-                    <div className="dust-particle" style={{ '--tx': '40px', '--ty': '10px', '--duration': '3.5s', '--delay': '1s' }}></div>
-                    <div className="dust-particle" style={{ '--tx': '-30px', '--ty': '20px', '--duration': '2.8s', '--delay': '0.2s' }}></div>
-                    <div className="dust-particle" style={{ '--tx': '10px', '--ty': '-50px', '--duration': '3.2s', '--delay': '0.8s' }}></div>
+                {/* Micro Label on Hover or Selected */}
+                {isSelected && (
+                  <div className="absolute left-1/2 -top-8 -translate-x-1/2 bg-slate-900/90 backdrop-blur-md text-white text-[10px] font-mono px-2 py-0.5 rounded-md shadow-md whitespace-nowrap pointer-events-none">
+                    {node.name} • {aqi ?? '—'} AQI
                   </div>
                 )}
-
               </div>
             </Marker>
           );
@@ -143,34 +146,48 @@ export default function NodeMap({ nodes = [], latestReadings = {}, selectedNodeI
               const pm10Driving = pm25SI != null && pm10SI != null && pm10SI > pm25SI;
               const spikeDriver = pm25Driving ? 'PM2.5' : pm10Driving ? 'PM10' : null;
               return (
-                <div style={{ fontFamily: 'Inter, sans-serif', minWidth: 190, color: '#222' }}>
-                  <div style={{ fontWeight: 700, marginBottom: 4, fontSize: '0.85rem' }}>{popupInfo.name}</div>
-                  <div style={{ color: info.color, fontWeight: 700, fontSize: '0.82rem', marginBottom: 6 }}>
-                    AQI: {aqi ?? '—'} — {info.label}
+                <div className="bg-white/95 backdrop-blur-xl border border-slate-200/90 rounded-xl p-3 shadow-xl min-w-[210px] text-slate-800 font-sans">
+                  <div className="flex items-center justify-between gap-2 mb-1.5 pb-1 border-b border-slate-100">
+                    <span className="font-extrabold text-xs text-slate-900 truncate">{popupInfo.name}</span>
+                    <button
+                      onClick={() => setPopupInfo(null)}
+                      className="text-slate-400 hover:text-slate-600 text-xs font-bold leading-none"
+                    >
+                      ×
+                    </button>
+                  </div>
+                  <div className="flex items-center gap-2 mb-2 font-mono text-xs">
+                    <span
+                      className="px-2 py-0.5 rounded text-white font-bold text-[11px]"
+                      style={{ backgroundColor: info.color }}
+                    >
+                      {aqi ?? '—'} AQI
+                    </span>
+                    <span className="text-[11px] font-medium text-slate-600">{info.label}</span>
                   </div>
                   {aqi >= 200 && spikeDriver && (
-                    <div style={{ fontSize: '0.7rem', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.35)', borderRadius: 4, padding: '3px 7px', marginBottom: 6, color: '#c00', fontWeight: 600 }}>
-                      ⚡ {spikeDriver} spike driving AQI
+                    <div className="text-[10px] bg-rose-50 border border-rose-200 rounded p-1 mb-2 text-rose-700 font-bold">
+                      ⚡ {spikeDriver} sub-index driving spike
                     </div>
                   )}
                   {reading && (
-                    <>
-                      <div style={{ fontSize: '0.75rem', color: '#444', display: 'flex', justifyContent: 'space-between' }}>
-                        <span>PM1.0</span><span style={{ fontWeight: 600 }}>{reading.pm1_0_raw?.toFixed(1) ?? '—'} µg/m³</span>
+                    <div className="space-y-1 text-[11px] font-mono">
+                      <div className="flex justify-between text-slate-600">
+                        <span>PM1.0:</span><strong className="text-slate-900">{reading.pm1_0_raw?.toFixed(1) ?? '—'} µg</strong>
                       </div>
-                      <div style={{ fontSize: '0.75rem', color: pm25Driving ? '#c00' : '#444', display: 'flex', justifyContent: 'space-between' }}>
-                        <span>PM2.5 {pm25Driving ? '▲' : ''}</span><span style={{ fontWeight: 600 }}>{reading.pm2_5_corrected?.toFixed(1) ?? '—'} µg/m³</span>
+                      <div className="flex justify-between text-slate-600">
+                        <span>PM2.5:</span><strong className="text-slate-900">{reading.pm2_5_corrected?.toFixed(1) ?? '—'} µg</strong>
                       </div>
-                      <div style={{ fontSize: '0.75rem', color: pm10Driving ? '#c00' : '#444', display: 'flex', justifyContent: 'space-between' }}>
-                        <span>PM10 {pm10Driving ? '▲' : ''}</span><span style={{ fontWeight: 600 }}>{reading.pm10_corrected?.toFixed(1) ?? '—'} µg/m³</span>
+                      <div className="flex justify-between text-slate-600">
+                        <span>PM10:</span><strong className="text-slate-900">{reading.pm10_corrected?.toFixed(1) ?? '—'} µg</strong>
                       </div>
-                      <div style={{ marginTop: 4, fontSize: '0.73rem', color: '#666', borderTop: '1px solid #eee', paddingTop: 4 }}>
-                        Source: {reading.classifier_label ?? '—'}
+                      <div className="flex justify-between text-slate-500 pt-1 border-t border-slate-100 text-[10px]">
+                        <span>Actuator:</span>
+                        <span className={`font-bold ${reading.relay_state ? 'text-rose-600' : 'text-slate-400'}`}>
+                          {reading.relay_state ? 'ENGAGED' : 'IDLE'}
+                        </span>
                       </div>
-                      <div style={{ fontSize: '0.73rem', color: '#666' }}>
-                        Relay: {reading.relay_state ? '🔴 ON' : '⚫ OFF'}
-                      </div>
-                    </>
+                    </div>
                   )}
                 </div>
               );

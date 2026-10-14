@@ -24,13 +24,13 @@ function NodeForm({ initial, onSave, onCancel }) {
   const set = (k, v) => setForm((f) => ({ ...f, [k]: v }));
 
   return (
-    <div className="tech-card p-5 bg-white border border-slate-300 shadow-md">
-      <div className="flex items-center justify-between pb-3 mb-4 border-b border-slate-200">
-        <span className="text-sm font-bold text-slate-900 uppercase tracking-wide flex items-center gap-2">
+    <div className="tech-card p-5 bg-white/90 backdrop-blur-xl border border-slate-200/90 rounded-2xl shadow-lg mb-4">
+      <div className="flex items-center justify-between pb-3 mb-4 border-b border-slate-100">
+        <span className="text-sm font-extrabold text-slate-900 uppercase tracking-wide flex items-center gap-2">
           <Settings size={16} className="text-blue-700" />
-          {initial ? `Edit Node: ${initial.name}` : 'Provision New Sensor Node'}
+          {initial ? `Edit Node Configuration: ${initial.name}` : 'Provision New Hardware Sensor Node'}
         </span>
-        <button onClick={onCancel} className="text-slate-400 hover:text-slate-700">
+        <button onClick={onCancel} className="text-slate-400 hover:text-slate-700 transition-colors">
           <X size={16} />
         </button>
       </div>
@@ -42,7 +42,7 @@ function NodeForm({ initial, onSave, onCancel }) {
             className="tech-input w-full mt-1 font-mono"
             value={form.name}
             onChange={(e) => set('name', e.target.value)}
-            placeholder="e.g. Mumbai_IITB_Node_01"
+            placeholder="e.g. Dhaka_Gazipur_Node_30"
           />
         </div>
 
@@ -52,7 +52,7 @@ function NodeForm({ initial, onSave, onCancel }) {
             className="tech-input w-full mt-1"
             value={form.description || ''}
             onChange={(e) => set('description', e.target.value)}
-            placeholder="e.g. Main Gate Heavy Traffic Zone"
+            placeholder="e.g. Heavy Industrial Emission Zone"
           />
         </div>
 
@@ -79,7 +79,7 @@ function NodeForm({ initial, onSave, onCancel }) {
         </div>
 
         <div>
-          <label className="text-[11px] font-mono font-medium text-slate-600">PM10 Mitigation Threshold (µg/m³)</label>
+          <label className="text-[11px] font-mono font-medium text-slate-600">PM10 Alarm Threshold (µg/m³)</label>
           <input
             className="tech-input w-full mt-1 font-mono"
             type="number"
@@ -148,14 +148,14 @@ function NodeForm({ initial, onSave, onCancel }) {
             value={form.control_mode || 'AUTONOMOUS'}
             onChange={(e) => set('control_mode', e.target.value)}
           >
-            <option value="AUTONOMOUS">AUTONOMOUS (AI Controlled)</option>
-            <option value="SIMULATION">SIMULATION (Demonstration / Mock)</option>
+            <option value="AUTONOMOUS">AUTONOMOUS (TinyML & SCADA Controlled)</option>
+            <option value="SIMULATION">SIMULATION (Demonstration / Mock Feeder)</option>
             <option value="MANUAL">MANUAL (Human Operator Interlock)</option>
           </select>
         </div>
       </div>
 
-      <div className="flex gap-3 mt-5 pt-3 border-t border-slate-200">
+      <div className="flex gap-3 mt-5 pt-3 border-t border-slate-100">
         <button className="tech-btn tech-btn-primary" onClick={() => onSave(form)}>
           <Save size={13} /> Save Node Configuration
         </button>
@@ -207,16 +207,16 @@ export default function NodeManagement() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] text-slate-900 flex flex-col font-sans">
+    <div className="min-h-screen bg-[#f8fafc] text-slate-900 flex flex-col font-sans selection:bg-blue-100 selection:text-blue-900">
       <AppNavbar nodes={nodes} />
 
       <main className="flex-1 max-w-[1780px] w-full mx-auto px-4 py-4 space-y-4">
         {/* Header Ribbon */}
-        <div className="tech-card p-4 flex items-center justify-between flex-wrap gap-3">
+        <div className="tech-card p-4 flex items-center justify-between flex-wrap gap-3 bg-white/80 backdrop-blur-xl border border-slate-200/80 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.03)]">
           <div>
             <div className="flex items-center gap-2">
-              <span className="font-extrabold text-base text-slate-900 tracking-wide">
-                SENSOR NODE TOPOLOGY & THRESHOLDS
+              <span className="font-extrabold text-base text-slate-900 tracking-wide font-sans">
+                HARDWARE NODE TOPOLOGY & CALIBRATION
               </span>
               <span className="tech-badge tech-badge-clean">{nodes.length} NODES CONFIGURED</span>
             </div>
@@ -237,7 +237,7 @@ export default function NodeManagement() {
         </div>
 
         {error && (
-          <div className="p-3 bg-rose-50 border border-rose-200 text-rose-700 text-xs rounded-lg">
+          <div className="p-3 bg-rose-50/90 backdrop-blur-md border border-rose-200 text-rose-700 text-xs rounded-xl shadow-sm">
             {error}
           </div>
         )}
@@ -262,12 +262,12 @@ export default function NodeManagement() {
                     onCancel={() => setEditNode(null)}
                   />
                 ) : (
-                  <div className="tech-card p-4 flex flex-col justify-between h-full hover:border-slate-300 transition-all">
+                  <div className="tech-card p-4 flex flex-col justify-between h-full bg-white/80 backdrop-blur-xl border border-slate-200/80 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.03)] hover:border-slate-300 transition-all">
                     <div>
                       <div className="flex items-start justify-between mb-2">
                         <div>
                           <div className="flex items-center gap-2">
-                            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
+                            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-sm" />
                             <span className="font-bold text-sm text-slate-900">{node.name}</span>
                           </div>
                           <div className="font-mono text-[11px] text-slate-500 mt-0.5">
@@ -275,7 +275,7 @@ export default function NodeManagement() {
                           </div>
                         </div>
 
-                        <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-slate-100 border border-slate-200 text-blue-700">
+                        <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-md bg-slate-100/80 border border-slate-200 text-blue-700">
                           {node.control_mode || 'AUTONOMOUS'}
                         </span>
                       </div>
@@ -286,7 +286,7 @@ export default function NodeManagement() {
                         {node.description && <span className="truncate max-w-[180px]">({node.description})</span>}
                       </div>
 
-                      <div className="grid grid-cols-2 gap-2 p-2.5 rounded bg-slate-50 border border-slate-200 font-mono text-[11px] mb-3">
+                      <div className="grid grid-cols-2 gap-2 p-2.5 rounded-xl bg-slate-50/70 backdrop-blur-md border border-slate-200/80 font-mono text-[11px] mb-3">
                         <div>
                           <span className="text-slate-500">PM10 LIMIT:</span>
                           <span className="text-amber-700 font-bold ml-1.5">{node.pm10_threshold} µg</span>
